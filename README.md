@@ -12,7 +12,7 @@ Most of my work is commercial and lives in private repos, so this profile is a m
 
 ## What I'm building
 
-### Noeva — fleet compliance SaaS · [noeva.co.za](https://noeva.co.za)
+### Noeva — fleet compliance SaaS · [fleet.noeva.co.za](https://fleet.noeva.co.za)
 *Founder & Technical Architect · 2024 – present · 2,000+ vehicles and devices under management*
 
 A custom router-management system built solo to replace per-device commercial licensing, then extended into full vehicle telematics.
@@ -44,7 +44,7 @@ Two things I'd call out:
 
 ---
 
-### Fooba — retail payments wallet
+### Fooba — retail payments wallet [fooba.co.za](https://fooba.co,za)
 *CTO (part-time) · 2024 – present*
 
 Ledger and money-movement architecture for a South African retail wallet. Pilot live with Big Save, targeting university students in Pretoria; SASSA and NSFAS disbursement integrations in progress.
