@@ -10,7 +10,7 @@ Most of my work is commercial and lives in private repos, so this profile is a m
 
 ---
 
-## What I'm building
+## What I've shipped
 
 ### Noeva — fleet compliance SaaS · [fleet.noeva.co.za](https://fleet.noeva.co.za)
 *Founder & Technical Architect · 2024 – present · 2,000+ vehicles and devices under management*
