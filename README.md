@@ -13,7 +13,7 @@ Most of my work is commercial and lives in private repos, so this profile is a m
 ## What I've shipped
 
 ### Noeva — fleet compliance SaaS · [fleet.noeva.co.za](https://fleet.noeva.co.za)
-*Founder & Technical Architect · 2024 – present · 2,000+ vehicles and devices under management*
+*Founder & Technical Architect · 2025 – present · 2,000+ vehicles and devices under management*
 
 A custom router-management system built solo to replace per-device commercial licensing, then extended into full vehicle telematics.
 
@@ -27,7 +27,7 @@ A custom router-management system built solo to replace per-device commercial li
 ---
 
 ### UbuntuNet — passenger WiFi and advertising network · [ubuntunet.africa](https://ubuntunet.africa)
-*Co-founder & CTO · 2024 – present*
+*Co-founder & CTO · 2025 – present*
 
 An advertising and audience-reporting network across transit, retail, hospitality and events. Live with **Golden Arrow Bus Services**, a ~1,300-bus Cape Town operator: 3 routes serving 12,000 passengers, rolling out to 100. Designed and built the full platform solo across three products:
 
@@ -45,7 +45,7 @@ Two things I'd call out:
 ---
 
 ### Fooba — retail payments wallet · [fooba.co.za](https://fooba.co,za)
-*CTO (part-time) · 2024 – present*
+*CTO (part-time) · 2025 – present*
 
 Ledger and money-movement architecture for a South African retail wallet. Pilot live with Big Save, targeting university students in Pretoria; SASSA and NSFAS disbursement integrations in progress.
 
@@ -58,7 +58,7 @@ Ledger and money-movement architecture for a South African retail wallet. Pilot 
 ---
 
 ### Easy Chef — in-home chef marketplace · [easychef.co.za](https://easychef.co.za)
-*Co-founder & CTO · 2024 – present*
+*Co-founder & CTO · 2025 – present*
 
 Currently in launch phase. Built through MVP: customer and cook mobile apps, verification workflows, a booking engine and automated payouts. Defined pricing tiers and unit economics.
 
