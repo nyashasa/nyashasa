@@ -4,7 +4,7 @@
 
 Twelve years shipping digital products: the first decade as a product designer and web developer for Toyota, FCB Health New York, Old Mutual and MultiChoice; the last two building and running production systems end to end. I design the flow, build the backend, ship the app and own it in production.
 
-Most of my work is commercial and lives in private repos, so this profile is a map of what I've built rather than a code dump. Happy to walk through any of it, or share code under NDA.
+Most of my work is commercial and lives in private repos, so this profile is a map of what I've built rather than a code dump. Happy to walk through any of it, or share code.
 
 📧 nyashasa@gmail.com · 📱 +27 81 461 6530 · 💼 [linkedin.com/in/nyashasa](https://linkedin.com/in/nyashasa)
 
@@ -44,7 +44,7 @@ Two things I'd call out:
 
 ---
 
-### Fooba — retail payments wallet [fooba.co.za](https://fooba.co,za)
+### Fooba — retail payments wallet · [fooba.co.za](https://fooba.co,za)
 *CTO (part-time) · 2024 – present*
 
 Ledger and money-movement architecture for a South African retail wallet. Pilot live with Big Save, targeting university students in Pretoria; SASSA and NSFAS disbursement integrations in progress.
