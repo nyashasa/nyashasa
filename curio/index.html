@@ -26,8 +26,6 @@
   --link-l: 44%;
   --read-l: 95%;
   --on-link: #ffffff;
-  --rim: rgba(255, 255, 255, .95);
-  --liquid-shadow: rgba(40, 30, 60, .2);
   --aura-1: #ff5a36;
   --aura-2: #ffb26b;
   --aura-3: #f27fa5;
@@ -58,7 +56,7 @@
     --lift: 0 2px 4px rgba(0, 0, 0, .3), 0 14px 34px rgba(0, 0, 0, .38);
     --glass-edge: rgba(255, 255, 255, .1); --sheen: rgba(255, 255, 255, .09);
     --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 10px 28px rgba(0, 0, 0, .32);
-    --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3; --rim: rgba(255, 255, 255, .38); --liquid-shadow: rgba(0, 0, 0, .5);
+    --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3;
     color-scheme: dark;
   }
 }
@@ -68,7 +66,7 @@
   --lift: 0 2px 4px rgba(0, 0, 0, .3), 0 14px 34px rgba(0, 0, 0, .38);
   --glass-edge: rgba(255, 255, 255, .1); --sheen: rgba(255, 255, 255, .09);
   --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 10px 28px rgba(0, 0, 0, .32);
-  --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3; --rim: rgba(255, 255, 255, .38); --liquid-shadow: rgba(0, 0, 0, .5);
+  --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3;
   color-scheme: dark;
 }
 
@@ -161,17 +159,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .make .dots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--card); margin-left: -6px; }
 .make .dots i:first-child { margin-left: 0; }
 
-/* the morphing glass: one shape that is the dock plus liquid necks reaching toward the cards beneath it */
-.liquid { position: fixed; left: 0; top: 0; z-index: 19; width: 0; height: 0; pointer-events: none; will-change: transform; }
-.liquid > * { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
-.liquid-glass {
-  background: linear-gradient(var(--sa, 135deg), var(--sheen), transparent 34%, transparent 68%, var(--sheen)), var(--glass);
-  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
-  backdrop-filter: blur(var(--blur)) saturate(180%);
-}
-.liquid-shadow path { fill: var(--liquid-shadow); }
-.liquid-rim { color: var(--rim); }
-.liquid-rim path { fill: none; stroke: url(#rim-grad); stroke-width: 1.4; }
+/* the liquid glass is drawn by WebGL on this canvas; cards it owns are drawn there and kept invisible here */
+.glcanvas { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 19; pointer-events: none; }
+.card.gl-owned { opacity: 0; }
+.dock.glass { background: var(--glass); }
 .dock {
   background: none;
   position: sticky;
@@ -781,11 +772,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     </div>
   </header>
 
-  <div class="liquid" id="liquid" aria-hidden="true">
-    <svg class="liquid-shadow" id="liquid-shadow"><defs><filter id="ls-blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="12"/></filter><mask id="ls-mask" maskUnits="userSpaceOnUse"><rect id="ls-mask-rect" fill="#fff"/><path id="ls-mask-path" fill="#000"/></mask></defs><g mask="url(#ls-mask)"><path id="ls-path" filter="url(#ls-blur)" transform="translate(0 9)"/></g></svg>
-    <div class="liquid-glass" id="liquid-glass"></div>
-    <svg class="liquid-rim"><defs><linearGradient id="rim-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="1"/><stop offset=".3" stop-color="currentColor" stop-opacity=".25"/><stop offset=".7" stop-color="currentColor" stop-opacity=".15"/><stop offset="1" stop-color="currentColor" stop-opacity=".7"/></linearGradient></defs><path id="lr-path"/></svg>
-  </div>
+  <canvas class="glcanvas" id="gl" aria-hidden="true"></canvas>
   <div class="dock" id="dock">
     <div class="search" role="search">
       <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search your curio…" aria-label="Search everything you've saved">
@@ -811,6 +798,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 <div class="drop" id="drop" hidden><div>Drop to save</div></div>
 <div class="toast glass" id="toast" role="status" hidden></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 (() => {
   "use strict";
@@ -939,8 +927,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       "glass-shadow": dark ? "inset 0 1px 0 rgba(255,255,255,.07), 0 10px 28px rgba(0,0,0,.32)" : "inset 0 1px 0 rgba(255,255,255,.75), 0 8px 24px rgba(40,30,60,.08)",
       "link-s": dark ? "38%" : "48%", "link-l": dark ? "32%" : "44%", "read-l": dark ? "16%" : "95%",
       "aura-o": dark ? ".3" : ".55",
-      rim: dark ? "rgba(255,255,255,.38)" : "rgba(255,255,255,.95)",
-      "liquid-shadow": dark ? "rgba(0,0,0,.5)" : "rgba(40,30,60,.2)",
     };
     return Object.entries(v).map(([k, x]) => "--" + k + ":" + x + ";").join("") + "color-scheme:" + (dark ? "dark" : "light") + ";";
   }
@@ -970,7 +956,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     auraKey = null;
     tintAura();
     LIQUID.refreshAll();
-    MORPH.schedule();
+    GLASS.schedule();
   }
 
   // ---------- liquid glass refraction (Chromium only) ----------
@@ -1076,338 +1062,421 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   })();
 
 
-  // ---------- morphing glass: the bar swallows cards as they scroll into it ----------
-  // Each card near the bar is drawn through its own SVG displacement filter, so its real pixels warp: on the way in
-  // its top stretches up into a tapering neck that reaches the bar, then rows pinch toward the centre and pour into
-  // the bar's bottom edge, vanishing as they cross it. The bar's glass is a smooth union of signed distance fields
-  // that bulges down to meet each neck's tip. Every card's pull runs on a spring, so shapes lag, overshoot and settle.
-  const MORPH = (() => {
-    const layer = $("#liquid"), glassEl = $("#liquid-glass"), dock = $("#dock");
-    const rimPath = $("#lr-path"), shadowPath = $("#ls-path"), maskPath = $("#ls-mask-path"), maskRect = $("#ls-mask-rect");
+  // ---------- liquid glass: one GPU surface for the bar and the cards meeting it ----------
+  // The bar's glass and every card near it are drawn by a WebGL shader as one liquid scene. Each shape is a signed
+  // distance field; the bar and the nearest card are joined with a smooth union whose blend radius grows on a spring
+  // as they approach, so glass bulges from one side and card material rises from the other until they fuse. Inside the
+  // glass the shader lenses what's behind it (cards passing under, and the colour field) along the surface normal, with
+  // a colour fringe at the bevel, a frosted blur and a moving specular rim. Cards are captured once with html2canvas
+  // and kept in a texture array; while the GPU owns a card, its DOM twin is transparent but still clickable.
+  const GLASS = (() => {
+    const canvas = $("#gl"), dock = $("#dock");
+    const fallback = () => { dock.classList.add("glass"); canvas.remove(); return { ok: false, schedule() {} }; };
+    const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, alpha: true, antialias: false });
+    if (!gl) return fallback();
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const springs = new Map();
-    let running = false, lastT = 0, dockShape = null, shapes = [];
-    let styled = new Set();
+    const MAX = 12, LW = 640, LH = 960;
 
-    const sdRect = (x, y, c) => {
-      const qx = Math.abs(x - c.cx) - (c.hw - c.r), qy = Math.abs(y - c.cy) - (c.hh - c.r);
-      return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - c.r;
-    };
-    const smin = (a, b, k) => {
-      if (k <= 0) return Math.min(a, b);
-      const hh = Math.max(k - Math.abs(a - b), 0) / k;
-      return Math.min(a, b) - hh * hh * k * 0.25;
-    };
-    function field(x, y) {
-      // Cards join each other with a plain min and only the nearest one blends with the dock, so neighbouring cards
-      // don't pile their blends into drips in the gaps between them.
-      const f = sdRect(x, y, dockShape);
-      let cf = Infinity, ck = 0;
-      for (const c of shapes) {
-        // A box bound on the card's distance skips shapes too far away to change the blend.
-        const lb = Math.max(Math.abs(x - c.cx) - c.hw, Math.abs(y - c.cy) - c.hh) + c.off;
-        if (lb >= cf || lb - f >= c.k) continue;
-        const d = sdRect(x, y, c) + c.off;
-        if (d < cf) { cf = d; ck = c.k; }
-      }
-      return cf === Infinity ? f : smin(f, cf, ck);
-    }
+    const VS = `#version 300 es
+in vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }`;
+    const FS = `#version 300 es
+precision highp float;
+precision highp sampler2DArray;
+uniform vec2 uView; uniform float uDpr;
+uniform vec4 uDock; uniform float uDockR;
+uniform int uCount; uniform vec4 uCard[${MAX}]; uniform vec4 uUV[${MAX}]; uniform float uLayer[${MAX}]; uniform float uK[${MAX}];
+uniform float uCardR;
+uniform sampler2DArray uTex;
+uniform vec3 uAura[3]; uniform vec3 uAuraCol[3]; uniform float uAuraO;
+uniform vec3 uPaper; uniform vec4 uGlass; uniform float uBlur; uniform float uDark; uniform float uLight;
+out vec4 outColor;
 
-    // Chromium-only refraction drawn from the field at quarter resolution.
-    let fx = null;
-    if (LIQUID.ok) {
-      const NS = "http://www.w3.org/2000/svg";
-      const mk = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); return e; };
-      const id = "morph-" + uid();
-      const img = mk("feImage", { x: "0", y: "0", width: "1", height: "1", preserveAspectRatio: "none", result: "map" });
-      const blur = mk("feGaussianBlur", { in: "SourceGraphic", stdDeviation: "10", result: "soft" });
-      const chan = (n, scale, m) => [mk("feDisplacementMap", { in: "soft", in2: "map", scale, xChannelSelector: "R", yChannelSelector: "G", result: "d" + n }), mk("feColorMatrix", { in: "d" + n, type: "matrix", values: m, result: "c" + n })];
-      const filter = mk("filter", { id, x: "0", y: "0", width: "100%", height: "100%", "color-interpolation-filters": "sRGB" });
-      filter.append(blur, img,
-        ...chan("r", 56, "1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"),
-        ...chan("g", 52, "0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"),
-        ...chan("b", 48, "0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"),
-        mk("feBlend", { in: "cr", in2: "cg", mode: "screen", result: "rg" }),
-        mk("feBlend", { in: "rg", in2: "cb", mode: "screen", result: "rgb" }),
-        mk("feColorMatrix", { in: "rgb", type: "saturate", values: "1.7" }));
-      $("#fx-defs").append(filter);
-      const canvas = document.createElement("canvas");
-      fx = { id, img, blur, canvas, ctx: canvas.getContext("2d") };
+float sdRR(vec2 p, vec4 r, float rad) {
+  vec2 hs = r.zw * 0.5;
+  vec2 q = abs(p - (r.xy + hs)) - (hs - rad);
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rad;
+}
+float smin(float a, float b, float k) {
+  if (k <= 0.0) return min(a, b);
+  float h = max(k - abs(a - b), 0.0) / k;
+  return min(a, b) - h * h * k * 0.25;
+}
+float scene(vec2 p, out float dD, out float dC, out int ic) {
+  dD = sdRR(p, uDock, uDockR);
+  dC = 1e5; ic = -1; float k = 0.0;
+  for (int i = 0; i < ${MAX}; i++) {
+    if (i >= uCount) break;
+    float d = sdRR(p, uCard[i], uCardR);
+    if (d < dC) { dC = d; ic = i; k = uK[i]; }
+  }
+  return smin(dD, dC, k);
+}
+float sceneOnly(vec2 p) { float a, b; int c; return scene(p, a, b, c); }
+
+vec3 aura(vec2 q) {
+  vec3 acc = vec3(0.0); float a = 0.0;
+  for (int i = 0; i < 3; i++) {
+    float t = clamp(1.0 - length(q - uAura[i].xy) / uAura[i].z, 0.0, 1.0);
+    acc = acc * (1.0 - t) + uAuraCol[i] * t;
+    a = a * (1.0 - t) + t;
+  }
+  return uPaper * (1.0 - a * uAuraO) + acc * uAuraO;
+}
+vec4 cardAt(vec2 q, float lod) {
+  for (int i = 0; i < ${MAX}; i++) {
+    if (i >= uCount) break;
+    vec4 r = uCard[i];
+    vec2 f = (q - r.xy) / r.zw;
+    if (f.x >= 0.0 && f.y >= 0.0 && f.x <= 1.0 && f.y <= 1.0) {
+      vec4 c = textureLod(uTex, vec3(mix(uUV[i].xy, uUV[i].zw, f), uLayer[i]), lod);
+      return c * clamp(0.5 - sdRR(q, r, uCardR), 0.0, 1.0);
     }
-    // Rebuilding the refraction map and re-rasterising an SVG backdrop filter every frame is too slow, so while the
-    // glass is moving it is plain frosted blur, and the bent edge comes back once it settles.
-    const settle = debounce(() => {
-      if (!fx || running) return;
-      const dr = dock.getBoundingClientRect();
-      drawRefraction(Math.round(dr.width), parseFloat(layer.style.height) || 0);
-      glassEl.style.backdropFilter = "url(#" + fx.id + ")";
-      glassEl.style.webkitBackdropFilter = "url(#" + fx.id + ")";
-    }, 140);
-    function unsettle() {
-      if (!fx || !glassEl.style.backdropFilter) return;
-      glassEl.style.backdropFilter = "";
-      glassEl.style.webkitBackdropFilter = "";
+  }
+  return vec4(0.0);
+}
+vec3 behind(vec2 q, float lod) { vec4 c = cardAt(q, lod); return aura(q) * (1.0 - c.a) + c.rgb; }
+
+void main() {
+  vec2 p = vec2(gl_FragCoord.x, uView.y * uDpr - gl_FragCoord.y) / uDpr;
+  float dD, dC; int ic;
+  float d = scene(p, dD, dC, ic);
+  if (d > 40.0) { outColor = vec4(0.0); return; }
+  vec2 e = vec2(0.75, 0.0);
+  vec2 n = vec2(sceneOnly(p + e.xy) - sceneOnly(p - e.xy), sceneOnly(p + e.yx) - sceneOnly(p - e.yx));
+  n = n / max(length(n), 1e-5);
+  float alpha = clamp(0.5 - d, 0.0, 1.0);
+
+  // Soft contact shadow outside the liquid.
+  float shadow = d > 0.0 ? 0.13 * exp(-max(d - 1.0, 0.0) / 9.0) * (0.4 + 0.6 * smoothstep(-20.0, 20.0, dC - dD)) : 0.0;
+  if (alpha <= 0.0) { outColor = vec4(0.0, 0.0, 0.0, shadow * (uDark > 0.5 ? 1.6 : 1.0)); return; }
+
+  // Which material: 1 is glass (the bar and its side of a neck), 0 is a card.
+  float m = dD <= 0.0 ? 1.0 : (ic < 0 ? 1.0 : smoothstep(-4.0, 4.0, dC - dD));
+
+  // Glass: a convex bevel bends the view toward the inside, strongest at the rim.
+  float B = 26.0;
+  float tt = clamp(-d / B, 0.0, 1.0);
+  float bend = 1.0 - sqrt(max(0.0, 1.0 - (1.0 - tt) * (1.0 - tt)));
+  vec2 off = -n * bend * 30.0;
+  vec3 glass = vec3(0.0);
+  if (m > 0.001) {
+    vec3 acc = vec3(0.0);
+    for (int i = 0; i < 9; i++) {
+      float a = float(i) * 2.3999632;
+      float r = uBlur * sqrt((float(i) + 0.5) / 9.0);
+      acc += behind(p + off + vec2(cos(a), sin(a)) * r, 2.4);
     }
-    function drawRefraction(W, T) {
-      const Q = 4, bezel = 30;
-      const cw = Math.ceil(W / Q), ch = Math.ceil(T / Q);
-      if (fx.canvas.width !== cw || fx.canvas.height !== ch) { fx.canvas.width = cw; fx.canvas.height = ch; }
-      const im = fx.ctx.createImageData(cw, ch), d = im.data;
-      for (let j = 0; j < ch; j++) {
-        const y = j * Q + Q / 2;
-        for (let i = 0; i < cw; i++) {
-          const x = i * Q + Q / 2, o = (j * cw + i) * 4;
-          let dx = 0, dy = 0;
-          const f = field(x, y);
-          if (f <= 0 && -f < bezel) {
-            const gx = field(x + 1, y) - field(x - 1, y), gy = field(x, y + 1) - field(x, y - 1);
-            const len = Math.hypot(gx, gy) || 1;
-            const t = 1 + f / bezel;
-            const m = 1 - Math.sqrt(1 - t * t);
-            dx = -(gx / len) * m;
-            dy = -(gy / len) * m;
+    vec3 bg = acc / 9.0;
+    if (bend > 0.01) {
+      bg.r = mix(bg.r, behind(p + off * 1.12, 1.5).r, 0.55 * bend + 0.2);
+      bg.b = mix(bg.b, behind(p + off * 0.86, 1.5).b, 0.55 * bend + 0.2);
+    }
+    glass = mix(bg, uGlass.rgb, uGlass.a);
+    vec2 L = normalize(vec2(cos(uLight), sin(uLight)));
+    float facing = dot(n, L);
+    float rim = pow(1.0 - tt, 7.0) * (0.35 + 0.65 * max(facing, 0.0));
+    float back = pow(1.0 - tt, 12.0) * 0.5 * max(-facing, 0.0);
+    float sheen = (1.0 - smoothstep(0.0, 70.0, p.y - uDock.y)) * 0.06;
+    glass += vec3(1.0) * (rim * 0.7 + back + sheen) * (uDark > 0.5 ? 0.4 : 1.0);
+  }
+
+  // Card material: in a neck, sample the nearest edge of the card so its material stretches toward the glass.
+  vec3 card = vec3(0.0);
+  if (m < 0.999 && ic >= 0) {
+    vec4 r = uCard[ic];
+    vec2 q = p;
+    float dc = sdRR(p, r, uCardR);
+    if (dc > -1.0) {
+      vec2 g = vec2(sdRR(p + e.xy, r, uCardR) - sdRR(p - e.xy, r, uCardR), sdRR(p + e.yx, r, uCardR) - sdRR(p - e.yx, r, uCardR));
+      g = g / max(length(g), 1e-5);
+      q = p - g * (dc + 1.5);
+    }
+    q += -n * bend * 8.0;
+    vec4 c = cardAt(q, 0.0);
+    card = aura(p) * (1.0 - c.a) + c.rgb;
+    card += vec3(1.0) * pow(1.0 - tt, 9.0) * 0.18 * (uDark > 0.5 ? 0.5 : 1.0);
+  }
+
+  vec3 col = mix(card, glass, m);
+  outColor = vec4(col * alpha, alpha) + vec4(0.0, 0.0, 0.0, shadow) * (1.0 - alpha);
+}`;
+
+    function compile(type, src) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(sh)); return null; }
+      return sh;
+    }
+    const vs = compile(gl.VERTEX_SHADER, VS), fs = compile(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return fallback();
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(prog)); return fallback(); }
+    gl.useProgram(prog);
+    const U = {};
+    for (const n of ["uView", "uDpr", "uDock", "uDockR", "uCount", "uCard", "uUV", "uLayer", "uK", "uCardR", "uTex", "uAura", "uAuraCol", "uAuraO", "uPaper", "uGlass", "uBlur", "uDark", "uLight"]) U[n] = gl.getUniformLocation(prog, n);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, "aPos");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+    const tex = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
+    gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 6, gl.RGBA8, LW, LH, MAX);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.uniform1i(U.uTex, 0);
+    const scratch = document.createElement("canvas");
+    scratch.width = LW;
+    scratch.height = LH;
+    const sctx = scratch.getContext("2d");
+
+    // ----- card captures -----
+    const rasters = new WeakMap();
+    const queue = [];
+    let busy = false;
+    const capturable = typeof html2canvas === "function";
+    function wantRaster(el, r) {
+      if (!capturable) return;
+      const have = rasters.get(el);
+      if (have && Math.abs(have.w - r.width) < 1 && Math.abs(have.h - r.height) < 1) return;
+      if (!queue.includes(el)) queue.push(el);
+      pump();
+    }
+    function pump() {
+      if (busy || !queue.length) return;
+      busy = true;
+      const el = queue.shift();
+      const go = async () => {
+        try {
+          if (!el.isConnected) return;
+          if (el.classList.contains("enter")) { queue.push(el); return; }
+          const r = el.getBoundingClientRect();
+          const s = Math.min(Math.min(window.devicePixelRatio || 1, 2), (LW - 2) / r.width, (LH - 2) / r.height);
+          // Images must be loaded, or the capture comes out blank.
+          for (const img of el.querySelectorAll("img")) {
+            img.loading = "eager";
+            if (!img.complete) await new Promise((res) => { img.addEventListener("load", res, { once: true }); img.addEventListener("error", res, { once: true }); setTimeout(res, 3000); });
           }
-          d[o] = 128 + dx * 127; d[o + 1] = 128 + dy * 127; d[o + 2] = 128; d[o + 3] = 255;
-        }
-      }
-      fx.ctx.putImageData(im, 0, 0);
-      const blurPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--blur")) || 24;
-      fx.blur.setAttribute("stdDeviation", String(blurPx / 2.2));
-      fx.img.setAttribute("width", W);
-      fx.img.setAttribute("height", T);
-      fx.img.setAttribute("href", fx.canvas.toDataURL());
-    }
-
-    function outline(W, H, R, T) {
-      let dPath = "M0," + R + " A" + R + "," + R + " 0 0 1 " + R + ",0 H" + (W - R) + " A" + R + "," + R + " 0 0 1 " + W + "," + R;
-      const xs = [];
-      for (let x = W - 0.5; x > 0.5; x -= 4) xs.push(x);
-      xs.push(0.5);
-      for (const x of xs) {
-        let y = x < R || x > W - R ? H / 2 : H - R - 1;
-        while (y < T - 1 && field(x, y) <= 0) y += 4;
-        let lo = y - 4, hi = y;
-        for (let n = 0; n < 4; n++) { const m = (lo + hi) / 2; if (field(x, m) <= 0) lo = m; else hi = m; }
-        dPath += " L" + x.toFixed(1) + "," + Math.min(T - 1, (lo + hi) / 2).toFixed(1);
-      }
-      return dPath + " Z";
-    }
-
-    // ----- per-card warp filters -----
-    const NS = "http://www.w3.org/2000/svg";
-    const warps = new Map();
-    const smooth = (t) => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
-    function warpFor(el) {
-      let w = warps.get(el);
-      if (w) return w;
-      // Two filters per card, used alternately: Safari caches a filter's output by id, so a fresh id each frame keeps
-      // it from showing a stale warp.
-      const make = () => {
-        const id = "warp-" + uid();
-        const f = document.createElementNS(NS, "filter");
-        f.setAttribute("id", id);
-        f.setAttribute("filterUnits", "userSpaceOnUse");
-        f.setAttribute("primitiveUnits", "userSpaceOnUse");
-        f.setAttribute("color-interpolation-filters", "sRGB");
-        const img = document.createElementNS(NS, "feImage");
-        img.setAttribute("preserveAspectRatio", "none");
-        img.setAttribute("result", "map");
-        const disp = document.createElementNS(NS, "feDisplacementMap");
-        disp.setAttribute("in", "SourceGraphic");
-        disp.setAttribute("in2", "map");
-        disp.setAttribute("xChannelSelector", "R");
-        disp.setAttribute("yChannelSelector", "G");
-        disp.setAttribute("result", "warped");
-        const mask = document.createElementNS(NS, "feColorMatrix");
-        mask.setAttribute("in", "map");
-        mask.setAttribute("type", "matrix");
-        mask.setAttribute("values", "0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 1 0 0");
-        mask.setAttribute("result", "mask");
-        const comp = document.createElementNS(NS, "feComposite");
-        comp.setAttribute("in", "warped");
-        comp.setAttribute("in2", "mask");
-        comp.setAttribute("operator", "in");
-        f.append(img, disp, mask, comp);
-        $("#fx-defs").append(f);
-        return { id, f, img, disp };
+          el.setAttribute("data-capture", "1");
+          // html2canvas sets canvas fonts without font-stretch, so expanded titles would come out at normal width
+          // with stretched letter spacing. Carry the stretch into the canvas font while capturing.
+          const stretch = getComputedStyle(document.documentElement).getPropertyValue("--title-wdth").trim();
+          const desc = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, "font");
+          const keyword = { "125%": "expanded", "112.5%": "semi-expanded", "100%": "" }[stretch] || "";
+          if (keyword && desc) {
+            Object.defineProperty(CanvasRenderingContext2D.prototype, "font", {
+              configurable: true,
+              get() { return desc.get.call(this); },
+              set(v) {
+                const wide = /Archivo/.test(v);
+                desc.set.call(this, wide ? v.replace(/(\d+(?:\.\d+)?px)/, keyword + " $1") : v);
+                if ("fontStretch" in this) this.fontStretch = wide ? keyword : "normal";
+              },
+            });
+          }
+          let c;
+          try {
+          c = await html2canvas(el, {
+            backgroundColor: null, scale: s, logging: false, useCORS: true,
+            ignoreElements: (n) => n !== el && n.classList && (n.classList.contains("card") || n.classList.contains("aura") || n.id === "gl" || n.id === "overlay" || n.id === "toast" || n.id === "panel"),
+            onclone: (doc) => {
+              const c2 = doc.querySelector('[data-capture="1"]');
+              if (c2) {
+                c2.style.opacity = "1"; c2.style.transform = "none"; c2.style.transition = "none"; c2.style.animation = "none";
+                c2.classList.remove("gl-owned", "enter");
+              }
+            },
+          });
+          } finally {
+            if (keyword && desc) Object.defineProperty(CanvasRenderingContext2D.prototype, "font", desc);
+          }
+          el.removeAttribute("data-capture");
+          rasters.set(el, { canvas: c, w: r.width, h: r.height, v: (rasters.get(el)?.v || 0) + 1 });
+          schedule();
+        } catch { el.removeAttribute("data-capture"); }
+        finally { busy = false; setTimeout(pump, 30); }
       };
-      const canvas = document.createElement("canvas");
-      w = { a: make(), b: make(), flip: false, canvas, ctx: canvas.getContext("2d") };
-      warps.set(el, w);
-      return w;
-    }
-    function dropWarp(el) {
-      const w = warps.get(el);
-      if (!w) return;
-      w.a.f.remove();
-      w.b.f.remove();
-      warps.delete(el);
+      (window.requestIdleCallback || ((f) => setTimeout(f, 40)))(go, { timeout: 300 });
     }
 
-    // Builds the warp for one card. Coordinates are the card's own: (0,0) is its top-left, yLine is the bar's
-    // bottom edge. Each map pixel stores where to sample the card from (R, G) and how opaque the result is (B).
-    function warpCard(el, r, e, gap, reach) {
-      const w = r.width, h = r.height, PAD = 14;
-      const up = Math.max(0, gap) + PAD;
-      const fw = w + PAD * 2, fh = h + up + PAD;
-      const Q = 3, cw = Math.ceil(fw / Q), ch = Math.ceil(fh / Q);
-      const cx = w / 2, hw = w / 2;
-      const em = Math.min(1, e);
-      const S = Math.min(h * 0.5, 90);
-      const yLine = -gap;
-      const rise = gap > 0 ? gap * Math.min(1.04, e / 0.55) : 0;
-      const yTop = -rise;
-      const pTop = 1 - 0.6 * em, p0 = 1 - 0.28 * em;
-      const gamma = 1 + 0.7 * em;
-      const T = 96;
-      const xs = new Float32Array(cw * ch), ys = new Float32Array(cw * ch), as = new Float32Array(cw * ch);
-      let maxD = 8;
-      for (let j = 0; j < ch; j++) {
-        const y = -up + (j + 0.5) * Q;
-        for (let i = 0; i < cw; i++) {
-          const x = -PAD + (i + 0.5) * Q, o = j * cw + i;
-          let sx = x, sy = y, a = 1, p = 1;
-          if (gap > 0) {
-            // Reaching: the top of the card stretches up into a neck that narrows toward its tip.
-            if (y < yTop) a = 0;
-            else if (y < S) {
-              const t = (y - yTop) / (S - yTop || 1);
-              sy = S * Math.pow(t, gamma);
-              p = y < 0 ? pTop + (p0 - pTop) * Math.pow(smooth((y - yTop) / (-yTop || 1)), 0.6) : p0 + (1 - p0) * smooth(y / S);
-            }
-          } else {
-            // Swallowed: rows pinch toward the centre near the bar's edge, then pour in and vanish above it.
-            const above = yLine - y;
-            if (above > 24) a = 0;
-            else {
-              p = above > 0 ? pTop : 1 - (1 - pTop) * smooth((yLine + T - y) / T);
-              if (above > 0) { sy = yLine - above * 1.8; a = Math.max(0, 1 - above / 14); }
-            }
-          }
-          if (p < 1) {
-            sx = cx + (x - cx) / p;
-            a *= Math.max(0, Math.min(1, (p * hw - Math.abs(x - cx)) / 2 + 0.5));
-          }
-          const dx = sx - x, dy = sy - y;
-          if (a > 0) maxD = Math.max(maxD, Math.abs(dx), Math.abs(dy));
-          xs[o] = dx; ys[o] = dy; as[o] = a;
-        }
+    // ----- texture layers, reused least-recently -----
+    const layers = Array.from({ length: MAX }, () => ({ el: null, v: 0, used: 0 }));
+    let tick = 0;
+    function layerFor(el) {
+      const ras = rasters.get(el);
+      if (!ras) return -1;
+      let idx = layers.findIndex((L) => L.el === el);
+      if (idx >= 0 && layers[idx].v === ras.v) { layers[idx].used = tick; return idx; }
+      if (idx < 0) {
+        idx = 0;
+        for (let i = 1; i < MAX; i++) if (layers[i].used < layers[idx].used) idx = i;
+        if (layers[idx].used === tick) return -1;
       }
-      const wp = warpFor(el);
-      if (wp.canvas.width !== cw || wp.canvas.height !== ch) { wp.canvas.width = cw; wp.canvas.height = ch; }
-      const im = wp.ctx.createImageData(cw, ch), d = im.data, half = maxD;
-      for (let o = 0; o < cw * ch; o++) {
-        const k = o * 4;
-        const a = as[o];
-        d[k] = a > 0 ? 128 + Math.max(-1, Math.min(1, xs[o] / half)) * 127 : 128;
-        d[k + 1] = a > 0 ? 128 + Math.max(-1, Math.min(1, ys[o] / half)) * 127 : 128;
-        d[k + 2] = Math.round(a * 255);
-        d[k + 3] = 255;
-      }
-      wp.ctx.putImageData(im, 0, 0);
-      wp.flip = !wp.flip;
-      const cur = wp.flip ? wp.a : wp.b;
-      const box = { x: -PAD, y: -up, width: fw, height: fh };
-      for (const [k, v] of Object.entries(box)) { cur.f.setAttribute(k, v); cur.img.setAttribute(k, v); }
-      cur.disp.setAttribute("scale", (half * 2).toFixed(1));
-      cur.img.setAttribute("href", wp.canvas.toDataURL());
-      el.style.filter = "url(#" + cur.id + ")";
-      return { rise, tipHalf: pTop * hw };
+      sctx.clearRect(0, 0, LW, LH);
+      sctx.drawImage(ras.canvas, 0, 0);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, idx, LW, LH, 1, gl.RGBA, gl.UNSIGNED_BYTE, scratch);
+      gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+      layers[idx] = { el, v: ras.v, used: tick };
+      return idx;
     }
+
+    // ----- colours read from the page's tokens -----
+    const probe = document.createElement("i");
+    probe.style.display = "none";
+    document.body.append(probe);
+    const colorCache = new Map();
+    function rgb(str) {
+      const key = str.trim();
+      if (colorCache.has(key)) return colorCache.get(key);
+      probe.style.color = "";
+      probe.style.color = key;
+      const m = (getComputedStyle(probe).color.match(/[\d.]+/g) || [0, 0, 0]).map(Number);
+      const out = [m[0] / 255, m[1] / 255, m[2] / 255];
+      if (colorCache.size > 64) colorCache.clear();
+      colorCache.set(key, out);
+      return out;
+    }
+
+    const springs = new Map();
+    let owned = new Set();
+    let running = false, lastT = 0;
 
     function frame(t) {
+      tick++;
       const dt = Math.min(0.034, lastT ? (t - lastT) / 1000 : 0.016);
       lastT = t;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (canvas.width !== Math.round(vw * dpr) || canvas.height !== Math.round(vh * dpr)) {
+        canvas.width = Math.round(vw * dpr);
+        canvas.height = Math.round(vh * dpr);
+      }
       const dr = dock.getBoundingClientRect();
-      const W = Math.round(dr.width), H = Math.round(dr.height);
-      if (!W || !H) { running = false; return; }
-      const small = window.innerWidth < 560;
-      const REACH = small ? 80 : 110;
-      const T = H + REACH;
-      const R = Math.min(parseFloat(getComputedStyle(dock).borderTopLeftRadius) || 0, H / 2);
+      const small = vw < 560;
+      const REACH = small ? 70 : 100, KMAX = small ? 40 : 52;
+      const band = dr.bottom + REACH;
       const engage = Math.min(1, Math.max(0, (window.scrollY - 20) / 60));
-      dockShape = { cx: W / 2, cy: H / 2, hw: W / 2, hh: H / 2, r: R };
-      shapes = [];
-      let moving = false;
-      const seen = new Set(), touched = new Set();
-      // Read every position before writing any style, so the browser lays out once per frame.
+      const root = getComputedStyle(document.documentElement);
+      const cardR = parseFloat(root.getPropertyValue("--radius")) || 12;
+
+      // Read positions first, write styles after.
       const near = [];
       for (const col of document.querySelectorAll("#wall > .col")) {
         for (const el of col.children) {
           const r = el.getBoundingClientRect();
-          if (r.top - dr.bottom > REACH) break;
-          near.push([el, r]);
+          if (r.top > band + 700) break;
+          if (el.classList.contains("composer") || r.bottom < 0) continue;
+          if (r.top <= band) near.push([el, r]);
+          else wantRaster(el, r);
         }
       }
-      {
-        for (const [el, r] of near) {
-          const gap = r.top - dr.bottom;
-          if (engage < 0.01 || el.classList.contains("composer")) continue;
-          if (r.bottom <= dr.bottom + 1) {
-            // Fully swallowed.
-            el.style.visibility = "hidden";
-            el.style.filter = "";
-            touched.add(el);
-            continue;
-          }
-          const target = engage * (gap >= 0 ? Math.pow(1 - gap / REACH, 1.15) : 1);
-          let sp = springs.get(el);
-          if (!sp) { sp = { s: target, v: 0 }; springs.set(el, sp); }
-          if (reduce) { sp.s = target; sp.v = 0; }
-          else {
-            sp.v += (170 * (target - sp.s) - 14 * sp.v) * dt;
-            sp.s += sp.v * dt;
-            if (Math.abs(sp.v) > 0.003 || Math.abs(target - sp.s) > 0.003) moving = true;
-          }
-          seen.add(el);
-          const e = Math.max(0, Math.min(1.25, sp.s));
-          if (e < 0.02) continue;
-          el.style.visibility = "";
-          touched.add(el);
-          const res = warpCard(el, r, e, gap, REACH);
-          if (gap > 0) {
-            // The glass bulges down to meet the tip of the card's neck.
-            const tip = r.top - res.rise - dr.top;
-            shapes.push({ cx: (r.left + r.right) / 2 - dr.left, cy: tip + 4, hw: Math.max(6, res.tipHalf), hh: 4, r: 4,
-              off: (1 - Math.min(1, e)) * 18, k: 10 + 46 * Math.min(1, e) });
-          }
+      near.sort((a, b) => Math.abs(a[1].top - dr.bottom) - Math.abs(b[1].top - dr.bottom));
+      let moving = false;
+      const cards = [], now = new Set();
+      for (const [el, r] of near) {
+        if (cards.length >= MAX) break;
+        wantRaster(el, r);
+        const ras = rasters.get(el);
+        if (!ras || Math.abs(ras.w - r.width) > 1 || Math.abs(ras.h - r.height) > 1) continue;
+        const layer = layerFor(el);
+        if (layer < 0) continue;
+        const gap = r.top - dr.bottom;
+        const target = engage * (gap > 0 ? Math.pow(Math.max(0, 1 - gap / REACH), 1.2) : 1);
+        let sp = springs.get(el);
+        if (!sp) { sp = { s: target, v: 0 }; springs.set(el, sp); }
+        if (reduce) { sp.s = target; sp.v = 0; }
+        else {
+          sp.v += (170 * (target - sp.s) - 13 * sp.v) * dt;
+          sp.s += sp.v * dt;
+          if (Math.abs(sp.v) > 0.002 || Math.abs(target - sp.s) > 0.002) moving = true;
         }
+        const c = ras.canvas;
+        cards.push({ r, layer, k: KMAX * Math.max(0, sp.s), u: c.width / LW, v: c.height / LH });
+        now.add(el);
       }
-      for (const k of springs.keys()) if (!seen.has(k)) springs.delete(k);
-      for (const el of styled) {
-        if (touched.has(el)) continue;
-        el.style.filter = "";
-        el.style.visibility = "";
-        dropWarp(el);
-      }
-      styled = touched;
+      for (const el of springs.keys()) if (!now.has(el)) springs.delete(el);
+      for (const el of owned) if (!now.has(el)) el.classList.remove("gl-owned");
+      for (const el of now) el.classList.add("gl-owned");
+      owned = now;
 
-      layer.style.transform = "translate(" + dr.left + "px," + dr.top + "px)";
-      layer.style.width = W + "px";
-      layer.style.height = T + "px";
-      const dPath = outline(W, H, R, T);
-      glassEl.style.clipPath = 'path("' + dPath + '")';
-      glassEl.style.setProperty("--sa", (135 + 18 * Math.sin(window.scrollY / 420)).toFixed(1) + "deg");
-      rimPath.setAttribute("d", dPath);
-      shadowPath.setAttribute("d", dPath);
-      maskPath.setAttribute("d", dPath);
-      maskRect.setAttribute("x", -80); maskRect.setAttribute("y", -80);
-      maskRect.setAttribute("width", W + 160); maskRect.setAttribute("height", T + 160);
+      // Uniforms.
+      const cardA = new Float32Array(MAX * 4), uvA = new Float32Array(MAX * 4), layA = new Float32Array(MAX), kA = new Float32Array(MAX);
+      cards.forEach((c, i) => {
+        cardA.set([c.r.left, c.r.top, c.r.width, c.r.height], i * 4);
+        uvA.set([0, 0, c.u, c.v], i * 4);
+        layA[i] = c.layer;
+        kA[i] = c.k;
+      });
+      const auraEl = $(".aura");
+      const auraOn = !auraEl.hidden;
+      const spans = auraOn ? [...auraEl.children] : [];
+      const auraA = new Float32Array(9), auraC = new Float32Array(9);
+      spans.slice(0, 3).forEach((sp, i) => {
+        const b = sp.getBoundingClientRect();
+        auraA.set([b.left + b.width / 2, b.top + b.height / 2, (b.width / 2) * Math.SQRT2 * 0.62], i * 3);
+        const v = root.getPropertyValue("--a" + (i + 1)).trim() || root.getPropertyValue("--aura-" + (i + 1));
+        auraC.set(rgb(v), i * 3);
+      });
+      const paper = rgb(root.getPropertyValue("--paper"));
+      const g = root.getPropertyValue("--glass-rgb").trim().split(/[\s,]+/).map(Number);
+      const lum = paper[0] * 0.3 + paper[1] * 0.59 + paper[2] * 0.11;
+
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      const bottom = Math.min(vh, Math.max(band, ...cards.map((c) => c.r.bottom)) + 44);
+      gl.enable(gl.SCISSOR_TEST);
+      gl.scissor(0, Math.max(0, Math.round((vh - bottom) * dpr)), canvas.width, Math.round(bottom * dpr));
+      gl.uniform2f(U.uView, vw, vh);
+      gl.uniform1f(U.uDpr, dpr);
+      gl.uniform4f(U.uDock, dr.left, dr.top, dr.width, dr.height);
+      gl.uniform1f(U.uDockR, Math.min(parseFloat(getComputedStyle(dock).borderTopLeftRadius) || 0, dr.height / 2));
+      gl.uniform1i(U.uCount, cards.length);
+      gl.uniform4fv(U.uCard, cardA);
+      gl.uniform4fv(U.uUV, uvA);
+      gl.uniform1fv(U.uLayer, layA);
+      gl.uniform1fv(U.uK, kA);
+      gl.uniform1f(U.uCardR, cardR);
+      gl.uniform3fv(U.uAura, auraA);
+      gl.uniform3fv(U.uAuraCol, auraC);
+      gl.uniform1f(U.uAuraO, auraOn ? parseFloat(getComputedStyle(auraEl).opacity) || 0 : 0);
+      gl.uniform3fv(U.uPaper, paper);
+      gl.uniform4f(U.uGlass, (g[0] || 255) / 255, (g[1] || 255) / 255, (g[2] || 255) / 255, Math.min(0.9, parseFloat(root.getPropertyValue("--glass-a")) || 0.46));
+      gl.uniform1f(U.uBlur, (parseFloat(root.getPropertyValue("--blur")) || 24) * 0.75);
+      gl.uniform1f(U.uDark, lum < 0.4 ? 1 : 0);
+      gl.uniform1f(U.uLight, -2.2 + 0.35 * Math.sin(window.scrollY / 380));
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.disable(gl.SCISSOR_TEST);
+
       if (moving) requestAnimationFrame(frame);
-      else { running = false; lastT = 0; settle(); }
+      else { running = false; lastT = 0; }
     }
 
     function schedule() {
       if (running) return;
       running = true;
-      unsettle();
       requestAnimationFrame(frame);
     }
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
-    if (typeof ResizeObserver === "function") new ResizeObserver(schedule).observe(dock);
-    return { schedule };
+    new ResizeObserver(schedule).observe(dock);
+    // The colour field drifts slowly, so keep the glass's view of it fresh while idle.
+    setInterval(() => { if (!document.hidden) schedule(); }, 250);
+    return { ok: true, schedule };
   })();
+
 
   // ---------- state ----------
   const S = {
@@ -2215,7 +2284,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     });
     if (S.store && total) S.entered = true;
     wall.replaceChildren(...cols.map((c) => c.el));
-    MORPH.schedule();
+    GLASS.schedule();
     const live = new Set(S.items.map((i) => i.id));
     for (const k of cardCache.keys()) if (!live.has(k)) cardCache.delete(k);
   }
@@ -2534,7 +2603,14 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
   // ---------- global input ----------
   const q = $("#q");
-  const onSearch = debounce(() => { S.query = q.value; namingSpace = false; render(); }, 120);
+  const onSearch = debounce(() => {
+    S.query = q.value;
+    namingSpace = false;
+    render();
+    // Results start at the top of the wall, so bring them into view instead of leaving them under the bar.
+    const wallTop = $("#wall").getBoundingClientRect().top + window.scrollY - $("#dock").offsetHeight - 24;
+    if (window.scrollY > wallTop) window.scrollTo({ top: Math.max(0, wallTop), behavior: "smooth" });
+  }, 120);
   q.addEventListener("input", () => { $("#q-clear").hidden = !q.value; onSearch(); });
   q.addEventListener("keydown", (e) => { if (e.key === "Escape") { q.value = ""; $("#q-clear").hidden = true; S.query = ""; render(); q.blur(); } });
   $("#q-clear").addEventListener("click", () => { q.value = ""; $("#q-clear").hidden = true; S.query = ""; render(); q.focus(); });
