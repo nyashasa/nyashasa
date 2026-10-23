@@ -1,0 +1,1561 @@
+<title>Curio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one calm column. A giant italic search line on top, a masonry wall of saved things below; any card opens as a sheet. */
+:root {
+  --paper: #eceef2;
+  --card: #ffffff;
+  --ink: #141821;
+  --muted: #5f6676;
+  --line: #d5d9e1;
+  --accent: #2f47d6;
+  --accent-soft: #e2e6fb;
+  --danger: #b42318;
+  --shade: rgba(16, 20, 32, .52);
+  --lift: 0 1px 2px rgba(20, 24, 33, .06), 0 8px 24px rgba(20, 24, 33, .08);
+  --link-s: 44%;
+  --link-l: 44%;
+  --on-link: #ffffff;
+
+  --font-display: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --gap: 16px;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101218;
+    --card: #1a1d25;
+    --ink: #e8eaf0;
+    --muted: #949bab;
+    --line: #2b2f3a;
+    --accent: #8f9dff;
+    --accent-soft: #252b4f;
+    --danger: #ff8270;
+    --shade: rgba(0, 0, 0, .68);
+    --lift: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px rgba(0, 0, 0, .35);
+    --link-s: 38%;
+    --link-l: 34%;
+    --on-link: #f4f5f8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101218;
+  --card: #1a1d25;
+  --ink: #e8eaf0;
+  --muted: #949bab;
+  --line: #2b2f3a;
+  --accent: #8f9dff;
+  --accent-soft: #252b4f;
+  --danger: #ff8270;
+  --shade: rgba(0, 0, 0, .68);
+  --lift: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px rgba(0, 0, 0, .35);
+  --link-s: 38%;
+  --link-l: 34%;
+  --on-link: #f4f5f8;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 14px/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.shell {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+  display: grid;
+  gap: 18px;
+}
+
+/* ---------- header ---------- */
+.topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.wordmark {
+  font: 400 26px/1 var(--font-display);
+  letter-spacing: -.01em;
+}
+.wordmark em { color: var(--accent); }
+.tally {
+  font: 400 12px/1.4 var(--font-mono);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: italic 400 clamp(36px, 6.4vw, 68px)/1.15 var(--font-display);
+  letter-spacing: -.015em;
+  padding: 4px 0 10px;
+  outline: none;
+}
+.search input::placeholder { color: var(--muted); opacity: .7; }
+.search input::-webkit-search-cancel-button { display: none; }
+.search .clear {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: 400 13px var(--font-mono);
+  padding: 8px 4px 8px 12px;
+  cursor: pointer;
+}
+.search .key {
+  font: 400 11px var(--font-mono);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font: 500 13px/1.3 var(--font-body);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chip:hover { border-color: var(--muted); }
+.chip .n {
+  font: 400 11px var(--font-mono);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip[aria-pressed="true"] .n { color: inherit; opacity: .7; }
+.chip.space { border-style: dashed; }
+.chip.space[aria-pressed="true"] { border-style: solid; }
+.chip .x { font: 400 12px var(--font-mono); opacity: .7; padding-left: 2px; }
+.chip.save { color: var(--accent); border-color: transparent; padding-inline: 6px; }
+.chips .divider { width: 1px; height: 18px; background: var(--line); margin-inline: 4px; }
+.space-form { display: inline-flex; gap: 6px; align-items: center; }
+.space-form input {
+  border: 1px solid var(--accent);
+  background: var(--card);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font: 500 13px var(--font-body);
+  width: 180px;
+  outline: none;
+}
+
+/* ---------- wall ---------- */
+.wall {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+  gap: var(--gap);
+  align-items: start;
+}
+.col { display: grid; gap: var(--gap); min-width: 0; }
+
+.card {
+  position: relative;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease;
+  min-width: 0;
+}
+.card:hover { transform: translateY(-2px); box-shadow: var(--lift); }
+.card .body { padding: 14px 16px; display: grid; gap: 6px; }
+.card .title { font-weight: 600; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+.card .text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  max-height: 15.5em;
+  overflow: hidden;
+}
+.card .text.long { -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+.meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font: 400 11px/1.4 var(--font-mono);
+  color: var(--muted);
+  padding: 0 16px 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.meta .tags { overflow: hidden; text-overflow: ellipsis; }
+.thinking { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); }
+.thinking::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: .25; } }
+
+.todo { display: flex; gap: 8px; align-items: flex-start; white-space: normal; }
+.todo input { margin: 3px 0 0; accent-color: var(--accent); cursor: pointer; }
+.todo.done span { color: var(--muted); text-decoration: line-through; }
+
+.card-image .frame { background: var(--tint, var(--line)); }
+.card-image img { display: block; width: 100%; height: auto; }
+.card-image .meta { padding-top: 10px; }
+
+.card-quote .body { padding: 22px 20px 14px; }
+.card-quote blockquote {
+  margin: 0;
+  font: 400 23px/1.16 var(--font-display);
+  letter-spacing: -.005em;
+  overflow-wrap: anywhere;
+}
+.card-quote .source { font: 500 11px/1.4 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+.linkface {
+  aspect-ratio: 16 / 10;
+  max-width: 100%;
+  background: hsl(var(--h, 225) var(--link-s) var(--link-l));
+  color: var(--on-link);
+  display: grid;
+  align-content: end;
+  padding: 14px 16px;
+  gap: 2px;
+}
+.linkface .site { font: 400 clamp(26px, 2.6vw, 34px)/1 var(--font-display); overflow-wrap: anywhere; }
+.linkface .path { font: 400 11px/1.4 var(--font-mono); opacity: .8; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.card-link .domain { font: 400 11px var(--font-mono); color: var(--muted); }
+
+.composer { cursor: default; border: 1px solid var(--line); background: var(--card); }
+.composer:hover { transform: none; box-shadow: none; }
+.composer .label { font: 500 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); padding: 14px 16px 0; }
+.composer textarea {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  resize: none;
+  padding: 6px 16px 8px;
+  min-height: 96px;
+  font-size: 15px;
+  line-height: 1.45;
+  outline: none;
+}
+.composer textarea::placeholder { color: var(--muted); }
+.composer .bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 10px 16px;
+  border-top: 1px solid var(--line);
+}
+.composer .hint { flex: 1; font: 400 11px var(--font-mono); color: var(--muted); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font: 500 13px/1.3 var(--font-body);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn.primary:disabled { opacity: .4; cursor: default; }
+.btn.danger { color: var(--danger); }
+.btn.danger.solid { background: var(--danger); color: var(--card); border-color: var(--danger); }
+.btn.quiet { border-color: transparent; color: var(--muted); }
+
+.empty {
+  grid-column: 1 / -1;
+  padding: 48px 8px;
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  max-width: 60ch;
+}
+.empty h2 { margin: 0; font: 400 34px/1.1 var(--font-display); text-wrap: balance; }
+.empty p { margin: 0; color: var(--muted); }
+.empty .row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+  font: 400 12px var(--font-mono);
+  color: var(--muted);
+  padding-top: 8px;
+}
+.footer .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); margin-right: 6px; vertical-align: 1px; }
+.footer .dot.on { background: var(--accent); }
+.footer .keys { margin-left: auto; }
+
+/* ---------- detail sheet ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--shade);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sheet {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  background: var(--paper);
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  overflow: hidden;
+  box-shadow: var(--lift);
+}
+.sheet .stage {
+  background: var(--card);
+  min-height: 420px;
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  padding: 28px;
+}
+.sheet .stage img { display: block; max-width: 100%; max-height: 72vh; margin: 0 auto; border-radius: 6px; }
+.sheet .stage .linkface { border-radius: 8px; aspect-ratio: 16 / 9; padding: 22px 24px; }
+.sheet .stage .linkface .site { font-size: clamp(34px, 5vw, 56px); }
+.stage textarea, .side textarea, .side input[type="text"] {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0 -10px;
+  outline: none;
+  resize: vertical;
+}
+.stage textarea:hover, .side textarea:hover, .side input[type="text"]:hover { border-color: var(--line); }
+.stage textarea:focus, .side textarea:focus, .side input[type="text"]:focus { border-color: var(--accent); background: var(--card); }
+.stage .notebig { font-size: 17px; line-height: 1.55; min-height: 340px; }
+.stage .quotebig { font: 400 clamp(28px, 3.4vw, 42px)/1.12 var(--font-display); min-height: 220px; }
+.stage .sourcebig { font: 500 12px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+.side { padding: 28px 26px 26px; display: grid; gap: 22px; align-content: start; }
+.side .titlebig { font: 400 30px/1.1 var(--font-display); }
+.field { display: grid; gap: 8px; }
+.field > .lbl { font: 500 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.tagset { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  border: 0;
+  border-radius: 999px;
+  padding: 3px 4px 3px 10px;
+  font: 500 12px/1.4 var(--font-body);
+}
+.tag button { border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 0 5px; font: 400 12px var(--font-mono); border-radius: 999px; }
+.tag button:hover { color: var(--danger); }
+.tag .go { padding: 0; color: inherit; font: inherit; }
+.tag.color { background: transparent; border: 1px solid var(--line); padding-right: 10px; }
+.tag.color i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; background: var(--sw); }
+.side input.tagadd {
+  margin: 0;
+  border: 1px dashed var(--line);
+  background: transparent;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font: 500 12px var(--font-body);
+  width: 120px;
+  outline: none;
+}
+.side input.tagadd:focus { border-color: var(--accent); border-style: solid; background: var(--card); }
+.summary { color: var(--ink); line-height: 1.5; }
+.summary.none { color: var(--muted); }
+.facts { display: grid; gap: 4px; font: 400 12px var(--font-mono); color: var(--muted); }
+.facts a { color: var(--accent); overflow-wrap: anywhere; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; gap: 2px; }
+.seg button { border: 0; background: transparent; border-radius: 999px; padding: 4px 12px; cursor: pointer; font: 500 12px var(--font-body); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font: 400 15px var(--font-mono);
+}
+.open-link { justify-self: start; }
+
+.drop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: var(--shade);
+  pointer-events: none;
+}
+.drop div {
+  border: 2px dashed var(--on-link);
+  color: var(--on-link);
+  border-radius: 18px;
+  padding: 40px 56px;
+  font: italic 400 40px var(--font-display);
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  transform: translateX(-50%);
+  z-index: 50;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font: 500 13px var(--font-body);
+  box-shadow: var(--lift);
+  max-width: calc(100vw - 32px);
+}
+
+@media (max-width: 820px) {
+  .sheet { grid-template-columns: minmax(0, 1fr); }
+  .sheet .stage { min-height: 0; padding: 52px 18px 20px; }
+  .side { padding: 20px 18px 22px; }
+  .stage .notebig { min-height: 220px; }
+}
+@media (max-width: 560px) {
+  :root { --gap: 10px; }
+  .card .body { padding: 12px; }
+  .meta { padding: 0 12px 10px; }
+  .card-quote .body { padding: 16px 14px 10px; }
+  .card-quote blockquote { font-size: 19px; }
+  .linkface .site { font-size: 22px; }
+  .footer .keys, .search .key, .composer .hint { display: none; }
+  .composer .bar { justify-content: space-between; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .card:hover { transition: none; transform: none; }
+  .thinking::before { animation: none; }
+}
+</style>
+
+<div class="shell">
+  <header class="topbar">
+    <div class="wordmark">curio<em>.</em></div>
+    <div class="tally" id="tally">Opening your curio…</div>
+  </header>
+
+  <div class="search" role="search">
+    <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search your curio…" aria-label="Search everything you've saved">
+    <button class="clear" id="q-clear" type="button" hidden>clear ×</button>
+    <span class="key" aria-hidden="true">/</span>
+  </div>
+
+  <nav class="chips" id="chips" aria-label="Filter"></nav>
+
+  <main class="wall" id="wall" aria-live="polite"></main>
+
+  <footer class="footer" id="footer">
+    <span id="where"><span class="dot"></span>Starting…</span>
+    <span id="aiwhere"></span>
+    <button class="btn quiet" id="clear-examples" type="button" hidden>Remove example cards</button>
+    <span class="keys">/ search · n new note · esc close</span>
+  </footer>
+</div>
+
+<input type="file" id="file-input" accept="image/*" multiple hidden>
+<div class="overlay" id="overlay" hidden></div>
+<div class="drop" id="drop" hidden><div>Drop to save</div></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- tiny helpers ----------
+  const $ = (s, r = document) => r.querySelector(s);
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    }
+    for (const kid of kids.flat()) {
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  }
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const uniq = (arr) => [...new Set(arr)];
+  const slugTag = (t) => String(t).trim().toLowerCase().replace(/\s+/g, " ").slice(0, 32);
+  const tagKey = (t) => slugTag(t).replace(/\s+/g, "-");
+  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  const fmtDate = (ms) => new Date(ms).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.hidden = true), 2600);
+  }
+
+  function domainOf(url) {
+    try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; }
+  }
+  function siteName(url) {
+    const d = domainOf(url);
+    if (!d) return "link";
+    const parts = d.split(".");
+    if (parts.length > 2 && ["co", "com", "org", "net", "ac", "gov"].includes(parts[parts.length - 2])) parts.splice(-2);
+    else parts.pop();
+    const name = parts[parts.length - 1] || d;
+    return name.length < 4 ? d : name;
+  }
+  function hueOf(str) {
+    let x = 0;
+    for (const c of str) x = (x * 31 + c.charCodeAt(0)) >>> 0;
+    return x % 360;
+  }
+  function titleFromUrl(url) {
+    try {
+      const u = new URL(url);
+      const segs = u.pathname.split("/").filter(Boolean).map(decodeURIComponent);
+      for (let i = segs.length - 1; i >= 0; i--) {
+        let s = segs[i].replace(/\.(html?|php|aspx?)$/i, "").replace(/[-_+]+/g, " ").trim();
+        const looksLikeId = !/\s/.test(s) && (/\d/.test(s) || s.length > 24);
+        if (s.length > 2 && /[a-z]/i.test(s) && !looksLikeId) {
+          return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+      }
+      return u.hostname.replace(/^www\./, "");
+    } catch { return ""; }
+  }
+
+  // ---------- state ----------
+  const S = {
+    items: [],
+    byId: new Map(),
+    meta: { spaces: [] },
+    query: "",
+    type: "all",
+    seed: 1,
+    openId: null,
+    store: null,
+    assets: null,
+    ai: { sample: null, images: false, off: false },
+    cols: 0,
+  };
+
+  // ---------- storage: cloud (Claude account) or this browser ----------
+  function makeQueue() {
+    const chains = new Map();
+    return (key, fn) => {
+      const prev = chains.get(key) || Promise.resolve();
+      const next = prev.catch(() => {}).then(fn);
+      chains.set(key, next);
+      next.finally(() => { if (chains.get(key) === next) chains.delete(key); });
+      return next;
+    };
+  }
+
+  function cloudStore(db, viewerId) {
+    const root = db.doc("data/users/" + viewerId + "/mind");
+    const items = root.collection("items");
+    const queue = makeQueue();
+    const latest = new Map();
+    return {
+      mode: "cloud",
+      subscribe(onItems, onMeta) {
+        items.orderBy("createdAt", "desc").limit(1000).onSnapshot(
+          (snap) => onItems(snap.docs.map((d) => ({ ...d.data(), id: d.id }))),
+          (e) => toast("Lost connection to your saved items. Reload to reconnect. (" + e.code + ")")
+        );
+        root.onSnapshot((snap) => onMeta(snap.exists ? snap.data() : {}), () => {});
+      },
+      put(item) {
+        latest.set(item.id, item);
+        return queue(item.id, async () => {
+          const body = latest.get(item.id);
+          if (!body) return;
+          latest.delete(item.id);
+          const { id, ...rest } = body;
+          await items.doc(id).set(JSON.parse(JSON.stringify(rest)));
+        });
+      },
+      remove(id) {
+        latest.delete(id);
+        return queue(id, () => items.doc(id).delete());
+      },
+      setMeta(meta) { return queue("__meta", () => root.set(meta)); },
+    };
+  }
+
+  function localStore() {
+    let dbp = null;
+    const listeners = { items: () => {}, meta: () => {} };
+    const mem = new Map();
+    let meta = {};
+    let persistent = true;
+    function idb() {
+      if (!dbp) dbp = new Promise((res, rej) => {
+        try {
+          const r = indexedDB.open("curio", 1);
+          r.onupgradeneeded = () => {
+            r.result.createObjectStore("items", { keyPath: "id" });
+            r.result.createObjectStore("kv");
+          };
+          r.onsuccess = () => res(r.result);
+          r.onerror = () => rej(r.error);
+        } catch (e) { rej(e); }
+      });
+      return dbp;
+    }
+    async function tx(store, mode, fn) {
+      const d = await idb();
+      return new Promise((res, rej) => {
+        const t = d.transaction(store, mode);
+        const req = fn(t.objectStore(store));
+        t.oncomplete = () => res(req && req.result);
+        t.onerror = () => rej(t.error);
+      });
+    }
+    const emit = () => listeners.items([...mem.values()].sort((a, b) => b.createdAt - a.createdAt));
+    const api = {
+      mode: "local",
+      get persistent() { return persistent; },
+      async subscribe(onItems, onMeta) {
+        listeners.items = onItems;
+        listeners.meta = onMeta;
+        try {
+          const all = await tx("items", "readonly", (s) => s.getAll());
+          (all || []).forEach((it) => mem.set(it.id, it));
+          meta = (await tx("kv", "readonly", (s) => s.get("meta"))) || {};
+        } catch { persistent = false; api.mode = "memory"; }
+        emit();
+        onMeta(meta);
+      },
+      async put(item) {
+        mem.set(item.id, item);
+        emit();
+        if (persistent) try { await tx("items", "readwrite", (s) => s.put(item)); } catch { toast("Couldn't save to this browser's storage."); }
+      },
+      async remove(id) {
+        mem.delete(id);
+        emit();
+        if (persistent) try { await tx("items", "readwrite", (s) => s.delete(id)); } catch {}
+      },
+      async setMeta(m) {
+        meta = m;
+        listeners.meta(meta);
+        if (persistent) try { await tx("kv", "readwrite", (s) => s.put(m, "meta")); } catch {}
+      },
+    };
+    return api;
+  }
+
+  async function connect() {
+    let store = null;
+    if (window.claude && typeof window.claude.use === "function") {
+      try {
+        const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+        const viewerId = user ? await user.id() : null;
+        if (db && viewerId) store = cloudStore(db, viewerId);
+        if (store) S.assets = await window.claude.use("assets").catch(() => null);
+        S.ai.sample = await window.claude.use("sample").catch(() => null);
+        if (S.ai.sample) {
+          const lim = await S.ai.sample.limits().catch(() => null);
+          S.ai.images = !!(lim && lim.images);
+        }
+      } catch { store = null; }
+    }
+    S.store = store || localStore();
+    S.store.subscribe(onItems, onMeta);
+    renderFooter();
+  }
+
+  function onItems(list) {
+    S.items = list;
+    S.byId = new Map(list.map((i) => [i.id, i]));
+    render();
+    if (S.openId) refreshDetail();
+  }
+  function onMeta(m) {
+    S.meta = { spaces: Array.isArray(m && m.spaces) ? m.spaces : [] };
+    renderChips();
+  }
+
+  // ---------- searching ----------
+  function haystack(it) {
+    return [it.type, it.title, it.text, it.url, domainOf(it.url || ""), it.source, it.summary, ...(it.tags || []), ...(it.colors || [])]
+      .filter(Boolean).join(" ").toLowerCase();
+  }
+  function matches(it, q) {
+    const toks = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!toks.length) return true;
+    const hay = haystack(it);
+    return toks.every((t) => {
+      if (t.startsWith("#") && t.length > 1) {
+        const k = t.slice(1);
+        return (it.tags || []).some((x) => tagKey(x) === k) || (it.colors || []).includes(k);
+      }
+      return hay.includes(t);
+    });
+  }
+  function rand(seed) { return () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296); }
+  function filtered(type = S.type, query = S.query) {
+    let list = S.items;
+    if (type !== "all" && type !== "rediscover") list = list.filter((i) => i.type === type);
+    list = list.filter((i) => matches(i, query));
+    if (type === "rediscover") {
+      const r = rand(S.seed);
+      list = list.map((i) => [r(), i]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+    }
+    return list;
+  }
+
+  // ---------- chips & spaces ----------
+  const TYPES = [
+    ["all", "Everything"], ["note", "Notes"], ["link", "Links"], ["image", "Images"], ["quote", "Quotes"], ["rediscover", "Rediscover"],
+  ];
+  let namingSpace = false;
+
+  function renderChips() {
+    const nav = $("#chips");
+    nav.replaceChildren();
+    for (const [key, label] of TYPES) {
+      const count = key === "all" || key === "rediscover" ? S.items.length : S.items.filter((i) => i.type === key).length;
+      if (key !== "all" && key !== "rediscover" && !count && S.type !== key) continue;
+      if (key === "rediscover" && S.items.length < 4) continue;
+      nav.append(h("button", {
+        class: "chip", type: "button", "aria-pressed": String(S.type === key),
+        onclick: () => {
+          if (key === "rediscover") S.seed = (Math.random() * 1e9) | 0;
+          S.type = key;
+          render();
+        },
+      }, label, key === "rediscover" ? null : h("span", { class: "n", text: count })));
+    }
+    const spaces = S.meta.spaces || [];
+    const q = S.query.trim();
+    const activeSpace = spaces.find((s) => s.query === q && (s.type || "all") === S.type);
+    if (spaces.length || q) nav.append(h("span", { class: "divider", "aria-hidden": "true" }));
+    for (const sp of spaces) {
+      const active = sp === activeSpace;
+      nav.append(h("button", {
+        class: "chip space", type: "button", "aria-pressed": String(active),
+        title: active ? "Click × to delete this space" : "Space: " + sp.query,
+        onclick: (e) => {
+          if (active && e.target.classList.contains("x")) { removeSpace(sp.id); return; }
+          S.query = active ? "" : sp.query;
+          S.type = active ? "all" : sp.type || "all";
+          $("#q").value = S.query;
+          render();
+        },
+      }, sp.name, h("span", { class: "n", text: filtered(sp.type || "all", sp.query).length }), active ? h("span", { class: "x", "aria-label": "Delete space", text: "×" }) : null));
+    }
+    if (q && !activeSpace) {
+      if (namingSpace) {
+        const input = h("input", { id: "space-name", type: "text", value: q.replace(/^#/, ""), "aria-label": "Space name", maxlength: "40" });
+        const form = h("form", {
+          class: "space-form",
+          onsubmit: (e) => { e.preventDefault(); addSpace(input.value.trim() || q); },
+        }, input, h("button", { class: "btn primary", type: "submit", text: "Save space" }),
+          h("button", { class: "btn quiet", type: "button", text: "Cancel", onclick: () => { namingSpace = false; renderChips(); } }));
+        nav.append(form);
+        setTimeout(() => { input.focus(); input.select(); });
+      } else {
+        nav.append(h("button", { class: "chip save", type: "button", text: "+ Save as space", onclick: () => { namingSpace = true; renderChips(); } }));
+      }
+    }
+  }
+  function addSpace(name) {
+    namingSpace = false;
+    const spaces = [...(S.meta.spaces || []), { id: uid(), name: name.slice(0, 40), query: S.query.trim(), type: S.type === "rediscover" ? "all" : S.type }];
+    S.meta = { spaces };
+    S.store.setMeta({ spaces });
+    renderChips();
+    toast("Space saved");
+  }
+  function removeSpace(id) {
+    const spaces = (S.meta.spaces || []).filter((s) => s.id !== id);
+    S.meta = { spaces };
+    S.store.setMeta({ spaces });
+    S.query = "";
+    S.type = "all";
+    $("#q").value = "";
+    render();
+    toast("Space deleted. Your items are still here.");
+  }
+
+  // ---------- cards ----------
+  const cardCache = new Map();
+
+  function parseTodos(text) {
+    return String(text || "").split("\n").map((line) => {
+      const m = line.match(/^\s*(?:[-*]\s*)?\[( |x|X)\]\s?(.*)$/);
+      return m ? { todo: true, done: m[1] !== " ", text: m[2] } : { todo: false, text: line };
+    });
+  }
+  function toggleTodo(it, index) {
+    const lines = String(it.text || "").split("\n");
+    lines[index] = lines[index].replace(/\[( |x|X)\]/, (m, c) => (c === " " ? "[x]" : "[ ]"));
+    save({ ...it, text: lines.join("\n") });
+  }
+
+  function noteBody(it) {
+    const lines = parseTodos(it.text);
+    if (!lines.some((l) => l.todo)) {
+      return h("div", { class: "text" + ((it.text || "").length > 420 ? " long" : ""), text: it.text || "" });
+    }
+    const box = h("div", { class: "text" + (lines.length > 12 ? " long" : "") });
+    lines.forEach((l, idx) => {
+      if (!l.todo) { box.append(h("div", { text: l.text || " " })); return; }
+      const cb = h("input", {
+        type: "checkbox", "aria-label": l.text, checked: l.done,
+        onclick: (e) => { e.stopPropagation(); toggleTodo(it, idx); },
+      });
+      box.append(h("label", { class: "todo" + (l.done ? " done" : ""), onclick: (e) => e.stopPropagation() }, cb, h("span", { text: l.text })));
+    });
+    return box;
+  }
+
+  function metaLine(it, withDate) {
+    const tags = (it.tags || []).filter((t) => t !== "example").slice(0, 3);
+    const bits = [];
+    if (it.aiStatus === "pending") bits.push(h("span", { class: "thinking", text: "tagging" }));
+    if (tags.length) bits.push(h("span", { class: "tags", text: tags.join(" · ") }));
+    else if (withDate || it.aiStatus !== "pending") bits.push(h("span", { text: fmtDate(it.createdAt) }));
+    return h("div", { class: "meta" }, bits);
+  }
+
+  function imageSrc(it) { return it.assetId ? "/_blob/" + it.assetId : it.image || ""; }
+
+  function buildCard(it) {
+    const open = () => openDetail(it.id);
+    const label = it.title || (it.text || "").slice(0, 60) || it.type;
+    const card = h("article", {
+      class: "card card-" + it.type, tabindex: "0", role: "button", "aria-label": "Open " + label,
+      onclick: open, onkeydown: (e) => { if (e.key === "Enter") open(); },
+    });
+    if (it.type === "image") {
+      const ratio = it.w && it.h ? it.h / it.w : 1;
+      const frame = h("div", { class: "frame", style: "--tint:" + (it.tint || "var(--line)") + ";aspect-ratio:" + (1 / ratio).toFixed(4) });
+      frame.append(h("img", { src: imageSrc(it), alt: it.title || it.summary || "Saved image", loading: "lazy", decoding: "async" }));
+      card.append(frame);
+      if (it.title || it.aiStatus === "pending" || (it.tags || []).length) card.append(metaLine(it));
+    } else if (it.type === "link") {
+      const u = (() => { try { return new URL(it.url); } catch { return null; } })();
+      card.append(h("div", { class: "linkface", style: "--h:" + hueOf(domainOf(it.url) || it.url || "") },
+        h("div", { class: "site", text: siteName(it.url) }),
+        h("div", { class: "path", text: u ? (u.pathname + u.search).replace(/\/$/, "") || "/" : "" })));
+      card.append(h("div", { class: "body" },
+        h("div", { class: "title", text: it.title || titleFromUrl(it.url) }),
+        it.text ? h("div", { class: "text", text: it.text.slice(0, 220) }) : null,
+        h("div", { class: "domain", text: domainOf(it.url) })));
+      card.append(metaLine(it));
+    } else if (it.type === "quote") {
+      card.append(h("div", { class: "body" },
+        h("blockquote", { text: "“" + (it.text || "").replace(/^["“]|["”]$/g, "") + "”" }),
+        it.source ? h("div", { class: "source", text: "— " + it.source }) : null));
+      card.append(metaLine(it));
+    } else {
+      card.append(h("div", { class: "body" }, it.title ? h("div", { class: "title", text: it.title }) : null, noteBody(it)));
+      card.append(metaLine(it, true));
+    }
+    return card;
+  }
+
+  function cardFor(it) {
+    const hit = cardCache.get(it.id);
+    if (hit && hit.item === it) return hit.el;
+    const el = buildCard(it);
+    cardCache.set(it.id, { item: it, el });
+    return el;
+  }
+
+  function estimateHeight(it, w) {
+    const charsPerLine = Math.max(18, w / 7.6);
+    const lines = (t, cap) => Math.min(cap, String(t || "").split("\n").reduce((n, l) => n + Math.max(1, Math.ceil(l.length / charsPerLine)), 0));
+    const meta = 30;
+    if (it.type === "image") return w * (it.w && it.h ? it.h / it.w : 1) + ((it.tags || []).length || it.title ? meta : 0);
+    if (it.type === "link") return w * 0.625 + 70 + (it.text ? 21 * lines(it.text, 5) : 0) + meta;
+    if (it.type === "quote") return 50 + 27 * Math.min(14, Math.ceil(String(it.text || "").length / (w / 11))) + (it.source ? 20 : 0) + meta;
+    return 32 + (it.title ? 22 : 0) + 21 * lines(it.text, 11) + meta;
+  }
+
+  // ---------- composer ----------
+  let composerEl = null;
+  function composer() {
+    if (composerEl) return composerEl;
+    const ta = h("textarea", { id: "composer-text", rows: "3", placeholder: "Type a thought, paste a link or a quote…", "aria-label": "New note" });
+    const saveBtn = h("button", { class: "btn primary", type: "button", text: "Save", disabled: true, onclick: () => submitComposer() });
+    ta.addEventListener("input", () => {
+      saveBtn.disabled = !ta.value.trim();
+      ta.style.height = "auto";
+      ta.style.height = Math.min(320, ta.scrollHeight) + "px";
+    });
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitComposer(); }
+      if (e.key === "Escape") ta.blur();
+    });
+    composerEl = h("section", { class: "card composer", "aria-label": "Add something" },
+      h("div", { class: "label", text: "Add to curio" }),
+      ta,
+      h("div", { class: "bar" },
+        h("label", { class: "btn", for: "file-input", text: "Image", tabindex: "0", onkeydown: (e) => { if (e.key === "Enter") $("#file-input").click(); } }),
+        h("span", { class: "hint", text: "⌘↵ to save" }),
+        saveBtn));
+    return composerEl;
+  }
+
+  function classify(raw) {
+    const text = raw.trim();
+    const lines = text.split("\n");
+    const first = lines[0].trim();
+    const urlish = /^(https?:\/\/|www\.)\S+$/i;
+    if (urlish.test(first)) {
+      const url = /^www\./i.test(first) ? "https://" + first : first;
+      return { type: "link", url, text: lines.slice(1).join("\n").trim() };
+    }
+    const q = text.match(/^["“']([\s\S]+?)["”']\s*(?:\n|\s)*(?:[—–-]{1,2}\s*([^\n]+))?$/);
+    if (q && q[1].length > 8) return { type: "quote", text: q[1].trim(), source: (q[2] || "").trim() };
+    if (lines.every((l) => /^>\s?/.test(l) || /^[—–]\s*\S/.test(l))) {
+      const body = lines.filter((l) => /^>/.test(l)).map((l) => l.replace(/^>\s?/, "")).join("\n").trim();
+      const src = lines.find((l) => /^[—–]/.test(l));
+      if (body) return { type: "quote", text: body, source: src ? src.replace(/^[—–]\s*/, "") : "" };
+    }
+    if (lines.length > 1 && first.length <= 70 && !/[.!?:]$/.test(first) && !/^\s*(?:[-*]\s*)?\[( |x)\]/i.test(first)) {
+      return { type: "note", title: first, text: lines.slice(1).join("\n").replace(/^\n+/, "") };
+    }
+    return { type: "note", text };
+  }
+
+  function newItem(fields) {
+    const now = Date.now();
+    return { id: uid(), title: "", text: "", tags: [], createdAt: now, updatedAt: now, aiStatus: "pending", ...fields };
+  }
+
+  async function submitComposer() {
+    const ta = $("#composer-text");
+    const raw = ta.value;
+    if (!raw.trim()) return;
+    ta.value = "";
+    ta.style.height = "";
+    ta.dispatchEvent(new Event("input"));
+    const item = newItem(classify(raw));
+    await save(item);
+    toast(item.type === "link" ? "Link saved" : item.type === "quote" ? "Quote saved" : "Note saved");
+    enrich(item.id);
+  }
+
+  function save(item) {
+    const next = { ...item, updatedAt: Date.now() };
+    S.byId.set(next.id, next);
+    return S.store.put(next);
+  }
+
+  // ---------- images ----------
+  function loadImage(src) {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => res(img);
+      img.onerror = () => rej(new Error("image"));
+      img.src = src;
+    });
+  }
+  function drawScaled(img, max) {
+    const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    return c;
+  }
+  const toBlob = (canvas, q) => new Promise((res) => canvas.toBlob(res, "image/jpeg", q));
+
+  const COLOR_NAMES = [[15, "red"], [40, "orange"], [65, "yellow"], [160, "green"], [195, "teal"], [255, "blue"], [290, "purple"], [335, "pink"], [360, "red"]];
+  function analyzeColors(img) {
+    const c = drawScaled(img, 40);
+    const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+    const bins = {};
+    let r0 = 0, g0 = 0, b0 = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;
+      r0 += d[i]; g0 += d[i + 1]; b0 += d[i + 2]; n++;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, delta = max - min;
+      const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+      let name;
+      if (s < 0.18 || delta < 0.08) name = l > 0.82 ? "white" : l < 0.18 ? "black" : "grey";
+      else {
+        let hh = max === r ? ((g - b) / delta) % 6 : max === g ? (b - r) / delta + 2 : (r - g) / delta + 4;
+        hh = (hh * 60 + 360) % 360;
+        name = COLOR_NAMES.find(([lim]) => hh < lim)[1];
+        if (name === "orange" && l < 0.4) name = "brown";
+      }
+      bins[name] = (bins[name] || 0) + (name === "grey" || name === "white" || name === "black" ? 0.6 : 1);
+    }
+    const colors = Object.entries(bins).sort((a, b) => b[1] - a[1]).filter(([, v]) => v / n > 0.12).slice(0, 2).map((x) => x[0]);
+    const hex = (v) => Math.round(v / n).toString(16).padStart(2, "0");
+    return { colors, tint: "#" + hex(r0) + hex(g0) + hex(b0) };
+  }
+  function cleanFileName(name) {
+    const base = String(name || "").replace(/\.[a-z0-9]+$/i, "");
+    if (!base || /^(img|dsc|pxl|screenshot|screen shot|photo|image|whatsapp image|untitled)[\s_-]*\d|^\d|^image$/i.test(base)) return "";
+    return base.replace(/[_-]+/g, " ").trim();
+  }
+
+  async function addImageFile(file, extra = {}) {
+    if (!file || !/^image\//.test(file.type)) return;
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await loadImage(url);
+      const { colors, tint } = analyzeColors(img);
+      const item = newItem({ type: "image", title: cleanFileName(file.name), w: img.naturalWidth, h: img.naturalHeight, colors, tint, ...extra });
+      if (S.store.mode === "cloud" && S.assets) {
+        try {
+          const blob = file.type === "image/gif" && file.size < 15e6 ? file : await toBlob(drawScaled(img, 2000), 0.86);
+          const r = await S.assets.upload(blob);
+          item.assetId = r.id;
+        } catch { /* fall back to an inline copy below */ }
+      }
+      if (!item.assetId) {
+        const cloud = S.store.mode === "cloud";
+        let max = cloud ? 900 : 1600, q = cloud ? 0.8 : 0.86, data;
+        for (let tries = 0; tries < 6; tries++) {
+          data = drawScaled(img, max).toDataURL("image/jpeg", q);
+          if (!cloud || data.length < 190000) break;
+          max = Math.round(max * 0.82); q = Math.max(0.5, q - 0.06);
+        }
+        item.image = data;
+      }
+      const aiBlob = S.ai.images ? await toBlob(drawScaled(img, 1024), 0.82) : null;
+      await save(item);
+      toast("Image saved");
+      enrich(item.id, aiBlob);
+    } catch {
+      toast("That file couldn't be read as an image. Try a JPG, PNG, GIF or WebP.");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  // ---------- auto-tagging ----------
+  const STOP = new Set("about above after again against all also and any are because been before being below between both but can could did does doing down during each few for from further had has have having her here hers herself him himself his how into its itself just let more most much must myself nor not now off once only other ought our ours ourselves out over own same she should some such than that the their theirs them themselves then there these they this those through too under until very was were what when where which while who whom why will with would you your yours yourself yourselves http https www com html really thing things like make made want need get got one two new note notes todo".split(" "));
+  const DOMAIN_TAGS = {
+    youtube: ["video"], youtu: ["video"], vimeo: ["video"], github: ["code"], gitlab: ["code"], figma: ["design"], dribbble: ["design", "inspiration"],
+    behance: ["design", "inspiration"], pinterest: ["inspiration"], are: ["inspiration"], instagram: ["social", "photo"], twitter: ["social"], x: ["social"],
+    linkedin: ["career"], spotify: ["music"], soundcloud: ["music"], bandcamp: ["music"], medium: ["article"], substack: ["newsletter", "article"],
+    wikipedia: ["reference"], amazon: ["shopping"], takealot: ["shopping"], etsy: ["shopping"], airbnb: ["travel"], booking: ["travel"],
+    nytimes: ["news", "article"], theguardian: ["news", "article"], bbc: ["news"], news24: ["news"], dailymaverick: ["news"], goodreads: ["books"],
+    imdb: ["film"], letterboxd: ["film"], netflix: ["film"], notion: ["productivity"], google: ["tool"], arxiv: ["research", "paper"],
+  };
+  function localEnrich(it) {
+    const tags = [];
+    if (it.url) {
+      const site = siteName(it.url).toLowerCase();
+      tags.push(...(DOMAIN_TAGS[site] || []));
+      if (!DOMAIN_TAGS[site] && site.length < 16) tags.push(site);
+    }
+    if (it.type === "note" && /\[( |x)\]/i.test(it.text || "")) tags.push("to-do");
+    if (it.type === "quote" && it.source) tags.push(it.source.toLowerCase().split(",")[0].trim());
+    const words = [it.title, it.text, it.url ? titleFromUrl(it.url) : ""].join(" ").toLowerCase().match(/[a-z][a-z'-]{3,}/g) || [];
+    const freq = {};
+    for (const w of words) if (!STOP.has(w)) freq[w] = (freq[w] || 0) + 1;
+    tags.push(...Object.entries(freq).sort((a, b) => b[1] - a[1] || b[0].length - a[0].length).slice(0, 4).map((x) => x[0]));
+    return { tags: uniq(tags.map(slugTag)).slice(0, 6), summary: "" };
+  }
+
+  function promptFor(it, withImage) {
+    const lines = [
+      "You are the librarian of a personal visual library called Curio. Someone just saved the item below.",
+      "Return ONLY a JSON object of the form {\"title\": string, \"tags\": string[], \"summary\": string}.",
+      "- title: a short, specific name for the item, at most 8 words. For a link, the most likely page title. If the person already gave a title, repeat it.",
+      "- tags: 3 to 6 lowercase tags of 1-2 words, mixing what it is (recipe, article, poster, to-do) with what it is about (ceramics, cape town, typography). For images include the main subject and the mood or style.",
+      "- summary: one plain sentence of at most 22 words describing it so it is easy to find later.",
+      "",
+      "Item type: " + it.type,
+    ];
+    if (it.title) lines.push("Title: " + it.title);
+    if (it.url) lines.push("URL: " + it.url);
+    if (it.text) lines.push("Text: " + String(it.text).slice(0, 3000));
+    if (it.source) lines.push("Attributed to: " + it.source);
+    if (it.colors && it.colors.length) lines.push("Dominant colours: " + it.colors.join(", "));
+    if (withImage) lines.push("The image itself is attached.");
+    else if (it.type === "image") lines.push("The image is not attached; tag from the title and colours only, and keep the summary generic.");
+    return lines.join("\n");
+  }
+
+  async function imageBlobFor(it) {
+    try {
+      const img = await loadImage(imageSrc(it));
+      return await toBlob(drawScaled(img, 1024), 0.82);
+    } catch { return null; }
+  }
+
+  async function enrich(id, imageBlob, opts = {}) {
+    const it = S.byId.get(id);
+    if (!it) return;
+    let result = null;
+    if (S.ai.sample && !S.ai.off) {
+      try {
+        const o = { modelTier: "quick" };
+        const withImage = !!(imageBlob && S.ai.images);
+        if (withImage) o.images = [imageBlob];
+        result = await S.ai.sample.json(promptFor(it, withImage), o);
+      } catch (e) {
+        const code = e && e.code;
+        if (code === "not_granted") { S.ai.off = true; renderFooter(); }
+        else if (code === "rate_limited") toast("Claude is busy, so this one was tagged on your device.");
+      }
+    }
+    if (!result || typeof result !== "object" || !Array.isArray(result.tags)) result = localEnrich(it);
+    const cur = S.byId.get(id);
+    if (!cur) return;
+    const fresh = result.tags.map(slugTag).filter((t) => t && t.length <= 32);
+    const keep = opts.replace ? (cur.tags || []).filter((t) => t === "example" || (cur.userTags || []).includes(t)) : cur.tags || [];
+    const next = { ...cur, tags: uniq([...keep, ...fresh]).slice(0, 9), aiStatus: "done" };
+    if (!cur.title && typeof result.title === "string" && result.title.trim() && cur.type !== "note") next.title = result.title.trim().slice(0, 90);
+    if (typeof result.summary === "string" && result.summary.trim()) next.summary = result.summary.trim().slice(0, 260);
+    await save(next);
+  }
+
+  // ---------- rendering the wall ----------
+  function columnCount() {
+    const w = $("#wall").clientWidth || window.innerWidth;
+    if (w < 330) return 1;
+    return Math.max(2, Math.min(6, Math.floor((w + 16) / (250 + 16))));
+  }
+
+  function render() {
+    renderChips();
+    const wall = $("#wall");
+    const n = columnCount();
+    S.cols = n;
+    wall.style.setProperty("--cols", n);
+    const list = filtered();
+    const total = S.items.length;
+    $("#tally").textContent = S.store
+      ? total === 0 ? "Nothing saved yet" : (list.length === total ? total : list.length + " of " + total) + (total === 1 ? " thing" : " things") + " kept"
+      : "Opening your curio…";
+    $("#clear-examples").hidden = !S.items.some((i) => (i.tags || []).includes("example"));
+
+    if (S.store && total === 0) {
+      const wide = n >= 3;
+      wall.style.setProperty("--cols", wide ? n : 1);
+      const empty = emptyState();
+      if (wide) empty.style.gridColumn = "2 / -1";
+      wall.replaceChildren(h("div", { class: "col" }, composer()), empty);
+      return;
+    }
+    if (S.store && !list.length) {
+      wall.replaceChildren(h("div", { class: "empty" },
+        h("h2", { text: "Nothing matches “" + (S.query || TYPES.find((t) => t[0] === S.type)[1]) + "”" }),
+        h("p", { text: "Search looks through titles, text, links, tags and colours. Try a broader word, or a colour like “blue”." }),
+        h("div", { class: "row" }, h("button", { class: "btn", type: "button", text: "Show everything", onclick: () => { S.query = ""; S.type = "all"; $("#q").value = ""; render(); } }))));
+      return;
+    }
+
+    const cols = Array.from({ length: n }, () => ({ el: h("div", { class: "col" }), hgt: 0 }));
+    const colWidth = Math.max(160, (wall.clientWidth - 16 * (n - 1)) / n);
+    const showComposer = S.type === "all" && !S.query.trim();
+    if (showComposer) { cols[0].el.append(composer()); cols[0].hgt += 190; }
+    for (const it of list) {
+      let best = cols[0];
+      for (const c of cols) if (c.hgt < best.hgt - 1) best = c;
+      best.el.append(cardFor(it));
+      best.hgt += estimateHeight(it, colWidth) + 16;
+    }
+    wall.replaceChildren(...cols.map((c) => c.el));
+    const live = new Set(S.items.map((i) => i.id));
+    for (const k of cardCache.keys()) if (!live.has(k)) cardCache.delete(k);
+  }
+
+  function emptyState() {
+    return h("div", { class: "empty", style: "padding-top: 8px" },
+      h("h2", { text: "A quiet place for everything you want to keep." }),
+      h("p", { text: "Save notes, links, quotes and images. Each one gets tagged for you, so you can find it later by what it's about, where it came from, or even its colour." }),
+      h("p", { text: "Type in the box, paste anything onto the page, or drag images in." }),
+      h("div", { class: "row" },
+        h("button", { class: "btn primary", type: "button", text: "Add a few example cards", onclick: addExamples }),
+        h("button", { class: "btn", type: "button", text: "Write a note", onclick: () => $("#composer-text").focus() })));
+  }
+
+  // ---------- detail sheet ----------
+  function openDetail(id) {
+    S.openId = id;
+    const ov = $("#overlay");
+    ov.hidden = false;
+    document.body.style.overflow = "hidden";
+    buildDetail();
+    setTimeout(() => $(".close", ov)?.focus());
+  }
+  function closeDetail() {
+    const back = S.openId && cardCache.get(S.openId)?.el;
+    S.openId = null;
+    $("#overlay").hidden = true;
+    $("#overlay").replaceChildren();
+    document.body.style.overflow = "";
+    if (back && back.isConnected) back.focus({ preventScroll: true });
+  }
+
+  const pendingEdits = new Map();
+  const flushEdit = debounce(() => {
+    for (const [id, patch] of pendingEdits) {
+      const cur = S.byId.get(id);
+      if (cur) save({ ...cur, ...patch });
+    }
+    pendingEdits.clear();
+  }, 500);
+  function edit(id, patch) {
+    pendingEdits.set(id, { ...(pendingEdits.get(id) || {}), ...patch });
+    flushEdit();
+  }
+
+  function tagRow(it) {
+    const set = h("div", { class: "tagset", id: "detail-tags" });
+    for (const t of it.tags || []) {
+      set.append(h("span", { class: "tag" },
+        h("button", { class: "go", type: "button", title: "Show everything tagged " + t, text: t, onclick: () => { closeDetail(); searchFor("#" + tagKey(t)); } }),
+        h("button", { type: "button", "aria-label": "Remove tag " + t, text: "×", onclick: () => {
+          const cur = S.byId.get(it.id);
+          save({ ...cur, tags: (cur.tags || []).filter((x) => x !== t), userTags: (cur.userTags || []).filter((x) => x !== t) });
+        } })));
+    }
+    for (const c of it.colors || []) {
+      set.append(h("button", { class: "tag color", type: "button", style: "--sw:" + c, title: "Show everything " + c, onclick: () => { closeDetail(); searchFor("#" + c); } },
+        h("i"), c));
+    }
+    const add = h("input", { class: "tagadd", type: "text", id: "tag-add", placeholder: "+ add tag", "aria-label": "Add a tag" });
+    add.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && add.value.trim()) {
+        const t = slugTag(add.value);
+        const cur = S.byId.get(it.id);
+        add.value = "";
+        save({ ...cur, tags: uniq([...(cur.tags || []), t]), userTags: uniq([...(cur.userTags || []), t]) });
+      }
+    });
+    set.append(add);
+    return set;
+  }
+
+  function summaryEl(it) {
+    if (it.aiStatus === "pending") return h("div", { class: "summary none", id: "detail-summary" }, h("span", { class: "thinking", text: "Claude is reading this…" }));
+    return h("div", { class: "summary" + (it.summary ? "" : " none"), id: "detail-summary", text: it.summary || "No summary yet." });
+  }
+
+  function refreshDetail() {
+    const it = S.byId.get(S.openId);
+    if (!it) { closeDetail(); return; }
+    const tags = $("#detail-tags");
+    if (tags) {
+      const typingTag = document.activeElement && document.activeElement.id === "tag-add";
+      const draft = typingTag ? document.activeElement.value : "";
+      tags.replaceWith(tagRow(it));
+      if (typingTag) { const add = $("#tag-add"); add.value = draft; add.focus(); }
+    }
+    const sum = $("#detail-summary");
+    if (sum) sum.replaceWith(summaryEl(it));
+    const t = $("#detail-title");
+    if (t && document.activeElement !== t && !t.value && it.title) t.value = it.title;
+    const rt = $("#retag");
+    if (rt) rt.disabled = it.aiStatus === "pending";
+  }
+
+  function buildDetail() {
+    const it = S.byId.get(S.openId);
+    if (!it) return closeDetail();
+    const ov = $("#overlay");
+    const stage = h("div", { class: "stage" });
+
+    if (it.type === "image") {
+      stage.append(h("img", { src: imageSrc(it), alt: it.title || it.summary || "Saved image" }));
+    } else if (it.type === "link") {
+      let u = null; try { u = new URL(it.url); } catch {}
+      stage.append(h("div", { class: "linkface", style: "--h:" + hueOf(domainOf(it.url) || "") },
+        h("div", { class: "site", text: siteName(it.url) }),
+        h("div", { class: "path", text: u ? u.hostname + u.pathname : it.url })));
+      stage.append(h("a", { class: "btn primary open-link", href: it.url, target: "_blank", rel: "noopener noreferrer", text: "Open " + (domainOf(it.url) || "link") + " ↗" }));
+    } else if (it.type === "quote") {
+      const ta = h("textarea", { class: "quotebig", id: "detail-text", "aria-label": "Quote" });
+      ta.value = it.text || "";
+      ta.addEventListener("input", () => edit(it.id, { text: ta.value }));
+      const src = h("input", { type: "text", class: "sourcebig", id: "detail-source", placeholder: "Who said it?", "aria-label": "Source" });
+      src.value = it.source || "";
+      src.addEventListener("input", () => edit(it.id, { source: src.value }));
+      stage.append(ta, src);
+    } else {
+      const ta = h("textarea", { class: "notebig", id: "detail-text", "aria-label": "Note", placeholder: "Write anything. Start a line with [ ] to make a checklist." });
+      ta.value = it.text || "";
+      ta.addEventListener("input", () => edit(it.id, { text: ta.value }));
+      stage.append(ta);
+    }
+
+    const title = h("input", { type: "text", class: "titlebig", id: "detail-title", placeholder: it.type === "link" ? titleFromUrl(it.url) : "Untitled", "aria-label": "Title" });
+    title.value = it.title || "";
+    title.addEventListener("input", () => edit(it.id, { title: title.value }));
+
+    const side = h("div", { class: "side" }, title);
+
+    if (it.type === "note" || it.type === "quote") {
+      side.append(h("div", { class: "field" }, h("span", { class: "lbl", text: "Show as" }),
+        h("div", { class: "seg" }, ["note", "quote"].map((t) => h("button", {
+          type: "button", "aria-pressed": String(it.type === t), text: t === "note" ? "Note" : "Quote",
+          onclick: () => { if (it.type !== t) { flushNow(); save({ ...S.byId.get(it.id), type: t }); setTimeout(buildDetail); } },
+        })))));
+    }
+
+    side.append(h("div", { class: "field" }, h("span", { class: "lbl", text: "Tags" }), tagRow(it)));
+    side.append(h("div", { class: "field" }, h("span", { class: "lbl", text: "Summary" }), summaryEl(it)));
+
+    if (it.type === "link" || it.type === "image") {
+      const notes = h("textarea", { id: "detail-notes", rows: "4", placeholder: "Why did you save this?", "aria-label": "Your notes" });
+      notes.value = it.text || "";
+      notes.addEventListener("input", () => edit(it.id, { text: notes.value }));
+      side.append(h("div", { class: "field" }, h("span", { class: "lbl", text: "Your notes" }), notes));
+    }
+
+    const facts = h("div", { class: "facts" }, h("span", { text: "Saved " + fmtDate(it.createdAt) }));
+    if (it.updatedAt && it.updatedAt - it.createdAt > 60000) facts.append(h("span", { text: "Edited " + fmtDate(it.updatedAt) }));
+    if (it.url) facts.append(h("a", { href: it.url, target: "_blank", rel: "noopener noreferrer", text: it.url }));
+    if (it.type === "image" && it.w) facts.append(h("span", { text: it.w + " × " + it.h + " px" }));
+    side.append(facts);
+
+    const actions = h("div", { class: "actions" });
+    const retag = h("button", { class: "btn", id: "retag", type: "button", text: S.ai.sample && !S.ai.off ? "Re-tag with Claude" : "Re-tag", disabled: it.aiStatus === "pending",
+      onclick: async () => {
+        flushNow();
+        const cur = S.byId.get(it.id);
+        await save({ ...cur, aiStatus: "pending" });
+        const blob = cur.type === "image" && S.ai.images ? await imageBlobFor(cur) : null;
+        enrich(it.id, blob, { replace: true });
+      } });
+    const del = h("button", { class: "btn danger", type: "button", text: "Delete", onclick: () => {
+      actions.replaceChildren(h("div", { class: "confirm" },
+        h("span", { text: "Delete this for good?" }),
+        h("button", { class: "btn danger solid", type: "button", text: "Delete", onclick: () => removeItem(it.id) }),
+        h("button", { class: "btn quiet", type: "button", text: "Keep it", onclick: () => actions.replaceChildren(retag, del) })));
+    } });
+    actions.append(retag, del);
+    side.append(actions);
+
+    const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": it.title || it.type },
+      h("button", { class: "close", type: "button", "aria-label": "Close", text: "×", onclick: closeDetail }),
+      stage, side);
+    ov.replaceChildren(sheet);
+  }
+  function flushNow() {
+    for (const [id, patch] of pendingEdits) {
+      const cur = S.byId.get(id);
+      if (cur) save({ ...cur, ...patch });
+    }
+    pendingEdits.clear();
+  }
+
+  async function removeItem(id) {
+    const it = S.byId.get(id);
+    pendingEdits.delete(id);
+    closeDetail();
+    await S.store.remove(id);
+    if (it && it.assetId && S.assets) S.assets.delete(it.assetId).catch(() => {});
+    toast("Deleted");
+  }
+
+  function searchFor(q) {
+    S.query = q;
+    S.type = "all";
+    $("#q").value = q;
+    $("#q-clear").hidden = !q;
+    render();
+    window.scrollTo({ top: 0 });
+  }
+
+  // ---------- examples ----------
+  function paintExample(kind) {
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    if (kind === 0) {
+      c.width = 900; c.height = 1150;
+      ctx.fillStyle = "#e9e2d4"; ctx.fillRect(0, 0, 900, 1150);
+      ctx.fillStyle = "#2f47d6"; ctx.beginPath(); ctx.arc(450, 470, 270, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#e0503c"; ctx.fillRect(120, 760, 660, 120);
+      ctx.fillStyle = "#16181f"; ctx.fillRect(120, 920, 300, 34);
+      ctx.fillStyle = "#f1b631"; ctx.beginPath(); ctx.arc(640, 300, 90, 0, Math.PI * 2); ctx.fill();
+    } else {
+      c.width = 1200; c.height = 800;
+      const g = ctx.createLinearGradient(0, 0, 0, 800);
+      g.addColorStop(0, "#1d2a6b"); g.addColorStop(0.55, "#b5577a"); g.addColorStop(1, "#f4a259");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 1200, 800);
+      ctx.fillStyle = "#151827";
+      ctx.beginPath(); ctx.moveTo(0, 800); ctx.lineTo(0, 560); ctx.lineTo(260, 470); ctx.lineTo(470, 540); ctx.lineTo(720, 420); ctx.lineTo(950, 520); ctx.lineTo(1200, 450); ctx.lineTo(1200, 800); ctx.fill();
+    }
+    return new Promise((res) => c.toBlob((b) => res(new File([b], "example.jpg", { type: "image/jpeg" })), "image/jpeg", 0.9));
+  }
+  async function addExamples() {
+    const ex = [
+      { type: "quote", text: "The details are not the details. They make the design.", source: "Charles Eames", tags: ["example", "design", "craft"] },
+      { type: "link", url: "https://en.wikipedia.org/wiki/Cabinet_of_curiosities", title: "Cabinet of curiosities", text: "Where the name comes from.", tags: ["example", "history", "collecting"] },
+      { type: "note", title: "Weekend in Cape Town", text: "[ ] Book Kirstenbosch summer concert tickets\n[x] Ask Thandi about the Bo-Kaap food tour\n[ ] Pack the film camera\n[ ] Sunset at Signal Hill", tags: ["example", "travel", "to-do"] },
+      { type: "link", url: "https://fonts.google.com/specimen/Instrument+Serif", title: "Instrument Serif", tags: ["example", "typography", "font"] },
+      { type: "note", text: "App idea: a shared grocery list that learns what we buy every week and pre-fills it on Sunday morning.", tags: ["example", "idea", "product"] },
+      { type: "quote", text: "Simplicity is about subtracting the obvious and adding the meaningful.", source: "John Maeda", tags: ["example", "design", "simplicity"] },
+      { type: "link", url: "https://www.are.na/", title: "Are.na", text: "Visual research tool. Good for moodboards.", tags: ["example", "inspiration", "tool"] },
+    ];
+    const now = Date.now();
+    let i = 0;
+    for (const f of ex) {
+      const item = newItem({ ...f, aiStatus: "done", summary: "" });
+      item.createdAt = item.updatedAt = now - (i++ + 2) * 3600e3;
+      await save(item);
+    }
+    await addImageFile(await paintExample(0), { title: "Colour study, blue sun", tags: ["example", "poster", "colour study"], createdAt: now - 1800e3 });
+    await addImageFile(await paintExample(1), { title: "Dusk palette", tags: ["example", "palette", "landscape"], createdAt: now - 12 * 3600e3 });
+  }
+  async function clearExamples() {
+    const ex = S.items.filter((i) => (i.tags || []).includes("example"));
+    for (const it of ex) {
+      await S.store.remove(it.id);
+      if (it.assetId && S.assets) S.assets.delete(it.assetId).catch(() => {});
+    }
+    toast("Removed " + ex.length + " example cards");
+  }
+
+  // ---------- footer ----------
+  function renderFooter() {
+    const m = S.store ? S.store.mode : null;
+    const where = $("#where");
+    where.replaceChildren(h("span", { class: "dot" + (m === "cloud" ? " on" : "") }),
+      m === "cloud" ? "Synced to your Claude account, private to you"
+        : m === "local" ? "Saved in this browser only"
+        : m === "memory" ? "Not saved: this browser is blocking storage" : "Starting…");
+    $("#aiwhere").textContent = S.ai.sample && !S.ai.off ? "Auto-tagging by Claude" : "Auto-tagging on this device";
+  }
+
+  // ---------- global input ----------
+  const q = $("#q");
+  const onSearch = debounce(() => { S.query = q.value; namingSpace = false; render(); }, 120);
+  q.addEventListener("input", () => { $("#q-clear").hidden = !q.value; onSearch(); });
+  q.addEventListener("keydown", (e) => { if (e.key === "Escape") { q.value = ""; $("#q-clear").hidden = true; S.query = ""; render(); q.blur(); } });
+  $("#q-clear").addEventListener("click", () => { q.value = ""; $("#q-clear").hidden = true; S.query = ""; render(); q.focus(); });
+  $("#file-input").addEventListener("change", async (e) => {
+    const files = [...e.target.files];
+    e.target.value = "";
+    for (const f of files) await addImageFile(f);
+  });
+  $("#clear-examples").addEventListener("click", clearExamples);
+  $("#overlay").addEventListener("click", (e) => { if (e.target.id === "overlay") closeDetail(); });
+
+  const typing = (el) => el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && S.openId) { flushNow(); closeDetail(); return; }
+    if (S.openId || typing(document.activeElement) || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "/") { e.preventDefault(); q.focus(); }
+    else if (e.key === "n" && S.type === "all" && !S.query) { e.preventDefault(); $("#composer-text")?.focus(); }
+  });
+
+  document.addEventListener("paste", (e) => {
+    if (!S.store) return;
+    const files = [...(e.clipboardData?.files || [])].filter((f) => /^image\//.test(f.type));
+    if (files.length && !(S.openId && typing(document.activeElement))) {
+      e.preventDefault();
+      files.forEach((f) => addImageFile(f));
+      return;
+    }
+    if (typing(document.activeElement) || S.openId) return;
+    const text = e.clipboardData?.getData("text/plain");
+    if (text && text.trim()) {
+      e.preventDefault();
+      if (S.type !== "all" || S.query) { S.type = "all"; S.query = ""; q.value = ""; render(); }
+      const ta = $("#composer-text");
+      ta.value = text;
+      ta.dispatchEvent(new Event("input"));
+      ta.focus();
+    }
+  });
+
+  let dragDepth = 0;
+  const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes("Files");
+  window.addEventListener("dragenter", (e) => { if (hasFiles(e)) { dragDepth++; $("#drop").hidden = false; } });
+  window.addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; $("#drop").hidden = true; } });
+  window.addEventListener("dragover", (e) => { if (hasFiles(e)) e.preventDefault(); });
+  window.addEventListener("drop", (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragDepth = 0;
+    $("#drop").hidden = true;
+    [...e.dataTransfer.files].forEach((f) => addImageFile(f));
+  });
+
+  let lastW = window.innerWidth;
+  window.addEventListener("resize", debounce(() => {
+    if (window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
+    if (columnCount() !== S.cols) render();
+  }, 120));
+
+  render();
+  renderFooter();
+  connect();
+})();
+</script>
