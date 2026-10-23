@@ -159,12 +159,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .make .dots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--card); margin-left: -6px; }
 .make .dots i:first-child { margin-left: 0; }
 
-/* the liquid glass is drawn by WebGL on this canvas; cards it owns are drawn there and kept invisible here */
-.glcanvas { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 19; pointer-events: none; }
-.card.gl-owned { opacity: 0; }
-.dock.glass { background: var(--glass); }
 .dock {
-  background: none;
   position: sticky;
   top: calc(env(safe-area-inset-top, 0px) + 10px);
   z-index: 20;
@@ -772,8 +767,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     </div>
   </header>
 
-  <canvas class="glcanvas" id="gl" aria-hidden="true"></canvas>
-  <div class="dock" id="dock">
+  <div class="dock glass" id="dock">
     <div class="search" role="search">
       <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search your curio…" aria-label="Search everything you've saved">
       <button class="clear" id="q-clear" type="button" hidden>clear ×</button>
@@ -798,7 +792,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 <div class="drop" id="drop" hidden><div>Drop to save</div></div>
 <div class="toast glass" id="toast" role="status" hidden></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 (() => {
   "use strict";
@@ -956,7 +949,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     auraKey = null;
     tintAura();
     LIQUID.refreshAll();
-    GLASS.schedule();
   }
 
   // ---------- liquid glass refraction (Chromium only) ----------
@@ -1060,458 +1052,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     }
     return { ok, attach, refreshAll: () => all.forEach((f) => f()) };
   })();
-
-
-  // ---------- liquid glass: one GPU surface for the bar and the cards meeting it ----------
-  // The bar's glass and every card near it are drawn by a WebGL shader as one liquid scene. Each shape is a signed
-  // distance field; the bar and the nearest card are joined with a smooth union whose blend radius grows on a spring
-  // as they approach, so glass bulges from one side and card material rises from the other until they fuse. Inside the
-  // glass the shader lenses what's behind it (cards passing under, and the colour field) along the surface normal, with
-  // a colour fringe at the bevel, a frosted blur and a moving specular rim. Cards are captured once with html2canvas
-  // and kept in a texture array; while the GPU owns a card, its DOM twin is transparent but still clickable.
-  const GLASS = (() => {
-    const canvas = $("#gl"), dock = $("#dock");
-    const fallback = () => { dock.classList.add("glass"); canvas.remove(); return { ok: false, schedule() {} }; };
-    const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, alpha: true, antialias: false });
-    if (!gl) return fallback();
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const MAX = 12, LW = 640, LH = 960;
-
-    const VS = `#version 300 es
-in vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }`;
-    const FS = `#version 300 es
-precision highp float;
-precision highp sampler2DArray;
-uniform vec2 uView; uniform float uDpr;
-uniform vec4 uDock; uniform float uDockR;
-uniform int uCount; uniform vec4 uCard[${MAX}]; uniform vec4 uUV[${MAX}]; uniform float uLayer[${MAX}]; uniform float uK[${MAX}];
-uniform float uCardR;
-uniform sampler2DArray uTex;
-uniform vec3 uAura[3]; uniform vec3 uAuraCol[3]; uniform float uAuraO;
-uniform vec3 uPaper; uniform vec4 uGlass; uniform float uBlur; uniform float uDark; uniform float uLight;
-out vec4 outColor;
-
-float sdRR(vec2 p, vec4 r, float rad) {
-  vec2 hs = r.zw * 0.5;
-  vec2 q = abs(p - (r.xy + hs)) - (hs - rad);
-  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rad;
-}
-float smin(float a, float b, float k) {
-  if (k <= 0.0) return min(a, b);
-  float h = max(k - abs(a - b), 0.0) / k;
-  return min(a, b) - h * h * k * 0.25;
-}
-float scene(vec2 p, out float dD, out float dC, out int ic) {
-  dD = sdRR(p, uDock, uDockR);
-  dC = 1e5; ic = -1; float k = 0.0;
-  for (int i = 0; i < ${MAX}; i++) {
-    if (i >= uCount) break;
-    float d = sdRR(p, uCard[i], uCardR);
-    if (d < dC) { dC = d; ic = i; k = uK[i]; }
-  }
-  return smin(dD, dC, k);
-}
-float sceneOnly(vec2 p) { float a, b; int c; return scene(p, a, b, c); }
-
-vec3 aura(vec2 q) {
-  vec3 acc = vec3(0.0); float a = 0.0;
-  for (int i = 0; i < 3; i++) {
-    float t = clamp(1.0 - length(q - uAura[i].xy) / uAura[i].z, 0.0, 1.0);
-    acc = acc * (1.0 - t) + uAuraCol[i] * t;
-    a = a * (1.0 - t) + t;
-  }
-  return uPaper * (1.0 - a * uAuraO) + acc * uAuraO;
-}
-vec4 cardAt(vec2 q, float lod) {
-  for (int i = 0; i < ${MAX}; i++) {
-    if (i >= uCount) break;
-    vec4 r = uCard[i];
-    vec2 f = (q - r.xy) / r.zw;
-    if (f.x >= 0.0 && f.y >= 0.0 && f.x <= 1.0 && f.y <= 1.0) {
-      vec4 c = textureLod(uTex, vec3(mix(uUV[i].xy, uUV[i].zw, f), uLayer[i]), lod);
-      return c * clamp(0.5 - sdRR(q, r, uCardR), 0.0, 1.0);
-    }
-  }
-  return vec4(0.0);
-}
-vec3 behind(vec2 q, float lod) { vec4 c = cardAt(q, lod); return aura(q) * (1.0 - c.a) + c.rgb; }
-
-void main() {
-  vec2 p = vec2(gl_FragCoord.x, uView.y * uDpr - gl_FragCoord.y) / uDpr;
-  float dD, dC; int ic;
-  float d = scene(p, dD, dC, ic);
-  if (d > 40.0) { outColor = vec4(0.0); return; }
-  vec2 e = vec2(0.75, 0.0);
-  vec2 n = vec2(sceneOnly(p + e.xy) - sceneOnly(p - e.xy), sceneOnly(p + e.yx) - sceneOnly(p - e.yx));
-  n = n / max(length(n), 1e-5);
-  float alpha = clamp(0.5 - d, 0.0, 1.0);
-
-  // Soft contact shadow outside the liquid.
-  float shadow = d > 0.0 ? 0.13 * exp(-max(d - 1.0, 0.0) / 9.0) * (0.4 + 0.6 * smoothstep(-20.0, 20.0, dC - dD)) : 0.0;
-  if (alpha <= 0.0) { outColor = vec4(0.0, 0.0, 0.0, shadow * (uDark > 0.5 ? 1.6 : 1.0)); return; }
-
-  // Which material: 1 is glass (the bar and its side of a neck), 0 is a card.
-  float m = dD <= 0.0 ? 1.0 : (ic < 0 ? 1.0 : smoothstep(-4.0, 4.0, dC - dD));
-
-  // Glass: a convex bevel bends the view toward the inside, strongest at the rim.
-  float B = 26.0;
-  float tt = clamp(-d / B, 0.0, 1.0);
-  float bend = 1.0 - sqrt(max(0.0, 1.0 - (1.0 - tt) * (1.0 - tt)));
-  vec2 off = -n * bend * 30.0;
-  vec3 glass = vec3(0.0);
-  if (m > 0.001) {
-    vec3 acc = vec3(0.0);
-    for (int i = 0; i < 9; i++) {
-      float a = float(i) * 2.3999632;
-      float r = uBlur * sqrt((float(i) + 0.5) / 9.0);
-      acc += behind(p + off + vec2(cos(a), sin(a)) * r, 2.4);
-    }
-    vec3 bg = acc / 9.0;
-    if (bend > 0.01) {
-      bg.r = mix(bg.r, behind(p + off * 1.12, 1.5).r, 0.55 * bend + 0.2);
-      bg.b = mix(bg.b, behind(p + off * 0.86, 1.5).b, 0.55 * bend + 0.2);
-    }
-    glass = mix(bg, uGlass.rgb, uGlass.a);
-    vec2 L = normalize(vec2(cos(uLight), sin(uLight)));
-    float facing = dot(n, L);
-    float rim = pow(1.0 - tt, 7.0) * (0.35 + 0.65 * max(facing, 0.0));
-    float back = pow(1.0 - tt, 12.0) * 0.5 * max(-facing, 0.0);
-    float sheen = (1.0 - smoothstep(0.0, 70.0, p.y - uDock.y)) * 0.06;
-    glass += vec3(1.0) * (rim * 0.7 + back + sheen) * (uDark > 0.5 ? 0.4 : 1.0);
-  }
-
-  // Card material: in a neck, sample the nearest edge of the card so its material stretches toward the glass.
-  vec3 card = vec3(0.0);
-  if (m < 0.999 && ic >= 0) {
-    vec4 r = uCard[ic];
-    vec2 q = p;
-    float dc = sdRR(p, r, uCardR);
-    if (dc > -1.0) {
-      vec2 g = vec2(sdRR(p + e.xy, r, uCardR) - sdRR(p - e.xy, r, uCardR), sdRR(p + e.yx, r, uCardR) - sdRR(p - e.yx, r, uCardR));
-      g = g / max(length(g), 1e-5);
-      q = p - g * (dc + 1.5);
-    }
-    q += -n * bend * 8.0;
-    vec4 c = cardAt(q, 0.0);
-    card = aura(p) * (1.0 - c.a) + c.rgb;
-    card += vec3(1.0) * pow(1.0 - tt, 9.0) * 0.18 * (uDark > 0.5 ? 0.5 : 1.0);
-  }
-
-  vec3 col = mix(card, glass, m);
-  outColor = vec4(col * alpha, alpha) + vec4(0.0, 0.0, 0.0, shadow) * (1.0 - alpha);
-}`;
-
-    function compile(type, src) {
-      const sh = gl.createShader(type);
-      gl.shaderSource(sh, src);
-      gl.compileShader(sh);
-      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(sh)); return null; }
-      return sh;
-    }
-    const vs = compile(gl.VERTEX_SHADER, VS), fs = compile(gl.FRAGMENT_SHADER, FS);
-    if (!vs || !fs) return fallback();
-    const prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(prog)); return fallback(); }
-    gl.useProgram(prog);
-    const U = {};
-    for (const n of ["uView", "uDpr", "uDock", "uDockR", "uCount", "uCard", "uUV", "uLayer", "uK", "uCardR", "uTex", "uAura", "uAuraCol", "uAuraO", "uPaper", "uGlass", "uBlur", "uDark", "uLight"]) U[n] = gl.getUniformLocation(prog, n);
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, "aPos");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-    const tex = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
-    gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 6, gl.RGBA8, LW, LH, MAX);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.uniform1i(U.uTex, 0);
-    const scratch = document.createElement("canvas");
-    scratch.width = LW;
-    scratch.height = LH;
-    const sctx = scratch.getContext("2d");
-
-    // ----- card captures -----
-    const rasters = new WeakMap();
-    const queue = [];
-    let busy = false;
-    const capturable = typeof html2canvas === "function";
-    function wantRaster(el, r) {
-      if (!capturable) return;
-      const have = rasters.get(el);
-      if (have && Math.abs(have.w - r.width) < 1 && Math.abs(have.h - r.height) < 1) return;
-      if (!queue.includes(el)) queue.push(el);
-      pump();
-    }
-    function pump() {
-      if (busy || !queue.length) return;
-      busy = true;
-      const el = queue.shift();
-      const go = async () => {
-        try {
-          if (!el.isConnected) return;
-          if (el.classList.contains("enter")) { queue.push(el); return; }
-          const r = el.getBoundingClientRect();
-          const s = Math.min(Math.min(window.devicePixelRatio || 1, 2), (LW - 2) / r.width, (LH - 2) / r.height);
-          // Images must be loaded, or the capture comes out blank.
-          for (const img of el.querySelectorAll("img")) {
-            img.loading = "eager";
-            if (!img.complete) await new Promise((res) => { img.addEventListener("load", res, { once: true }); img.addEventListener("error", res, { once: true }); setTimeout(res, 3000); });
-          }
-          el.setAttribute("data-capture", "1");
-          // html2canvas sets canvas fonts without font-stretch, so expanded titles would come out at normal width
-          // with stretched letter spacing. Carry the stretch into the canvas font while capturing.
-          const stretch = getComputedStyle(document.documentElement).getPropertyValue("--title-wdth").trim();
-          const desc = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, "font");
-          const keyword = { "125%": "expanded", "112.5%": "semi-expanded", "100%": "" }[stretch] || "";
-          if (keyword && desc) {
-            Object.defineProperty(CanvasRenderingContext2D.prototype, "font", {
-              configurable: true,
-              get() { return desc.get.call(this); },
-              set(v) {
-                const wide = /Archivo/.test(v);
-                desc.set.call(this, wide ? v.replace(/(\d+(?:\.\d+)?px)/, keyword + " $1") : v);
-                if ("fontStretch" in this) this.fontStretch = wide ? keyword : "normal";
-              },
-            });
-          }
-          let c;
-          try {
-          c = await html2canvas(el, {
-            backgroundColor: null, scale: s, logging: false, useCORS: true,
-            ignoreElements: (n) => n !== el && n.classList && (n.classList.contains("card") || n.classList.contains("aura") || n.id === "gl" || n.id === "overlay" || n.id === "toast" || n.id === "panel"),
-            onclone: (doc) => {
-              const c2 = doc.querySelector('[data-capture="1"]');
-              if (c2) {
-                // html2canvas draws inset shadows as a solid inner box, so captures go without the shadow.
-                c2.style.opacity = "1"; c2.style.transform = "none"; c2.style.transition = "none"; c2.style.animation = "none"; c2.style.boxShadow = "none";
-                c2.classList.remove("gl-owned", "enter");
-              }
-            },
-          });
-          } finally {
-            if (keyword && desc) Object.defineProperty(CanvasRenderingContext2D.prototype, "font", desc);
-          }
-          el.removeAttribute("data-capture");
-          rasters.set(el, { canvas: c, w: r.width, h: r.height, v: (rasters.get(el)?.v || 0) + 1 });
-          schedule();
-        } catch { el.removeAttribute("data-capture"); }
-        finally { busy = false; setTimeout(pump, 30); }
-      };
-      (window.requestIdleCallback || ((f) => setTimeout(f, 40)))(go, { timeout: 300 });
-    }
-
-    // ----- texture layers, reused least-recently -----
-    const layers = Array.from({ length: MAX }, () => ({ el: null, v: 0, used: 0 }));
-    let tick = 0;
-    function layerFor(el) {
-      const ras = rasters.get(el);
-      if (!ras) return -1;
-      let idx = layers.findIndex((L) => L.el === el);
-      if (idx >= 0 && layers[idx].v === ras.v) { layers[idx].used = tick; return idx; }
-      if (idx < 0) {
-        idx = 0;
-        for (let i = 1; i < MAX; i++) if (layers[i].used < layers[idx].used) idx = i;
-        if (layers[idx].used === tick) return -1;
-      }
-      sctx.clearRect(0, 0, LW, LH);
-      sctx.drawImage(ras.canvas, 0, 0);
-      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, idx, LW, LH, 1, gl.RGBA, gl.UNSIGNED_BYTE, scratch);
-      gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
-      layers[idx] = { el, v: ras.v, used: tick };
-      return idx;
-    }
-
-    // ----- colours read from the page's tokens -----
-    const probe = document.createElement("i");
-    probe.style.display = "none";
-    document.body.append(probe);
-    const colorCache = new Map();
-    function rgb(str) {
-      const key = str.trim();
-      if (colorCache.has(key)) return colorCache.get(key);
-      probe.style.color = "";
-      probe.style.color = key;
-      const m = (getComputedStyle(probe).color.match(/[\d.]+/g) || [0, 0, 0]).map(Number);
-      const out = [m[0] / 255, m[1] / 255, m[2] / 255];
-      if (colorCache.size > 64) colorCache.clear();
-      colorCache.set(key, out);
-      return out;
-    }
-
-    const springs = new Map();
-    let owned = new Set();
-    let running = false, loop = 0, lastT = 0, lastFrame = 0, lastScrollY = -1, lastScrollAt = 0, errors = 0, dead = false;
-
-    // If drawing ever fails, give the page back to plain HTML and frosted CSS glass rather than leave a frozen frame.
-    function disable() {
-      if (dead) return;
-      dead = true;
-      for (const el of owned) el.classList.remove("gl-owned");
-      owned = new Set();
-      canvas.hidden = true;
-      dock.classList.add("glass");
-    }
-    canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); disable(); });
-
-    function frame(t, id) {
-      if (id !== loop) return;
-      lastFrame = performance.now();
-      let again = false;
-      try { again = draw(t); }
-      catch (err) {
-        console.error(err);
-        if (++errors > 2) disable();
-      }
-      // Keep drawing while springs move or the page is still scrolling (momentum scrolls can be quiet).
-      if (window.scrollY !== lastScrollY) { lastScrollY = window.scrollY; lastScrollAt = lastFrame; }
-      if (!dead && (again || lastFrame - lastScrollAt < 300)) requestAnimationFrame((t2) => frame(t2, id));
-      else { running = false; lastT = 0; }
-    }
-
-    function draw(t) {
-      tick++;
-      const dt = Math.min(0.034, lastT ? (t - lastT) / 1000 : 0.016);
-      lastT = t;
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      if (canvas.width !== Math.round(vw * dpr) || canvas.height !== Math.round(vh * dpr)) {
-        canvas.width = Math.round(vw * dpr);
-        canvas.height = Math.round(vh * dpr);
-      }
-      const dr = dock.getBoundingClientRect();
-      const small = vw < 560;
-      const REACH = small ? 70 : 100, KMAX = small ? 40 : 52;
-      const band = dr.bottom + REACH;
-      const engage = Math.min(1, Math.max(0, (window.scrollY - 20) / 60));
-      const root = getComputedStyle(document.documentElement);
-      const cardR = parseFloat(root.getPropertyValue("--radius")) || 12;
-
-      // Read positions first, write styles after. Only the card at the front of each column (the first one still
-      // showing below the bar) can merge with it; anything behind it, or with another card in between, can't.
-      const near = [];
-      for (const col of document.querySelectorAll("#wall > .col")) {
-        let frontTaken = false;
-        for (const el of col.children) {
-          const r = el.getBoundingClientRect();
-          if (r.top > band + 700) break;
-          const front = !frontTaken && r.bottom > dr.bottom + 1;
-          if (front) frontTaken = true;
-          if (el.classList.contains("composer") || r.bottom < 0) continue;
-          if (r.top <= band) near.push([el, r, front]);
-          else wantRaster(el, r);
-        }
-      }
-      near.sort((a, b) => Math.abs(a[1].top - dr.bottom) - Math.abs(b[1].top - dr.bottom));
-      let moving = false;
-      const cards = [], now = new Set();
-      for (const [el, r, front] of near) {
-        if (cards.length >= MAX) break;
-        wantRaster(el, r);
-        const ras = rasters.get(el);
-        if (!ras || Math.abs(ras.w - r.width) > 1 || Math.abs(ras.h - r.height) > 1) continue;
-        const layer = layerFor(el);
-        if (layer < 0) continue;
-        const gap = r.top - dr.bottom;
-        // A card already reaching above the bar's top edge lets go, so glass never climbs up its length.
-        const target = !front ? 0 : engage * (gap > 0 ? Math.pow(Math.max(0, 1 - gap / REACH), 1.2) : 1) * Math.min(1, Math.max(0, (r.top - dr.top) / 30));
-        let sp = springs.get(el);
-        if (!sp) { sp = { s: target, v: 0 }; springs.set(el, sp); }
-        if (reduce) { sp.s = target; sp.v = 0; }
-        else {
-          sp.v += (170 * (target - sp.s) - 13 * sp.v) * dt;
-          sp.s += sp.v * dt;
-          if (Math.abs(sp.v) > 0.002 || Math.abs(target - sp.s) > 0.002) moving = true;
-        }
-        const c = ras.canvas;
-        cards.push({ r, layer, k: KMAX * Math.max(0, sp.s), u: c.width / LW, v: c.height / LH });
-        now.add(el);
-      }
-      for (const el of springs.keys()) if (!now.has(el)) springs.delete(el);
-      for (const el of owned) if (!now.has(el)) el.classList.remove("gl-owned");
-      for (const el of now) el.classList.add("gl-owned");
-      owned = now;
-
-      // Uniforms.
-      const cardA = new Float32Array(MAX * 4), uvA = new Float32Array(MAX * 4), layA = new Float32Array(MAX), kA = new Float32Array(MAX);
-      cards.forEach((c, i) => {
-        cardA.set([c.r.left, c.r.top, c.r.width, c.r.height], i * 4);
-        uvA.set([0, 0, c.u, c.v], i * 4);
-        layA[i] = c.layer;
-        kA[i] = c.k;
-      });
-      const auraEl = $(".aura");
-      const auraOn = !auraEl.hidden;
-      const spans = auraOn ? [...auraEl.children] : [];
-      const auraA = new Float32Array(9), auraC = new Float32Array(9);
-      spans.slice(0, 3).forEach((sp, i) => {
-        const b = sp.getBoundingClientRect();
-        auraA.set([b.left + b.width / 2, b.top + b.height / 2, (b.width / 2) * Math.SQRT2 * 0.62], i * 3);
-        const v = root.getPropertyValue("--a" + (i + 1)).trim() || root.getPropertyValue("--aura-" + (i + 1));
-        auraC.set(rgb(v), i * 3);
-      });
-      const paper = rgb(root.getPropertyValue("--paper"));
-      const g = root.getPropertyValue("--glass-rgb").trim().split(/[\s,]+/).map(Number);
-      const lum = paper[0] * 0.3 + paper[1] * 0.59 + paper[2] * 0.11;
-
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      const bottom = Math.min(vh, Math.max(band, ...cards.map((c) => c.r.bottom)) + 44);
-      gl.enable(gl.SCISSOR_TEST);
-      gl.scissor(0, Math.max(0, Math.round((vh - bottom) * dpr)), canvas.width, Math.round(bottom * dpr));
-      gl.uniform2f(U.uView, vw, vh);
-      gl.uniform1f(U.uDpr, dpr);
-      gl.uniform4f(U.uDock, dr.left, dr.top, dr.width, dr.height);
-      gl.uniform1f(U.uDockR, Math.min(parseFloat(getComputedStyle(dock).borderTopLeftRadius) || 0, dr.height / 2));
-      gl.uniform1i(U.uCount, cards.length);
-      gl.uniform4fv(U.uCard, cardA);
-      gl.uniform4fv(U.uUV, uvA);
-      gl.uniform1fv(U.uLayer, layA);
-      gl.uniform1fv(U.uK, kA);
-      gl.uniform1f(U.uCardR, cardR);
-      gl.uniform3fv(U.uAura, auraA);
-      gl.uniform3fv(U.uAuraCol, auraC);
-      gl.uniform1f(U.uAuraO, auraOn ? parseFloat(getComputedStyle(auraEl).opacity) || 0 : 0);
-      gl.uniform3fv(U.uPaper, paper);
-      gl.uniform4f(U.uGlass, (g[0] || 255) / 255, (g[1] || 255) / 255, (g[2] || 255) / 255, Math.min(0.9, parseFloat(root.getPropertyValue("--glass-a")) || 0.46));
-      gl.uniform1f(U.uBlur, (parseFloat(root.getPropertyValue("--blur")) || 24) * 0.75);
-      gl.uniform1f(U.uDark, lum < 0.4 ? 1 : 0);
-      gl.uniform1f(U.uLight, -2.2 + 0.35 * Math.sin(window.scrollY / 380));
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      gl.disable(gl.SCISSOR_TEST);
-
-      return moving;
-    }
-
-    function schedule() {
-      if (dead) return;
-      // A frame that was requested but never ran (the frame was throttled or hidden) must not block new ones.
-      if (running && performance.now() - lastFrame < 500) return;
-      running = true;
-      const id = ++loop;
-      requestAnimationFrame((t) => frame(t, id));
-    }
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("touchmove", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    new ResizeObserver(schedule).observe(dock);
-    // The colour field drifts slowly, so keep the glass's view of it fresh while idle.
-    setInterval(() => { if (!document.hidden) schedule(); }, 250);
-    return { ok: true, schedule };
-  })();
-
 
   // ---------- state ----------
   const S = {
@@ -2319,7 +1859,6 @@ void main() {
     });
     if (S.store && total) S.entered = true;
     wall.replaceChildren(...cols.map((c) => c.el));
-    GLASS.schedule();
     const live = new Set(S.items.map((i) => i.id));
     for (const k of cardCache.keys()) if (!live.has(k)) cardCache.delete(k);
   }
@@ -2722,6 +2261,7 @@ void main() {
   }, 120));
 
   applyLook();
+  LIQUID.attach($("#dock"), { bezel: 30, scale: 54 });
   LIQUID.attach($("#toast"), { bezel: 14, scale: 26 });
   render();
   renderFooter();

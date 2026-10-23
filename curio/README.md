@@ -22,8 +22,7 @@ Live app: https://claude.ai/artifact/KhV8z3jdWnF8M5dhzf1vWe
 
 ## Look and feel
 
-- **Glass:** a frosted search dock, translucent cards and a slow colour field underneath, tinted from your recent images.
-- **Liquid glass, rendered on the GPU:** the search bar's glass and the cards near it are drawn by a WebGL shader as one liquid surface. Each shape is a signed distance field, and the bar and the nearest card are joined with a smooth union. Its blend radius grows on a spring as they approach, so glass bulges from one side and card material rises from the other until they fuse with liquid fillets. Inside the glass, what's behind it (cards scrolling under, and the colour field) is lensed along the surface normal, with a colour fringe at the bevel, a frosted blur and a specular rim that shifts as you scroll. Cards are captured once with html2canvas into a texture array. While the GPU draws a card, its HTML twin is invisible but still clickable. Without WebGL2 the bar falls back to plain frosted glass.
+- **Glass:** a frosted search dock, translucent cards and a slow colour field underneath, tinted from your recent images. In Chrome and Edge the dock's edges also bend what's behind them, like liquid glass. Other browsers get plain frosted glass.
 - **Make it yours:** the button at the top right opens a panel with four themes (Ember, Fynbos, Ultraviolet, Glacier), light, dark or system mode, three type pairings, a glass slider from clear to frosted, corner radius, card size, and the background source. Your choices sync to your account.
 - **Type:** an expanded heavy grotesk (Archivo) for names, with a serif italic (Instrument Serif) for quotes, search and emphasis.
 
