@@ -26,6 +26,8 @@
   --link-l: 44%;
   --read-l: 95%;
   --on-link: #ffffff;
+  --rim: rgba(255, 255, 255, .95);
+  --liquid-shadow: rgba(40, 30, 60, .2);
   --aura-1: #ff5a36;
   --aura-2: #ffb26b;
   --aura-3: #f27fa5;
@@ -56,7 +58,7 @@
     --lift: 0 2px 4px rgba(0, 0, 0, .3), 0 14px 34px rgba(0, 0, 0, .38);
     --glass-edge: rgba(255, 255, 255, .1); --sheen: rgba(255, 255, 255, .09);
     --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 10px 28px rgba(0, 0, 0, .32);
-    --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3;
+    --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3; --rim: rgba(255, 255, 255, .38); --liquid-shadow: rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
 }
@@ -66,7 +68,7 @@
   --lift: 0 2px 4px rgba(0, 0, 0, .3), 0 14px 34px rgba(0, 0, 0, .38);
   --glass-edge: rgba(255, 255, 255, .1); --sheen: rgba(255, 255, 255, .09);
   --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 10px 28px rgba(0, 0, 0, .32);
-  --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3;
+  --link-s: 38%; --link-l: 32%; --read-l: 16%; --aura-o: .3; --rim: rgba(255, 255, 255, .38); --liquid-shadow: rgba(0, 0, 0, .5);
   color-scheme: dark;
 }
 
@@ -159,7 +161,19 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .make .dots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--card); margin-left: -6px; }
 .make .dots i:first-child { margin-left: 0; }
 
+/* the morphing glass: one shape that is the dock plus liquid necks reaching toward the cards beneath it */
+.liquid { position: fixed; left: 0; top: 0; z-index: 19; width: 0; height: 0; pointer-events: none; will-change: transform; }
+.liquid > * { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+.liquid-glass {
+  background: linear-gradient(var(--sa, 135deg), var(--sheen), transparent 34%, transparent 68%, var(--sheen)), var(--glass);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+}
+.liquid-shadow path { fill: var(--liquid-shadow); }
+.liquid-rim { color: var(--rim); }
+.liquid-rim path { fill: none; stroke: url(#rim-grad); stroke-width: 1.4; }
 .dock {
+  background: none;
   position: sticky;
   top: calc(env(safe-area-inset-top, 0px) + 10px);
   z-index: 20;
@@ -767,7 +781,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     </div>
   </header>
 
-  <div class="dock glass" id="dock">
+  <div class="liquid" id="liquid" aria-hidden="true">
+    <svg class="liquid-shadow" id="liquid-shadow"><defs><filter id="ls-blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="12"/></filter><mask id="ls-mask" maskUnits="userSpaceOnUse"><rect id="ls-mask-rect" fill="#fff"/><path id="ls-mask-path" fill="#000"/></mask></defs><g mask="url(#ls-mask)"><path id="ls-path" filter="url(#ls-blur)" transform="translate(0 9)"/></g></svg>
+    <div class="liquid-glass" id="liquid-glass"></div>
+    <svg class="liquid-rim"><defs><linearGradient id="rim-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="1"/><stop offset=".3" stop-color="currentColor" stop-opacity=".25"/><stop offset=".7" stop-color="currentColor" stop-opacity=".15"/><stop offset="1" stop-color="currentColor" stop-opacity=".7"/></linearGradient></defs><path id="lr-path"/></svg>
+  </div>
+  <div class="dock" id="dock">
     <div class="search" role="search">
       <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search your curio…" aria-label="Search everything you've saved">
       <button class="clear" id="q-clear" type="button" hidden>clear ×</button>
@@ -920,6 +939,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       "glass-shadow": dark ? "inset 0 1px 0 rgba(255,255,255,.07), 0 10px 28px rgba(0,0,0,.32)" : "inset 0 1px 0 rgba(255,255,255,.75), 0 8px 24px rgba(40,30,60,.08)",
       "link-s": dark ? "38%" : "48%", "link-l": dark ? "32%" : "44%", "read-l": dark ? "16%" : "95%",
       "aura-o": dark ? ".3" : ".55",
+      rim: dark ? "rgba(255,255,255,.38)" : "rgba(255,255,255,.95)",
+      "liquid-shadow": dark ? "rgba(0,0,0,.5)" : "rgba(40,30,60,.2)",
     };
     return Object.entries(v).map(([k, x]) => "--" + k + ":" + x + ";").join("") + "color-scheme:" + (dark ? "dark" : "light") + ";";
   }
@@ -949,6 +970,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     auraKey = null;
     tintAura();
     LIQUID.refreshAll();
+    MORPH.schedule();
   }
 
   // ---------- liquid glass refraction (Chromium only) ----------
@@ -1051,6 +1073,194 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       rebuild();
     }
     return { ok, attach, refreshAll: () => all.forEach((f) => f()) };
+  })();
+
+
+  // ---------- morphing glass: the dock reaches for cards as they meet it ----------
+  // The dock and the top edge of each nearby card are signed distance fields; a smooth union of them grows a liquid
+  // neck between the two as the gap closes (Apple's GlassEffectContainer merges glass the same way). Each card's pull
+  // runs on a spring so the neck lags, stretches and snaps. The outline becomes the glass's clip path, and in
+  // Chromium the refraction map is drawn from the same field so the bending follows the moving edge.
+  const MORPH = (() => {
+    const layer = $("#liquid"), glassEl = $("#liquid-glass"), dock = $("#dock");
+    const rimPath = $("#lr-path"), shadowPath = $("#ls-path"), maskPath = $("#ls-mask-path"), maskRect = $("#ls-mask-rect");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const springs = new Map();
+    let running = false, lastT = 0, dockShape = null, shapes = [];
+
+    const sdRect = (x, y, c) => {
+      const qx = Math.abs(x - c.cx) - (c.hw - c.r), qy = Math.abs(y - c.cy) - (c.hh - c.r);
+      return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - c.r;
+    };
+    const smin = (a, b, k) => {
+      if (k <= 0) return Math.min(a, b);
+      const hh = Math.max(k - Math.abs(a - b), 0) / k;
+      return Math.min(a, b) - hh * hh * k * 0.25;
+    };
+    function field(x, y) {
+      // Cards join each other with a plain min and only the nearest one blends with the dock, so neighbouring cards
+      // don't pile their blends into drips in the gaps between them.
+      const f = sdRect(x, y, dockShape);
+      let cf = Infinity, ck = 0;
+      for (const c of shapes) {
+        // A box bound on the card's distance skips shapes too far away to change the blend.
+        const lb = Math.max(Math.abs(x - c.cx) - c.hw, Math.abs(y - c.cy) - c.hh) + c.off;
+        if (lb >= cf || lb - f >= c.k) continue;
+        const d = sdRect(x, y, c) + c.off;
+        if (d < cf) { cf = d; ck = c.k; }
+      }
+      return cf === Infinity ? f : smin(f, cf, ck);
+    }
+
+    // Chromium-only refraction drawn from the field at quarter resolution.
+    let fx = null;
+    if (LIQUID.ok) {
+      const NS = "http://www.w3.org/2000/svg";
+      const mk = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); return e; };
+      const id = "morph-" + uid();
+      const img = mk("feImage", { x: "0", y: "0", width: "1", height: "1", preserveAspectRatio: "none", result: "map" });
+      const blur = mk("feGaussianBlur", { in: "SourceGraphic", stdDeviation: "10", result: "soft" });
+      const chan = (n, scale, m) => [mk("feDisplacementMap", { in: "soft", in2: "map", scale, xChannelSelector: "R", yChannelSelector: "G", result: "d" + n }), mk("feColorMatrix", { in: "d" + n, type: "matrix", values: m, result: "c" + n })];
+      const filter = mk("filter", { id, x: "0", y: "0", width: "100%", height: "100%", "color-interpolation-filters": "sRGB" });
+      filter.append(blur, img,
+        ...chan("r", 56, "1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"),
+        ...chan("g", 52, "0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"),
+        ...chan("b", 48, "0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"),
+        mk("feBlend", { in: "cr", in2: "cg", mode: "screen", result: "rg" }),
+        mk("feBlend", { in: "rg", in2: "cb", mode: "screen", result: "rgb" }),
+        mk("feColorMatrix", { in: "rgb", type: "saturate", values: "1.7" }));
+      $("#fx-defs").append(filter);
+      const canvas = document.createElement("canvas");
+      fx = { id, img, blur, canvas, ctx: canvas.getContext("2d") };
+    }
+    // Rebuilding the refraction map and re-rasterising an SVG backdrop filter every frame is too slow, so while the
+    // glass is moving it is plain frosted blur, and the bent edge comes back once it settles.
+    const settle = debounce(() => {
+      if (!fx || running) return;
+      const dr = dock.getBoundingClientRect();
+      drawRefraction(Math.round(dr.width), parseFloat(layer.style.height) || 0);
+      glassEl.style.backdropFilter = "url(#" + fx.id + ")";
+      glassEl.style.webkitBackdropFilter = "url(#" + fx.id + ")";
+    }, 140);
+    function unsettle() {
+      if (!fx || !glassEl.style.backdropFilter) return;
+      glassEl.style.backdropFilter = "";
+      glassEl.style.webkitBackdropFilter = "";
+    }
+    function drawRefraction(W, T) {
+      const Q = 4, bezel = 30;
+      const cw = Math.ceil(W / Q), ch = Math.ceil(T / Q);
+      if (fx.canvas.width !== cw || fx.canvas.height !== ch) { fx.canvas.width = cw; fx.canvas.height = ch; }
+      const im = fx.ctx.createImageData(cw, ch), d = im.data;
+      for (let j = 0; j < ch; j++) {
+        const y = j * Q + Q / 2;
+        for (let i = 0; i < cw; i++) {
+          const x = i * Q + Q / 2, o = (j * cw + i) * 4;
+          let dx = 0, dy = 0;
+          const f = field(x, y);
+          if (f <= 0 && -f < bezel) {
+            const gx = field(x + 1, y) - field(x - 1, y), gy = field(x, y + 1) - field(x, y - 1);
+            const len = Math.hypot(gx, gy) || 1;
+            const t = 1 + f / bezel;
+            const m = 1 - Math.sqrt(1 - t * t);
+            dx = -(gx / len) * m;
+            dy = -(gy / len) * m;
+          }
+          d[o] = 128 + dx * 127; d[o + 1] = 128 + dy * 127; d[o + 2] = 128; d[o + 3] = 255;
+        }
+      }
+      fx.ctx.putImageData(im, 0, 0);
+      const blurPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--blur")) || 24;
+      fx.blur.setAttribute("stdDeviation", String(blurPx / 2.2));
+      fx.img.setAttribute("width", W);
+      fx.img.setAttribute("height", T);
+      fx.img.setAttribute("href", fx.canvas.toDataURL());
+    }
+
+    function outline(W, H, R, T) {
+      let dPath = "M0," + R + " A" + R + "," + R + " 0 0 1 " + R + ",0 H" + (W - R) + " A" + R + "," + R + " 0 0 1 " + W + "," + R;
+      const xs = [];
+      for (let x = W - 0.5; x > 0.5; x -= 4) xs.push(x);
+      xs.push(0.5);
+      for (const x of xs) {
+        let y = x < R || x > W - R ? H / 2 : H - R - 1;
+        while (y < T - 1 && field(x, y) <= 0) y += 4;
+        let lo = y - 4, hi = y;
+        for (let n = 0; n < 4; n++) { const m = (lo + hi) / 2; if (field(x, m) <= 0) lo = m; else hi = m; }
+        dPath += " L" + x.toFixed(1) + "," + Math.min(T - 1, (lo + hi) / 2).toFixed(1);
+      }
+      return dPath + " Z";
+    }
+
+    function frame(t) {
+      const dt = Math.min(0.034, lastT ? (t - lastT) / 1000 : 0.016);
+      lastT = t;
+      const dr = dock.getBoundingClientRect();
+      const W = Math.round(dr.width), H = Math.round(dr.height);
+      if (!W || !H) { running = false; return; }
+      const small = window.innerWidth < 560;
+      const REACH = small ? 64 : 92, STRIP = small ? 34 : 44;
+      const T = H + REACH;
+      const R = Math.min(parseFloat(getComputedStyle(dock).borderTopLeftRadius) || 0, H / 2);
+      const engage = Math.min(1, Math.max(0, (window.scrollY - 20) / 60));
+      const cardR = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius")) || 12;
+      dockShape = { cx: W / 2, cy: H / 2, hw: W / 2, hh: H / 2, r: R };
+      shapes = [];
+      let moving = false;
+      const seen = new Set();
+      for (const col of document.querySelectorAll("#wall > .col")) {
+        for (const el of col.children) {
+          const r = el.getBoundingClientRect();
+          if (r.bottom < dr.top) continue;
+          const gap = r.top - dr.bottom;
+          if (gap > REACH) break;
+          if (gap < -STRIP) continue;
+          const target = engage * (gap >= 0 ? Math.pow(1 - gap / REACH, 1.25) : 1);
+          let sp = springs.get(el);
+          if (!sp) { sp = { s: target, v: 0 }; springs.set(el, sp); }
+          if (reduce) { sp.s = target; sp.v = 0; }
+          else {
+            sp.v += (190 * (target - sp.s) - 15 * sp.v) * dt;
+            sp.s += sp.v * dt;
+            if (Math.abs(sp.v) > 0.003 || Math.abs(target - sp.s) > 0.003) moving = true;
+          }
+          seen.add(el);
+          const s = Math.max(0, Math.min(1.2, sp.s));
+          if (s < 0.02) continue;
+          const left = r.left - dr.left, right = r.right - dr.left, top = r.top - dr.top;
+          const deep = gap < 0 ? Math.max(0, 1 + gap / STRIP) : 1;
+          const cr = Math.min(cardR, STRIP / 2);
+          shapes.push({ cx: (left + right) / 2, cy: top + STRIP / 2, hw: (right - left) / 2, hh: STRIP / 2, r: cr,
+            off: (1 - Math.min(1, s)) * 30, k: (12 + 100 * s) * deep });
+        }
+      }
+      for (const k of springs.keys()) if (!seen.has(k)) springs.delete(k);
+
+      layer.style.transform = "translate(" + dr.left + "px," + dr.top + "px)";
+      layer.style.width = W + "px";
+      layer.style.height = T + "px";
+      const dPath = outline(W, H, R, T);
+      glassEl.style.clipPath = 'path("' + dPath + '")';
+      glassEl.style.setProperty("--sa", (135 + 18 * Math.sin(window.scrollY / 420)).toFixed(1) + "deg");
+      rimPath.setAttribute("d", dPath);
+      shadowPath.setAttribute("d", dPath);
+      maskPath.setAttribute("d", dPath);
+      maskRect.setAttribute("x", -80); maskRect.setAttribute("y", -80);
+      maskRect.setAttribute("width", W + 160); maskRect.setAttribute("height", T + 160);
+      if (moving) requestAnimationFrame(frame);
+      else { running = false; lastT = 0; settle(); }
+    }
+
+    function schedule() {
+      if (running) return;
+      running = true;
+      unsettle();
+      requestAnimationFrame(frame);
+    }
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    if (typeof ResizeObserver === "function") new ResizeObserver(schedule).observe(dock);
+    return { schedule };
   })();
 
   // ---------- state ----------
@@ -1859,6 +2069,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     });
     if (S.store && total) S.entered = true;
     wall.replaceChildren(...cols.map((c) => c.el));
+    MORPH.schedule();
     const live = new Set(S.items.map((i) => i.id));
     for (const k of cardCache.keys()) if (!live.has(k)) cardCache.delete(k);
   }
@@ -2254,7 +2465,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   }, 120));
 
   applyLook();
-  LIQUID.attach($("#dock"), { bezel: 30, scale: 54 });
   LIQUID.attach($("#toast"), { bezel: 14, scale: 26 });
   render();
   renderFooter();

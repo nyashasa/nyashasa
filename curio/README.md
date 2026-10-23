@@ -22,7 +22,9 @@ Live app: https://claude.ai/artifact/KhV8z3jdWnF8M5dhzf1vWe
 
 ## Look and feel
 
-- **Glass:** a frosted search dock, translucent cards and a slow colour field underneath, tinted from your recent images. In Chrome and Edge the dock's edges also bend what's behind them, like liquid glass. Other browsers get plain frosted glass.
+- **Glass:** a frosted search dock, translucent cards and a slow colour field underneath, tinted from your recent images.
+- **Morphing glass:** the dock and the cards scrolling beneath it behave like liquid. As a card approaches, the glass reaches down for it, wraps its top edge as it passes under, and stretches and snaps away as it leaves. This works in every modern browser. The dock is the smooth union of signed distance fields (the dock plus the top edge of each nearby card), traced into a clip path each frame. Each card's pull runs on a spring, so the glass lags and wobbles. This is the same idea Apple uses when `GlassEffectContainer` merges nearby glass.
+- **Refraction:** in Chrome and Edge, once the glass comes to rest, its edge bends what's behind it. The displacement map is drawn from the same distance field, with a slight colour fringe. While the glass is moving it falls back to plain frosted blur so scrolling stays smooth.
 - **Make it yours:** the button at the top right opens a panel with four themes (Ember, Fynbos, Ultraviolet, Glacier), light, dark or system mode, three type pairings, a glass slider from clear to frosted, corner radius, card size, and the background source. Your choices sync to your account.
 - **Type:** an expanded heavy grotesk (Archivo) for names, with a serif italic (Instrument Serif) for quotes, search and emphasis.
 
