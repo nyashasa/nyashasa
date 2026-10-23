@@ -17,28 +17,14 @@ Live app: https://claude.ai/artifact/KhV8z3jdWnF8M5dhzf1vWe
 - **Spaces** are saved searches, such as `#recipe` or `typography`. They act as smart folders that stay up to date on their own.
 - **Rediscover** shuffles the wall so older things come back to the surface.
 - **Detail sheet**: click any card to edit it, manage tags, add notes, re-tag, favourite it, open the link, or delete it.
-- **Favourites.** Star any specimen from its hover actions (it gets a brass sticker), then filter by Favourites.
-
-## The cabinet
-
-Curio is laid out as a cabinet of curiosities. Everything you keep becomes a paper specimen lying in a lined drawer, with a permanent accession number (`CUR-0042`) and a Latin classification:
-
-| You save | It becomes | Classification |
-|---|---|---|
-| A note | A ruled index card | *Nota* |
-| A checklist (`[ ]` lines) | A till receipt with a progress total and barcode | *Agenda* |
-| A quote | A letterpress slip | *Dictum* |
-| A link | An admission ticket with a perforated stub; the wording follows the kind of link (Screening, Reading room, Workshop, Exhibition…) | *Nexus*, *Pellicula*, *Lectio*, *Codex*, *Ars*… |
-| Hex codes (`#c2321f`) | A strip of paint chips; click one to copy it | *Chromata* |
-| An image | A pinned, mounted specimen with its pigments | *Imago* |
-
-Opening a specimen shows its **catalogue record**: accession number, classification, date acquired, provenance, Claude's description, index terms and your curator's notes. Removing one is a *deaccession*.
+- **Cards built for what they hold.** Links get a cover drawn for their kind: a play button for video, a record for music, an editor window for code, a magazine masthead for articles, a handle card for social posts, a price tag for shopping, and colour tiles for design tools. Notes that contain hex codes (`#f2381b`) become palette cards whose swatches copy on click. Checklists show their progress.
+- **Favourites.** Star any card from its hover actions, then filter by Favourites.
 
 ## Look and feel
 
-- **The glass case:** the search dock is glass over the drawer. In Chrome and Edge its edges bend what's beneath them, like liquid glass. Other browsers get plain frosted glass.
-- **Make it yours:** choose the drawer lining (Day & night, Linen, Felt, Velvet, Cyanotype), how clear the case glass is, how worn the paper corners are, a natural or tidy arrangement, specimen size, and the light (lamplight, colours from your images, or off). Your choices sync to your account.
-- **Type:** Bodoni Moda for display and quotes, Courier Prime for anything typed onto a card or label, Schibsted Grotesk for the interface.
+- **Glass:** a frosted search dock, translucent cards and a slow colour field underneath, tinted from your recent images. In Chrome and Edge the dock's edges also bend what's behind them, like liquid glass. Other browsers get plain frosted glass.
+- **Make it yours:** the button at the top right opens a panel with four themes (Ember, Fynbos, Ultraviolet, Glacier), light, dark or system mode, three type pairings, a glass slider from clear to frosted, corner radius, card size, and the background source. Your choices sync to your account.
+- **Type:** an expanded heavy grotesk (Archivo) for names, with a serif italic (Instrument Serif) for quotes, search and emphasis.
 
 Keyboard shortcuts: `/` searches, `n` starts a new note, `⌘/Ctrl + Enter` saves, `Esc` closes.
 
