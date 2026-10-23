@@ -162,6 +162,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .make .dots i:first-child { margin-left: 0; }
 
 /* the morphing glass: one shape that is the dock plus liquid necks reaching toward the cards beneath it */
+.necks { position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
+.necks path { fill: var(--card-glass); }
+.necks path.rim { fill: none; stroke: var(--glass-edge); stroke-width: 1; }
+.card.melt { transform-origin: 50% 100%; border-top-color: transparent; box-shadow: none; }
 .liquid { position: fixed; left: 0; top: 0; z-index: 19; width: 0; height: 0; pointer-events: none; will-change: transform; }
 .liquid > * { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
 .liquid-glass {
@@ -781,6 +785,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     </div>
   </header>
 
+  <svg class="necks" id="necks" aria-hidden="true"></svg>
   <div class="liquid" id="liquid" aria-hidden="true">
     <svg class="liquid-shadow" id="liquid-shadow"><defs><filter id="ls-blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="12"/></filter><mask id="ls-mask" maskUnits="userSpaceOnUse"><rect id="ls-mask-rect" fill="#fff"/><path id="ls-mask-path" fill="#000"/></mask></defs><g mask="url(#ls-mask)"><path id="ls-path" filter="url(#ls-blur)" transform="translate(0 9)"/></g></svg>
     <div class="liquid-glass" id="liquid-glass"></div>
@@ -1087,6 +1092,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const springs = new Map();
     let running = false, lastT = 0, dockShape = null, shapes = [];
+    const neckSvg = $("#necks"), neckPaths = [];
+    const stretched = new Map();
+    let styled = new Set();
 
     const sdRect = (x, y, c) => {
       const qx = Math.abs(x - c.cx) - (c.hw - c.r), qy = Math.abs(y - c.cy) - (c.hh - c.r);
@@ -1207,13 +1215,22 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       dockShape = { cx: W / 2, cy: H / 2, hw: W / 2, hh: H / 2, r: R };
       shapes = [];
       let moving = false;
-      const seen = new Set();
+      const seen = new Set(), touched = new Set(), necks = [];
       for (const col of document.querySelectorAll("#wall > .col")) {
         for (const el of col.children) {
           const r = el.getBoundingClientRect();
           if (r.bottom < dr.top) continue;
-          const gap = r.top - dr.bottom;
+          // Measure where the card sits without the stretch we applied last frame, so the pull doesn't feed itself.
+          const st = stretched.get(el) || 0;
+          const hgt = r.height / (1 + st);
+          const gap = r.top + (r.height - hgt) - dr.bottom;
           if (gap > REACH) break;
+          if (gap < 0 && !el.classList.contains("composer")) {
+            // Swallowed: the further a card sinks into the bar, the more it dissolves into the glass.
+            const sink = Math.min(1, -gap / (hgt * 0.75));
+            el.style.opacity = (1 - 0.65 * sink * engage).toFixed(3);
+            touched.add(el);
+          }
           if (gap < -STRIP) continue;
           const target = engage * (gap >= 0 ? Math.pow(1 - gap / REACH, 1.25) : 1);
           let sp = springs.get(el);
@@ -1232,9 +1249,25 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
           const cr = Math.min(cardR, STRIP / 2);
           shapes.push({ cx: (left + right) / 2, cy: top + STRIP / 2, hw: (right - left) / 2, hh: STRIP / 2, r: cr,
             off: (1 - Math.min(1, s)) * 30, k: (12 + 100 * s) * deep });
+          // The card answers the pull: it stretches toward the bar and grows a neck of its own material.
+          const stretch = 0.05 * Math.min(1.2, s) * deep;
+          el.style.scale = "1 " + (1 + stretch).toFixed(4);
+          el.classList.add("melt");
+          stretched.set(el, stretch);
+          touched.add(el);
+          necks.push({ r: el.getBoundingClientRect(), s, deep, cr: cardR });
         }
       }
       for (const k of springs.keys()) if (!seen.has(k)) springs.delete(k);
+      for (const el of styled) {
+        if (touched.has(el)) continue;
+        el.style.scale = "";
+        el.style.opacity = "";
+        el.classList.remove("melt");
+        stretched.delete(el);
+      }
+      styled = touched;
+      drawNecks(necks, dr);
 
       layer.style.transform = "translate(" + dr.left + "px," + dr.top + "px)";
       layer.style.width = W + "px";
@@ -1249,6 +1282,54 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       maskRect.setAttribute("width", W + 160); maskRect.setAttribute("height", T + 160);
       if (moving) requestAnimationFrame(frame);
       else { running = false; lastT = 0; settle(); }
+    }
+
+    // Each card's top edge pulls up toward the bar as a raised-cosine droplet. It starts narrow and low, then widens
+    // and grows until it touches the glass reaching down, about 30px out, so the two liquids meet. Returns a filled
+    // neck (in the card's material) and the card's new top outline (drawn as its border).
+    function neckPath(n, dr) {
+      const r = n.r, s = Math.min(1.2, n.s);
+      const cr = Math.min(n.cr, r.width / 2, r.height / 2);
+      const gap = Math.max(0, r.top - dr.bottom);
+      const h = gap * Math.min(1.08, s / 0.6) * n.deep;
+      if (h < 0.8) return null;
+      const cx = (r.left + r.right) / 2, hw = r.width / 2;
+      const wn = hw * (0.3 + 0.7 * Math.min(1, s) ** 2);
+      const edge = (x) => {
+        const dx = x < r.left + cr ? r.left + cr - x : x > r.right - cr ? x - (r.right - cr) : 0;
+        return r.top + cr - Math.sqrt(Math.max(0, cr * cr - dx * dx));
+      };
+      const tops = [], bots = [];
+      for (let x = r.left + 0.5; x < r.right; x += 3) {
+        const u = (x - cx) / wn;
+        const lift = Math.abs(u) < 1 ? h * ((1 + Math.cos(Math.PI * u)) / 2) ** 0.85 : 0;
+        const e = edge(x);
+        tops.push([x, Math.min(e, r.top - lift)]);
+        bots.push([x, e + 0.6]);
+      }
+      tops.push([r.right - 0.5, edge(r.right - 0.5)]);
+      bots.push([r.right - 0.5, edge(r.right - 0.5) + 0.6]);
+      const pts = (a) => a.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" L");
+      let fill = "M" + pts(tops);
+      for (let i = bots.length - 1; i >= 0; i--) fill += " L" + bots[i][0].toFixed(1) + "," + bots[i][1].toFixed(1);
+      const rim = "M" + r.left + "," + (r.top + cr + 1).toFixed(1) + " L" + pts(tops) + " L" + r.right + "," + (r.top + cr + 1).toFixed(1);
+      return { fill: fill + " Z", rim };
+    }
+    function drawNecks(necks, dr) {
+      const NS = "http://www.w3.org/2000/svg";
+      while (neckPaths.length < necks.length) {
+        const g = document.createElementNS(NS, "g");
+        const fill = document.createElementNS(NS, "path"), rim = document.createElementNS(NS, "path");
+        rim.setAttribute("class", "rim");
+        g.append(fill, rim);
+        neckSvg.append(g);
+        neckPaths.push({ fill, rim });
+      }
+      neckPaths.forEach((p, i) => {
+        const d = i < necks.length ? neckPath(necks[i], dr) : null;
+        p.fill.setAttribute("d", d ? d.fill : "");
+        p.rim.setAttribute("d", d ? d.rim : "");
+      });
     }
 
     function schedule() {
