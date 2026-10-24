@@ -14,7 +14,12 @@ Live app: https://claude.ai/artifact/BfKPfaChJD4oA7xYxpur12
 - **Mixer.** Each channel has TRIM, 3-band EQ (fully left kills the band) and a filter (left low-pass, right high-pass). Each channel also has a CUE button, a volume fader and a meter. The centre has a master level and a crossfader.
 - **FX.** Echo synced to the beat (1/4, 1/2, 3/4 or 1 beat), reverb and flanger, with an amount knob and per-channel assign.
 - **Split cue.** The master goes to your right ear and the CUE'd channel to your left, so you can preview the next track in headphones.
-- **Your own music.** Load or drop an audio file onto a deck. Its tempo and beat grid are detected automatically.
+- **Your crate.** Add music you own once and it's there on every visit. Use "Add music" in the crate, drop files on it, or drop a file on a deck to add it and load it straight away.
+  - **Tempo and key from the file.** Title, artist, BPM and key are read from the file's tags: ID3 in MP3, AIFF and WAV; MP4 atoms in M4A; Vorbis comments in FLAC. Downloads from Beatport, Bandcamp, Traxsource and Juno usually carry them. When a file has no BPM, the tempo is detected from the audio, and the crate marks each track "Tagged" or "Detected".
+  - **Keys on the Camelot wheel.** Each track gets a coloured key chip (8A, 9B…). The screen shows each deck's key, and the tempo tip says whether the two keys mix. Without key lock, the tempo fader moves the key too. Once you've pitched about a semitone (~6%), the key readout turns amber and shows the new key.
+  - **Fits the deck you're playing.** Rows that are in key and within 8% of the tempo of the deck on air are marked "Fits deck 1/2". The "Best fit" sort puts them first. You can also sort by newest, BPM or key, and search by title, artist, BPM or key.
+  - **Cues are saved per track.** The cue point and all eight hot cues come back the next time you load a track.
+  - Formats: MP3, WAV, FLAC and M4A/AAC in every browser. AIFF only plays in Safari. Tracks downloaded inside streaming apps (Spotify, Apple Music, Tidal) are DRM-locked and won't open.
 - **Demo tracks.** Three tracks are generated in the browser: Golden Hour (122 BPM house), Night Bus (126 BPM tech house) and Slow Burn (118 BPM disco house). Each has a DJ-friendly arrangement in 8-bar phrases: a drum intro, then bass, the full groove, a breakdown, a drop and a drum outro.
 
 ## The coach
@@ -34,6 +39,14 @@ Twelve lessons that watch what you do and move on when you've done it:
 12. Echo out
 
 Live tips flag the common mistakes: a clipping master, two basslines at once, tempos that don't match, and trainwrecked beats.
+
+## Where your music is kept
+
+- **In the Claude artifact**, the crate is saved to your Claude account and is private to you; other people who open the link get their own crate.
+  - The audio goes to the artifact's asset store. The store doesn't accept audio types, so each file is kept as base64 text in pieces of up to 14 MB.
+  - The tags and cues go to a private per-person folder in the artifact's database.
+  - The crate shows how much storage is used.
+- **Opened as a plain file** (`cue-lab/index.html` in a browser), or by someone who can't edit the artifact, the crate is saved in that browser's IndexedDB.
 
 Keyboard: `Q` `W` `E` are cue, play and sync on deck 1, and `A`/`S` nudge it. `I` `O` `P` and `K`/`L` do the same on deck 2. `←`/`→` move the crossfader.
 

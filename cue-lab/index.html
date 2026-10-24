@@ -161,7 +161,7 @@ button { font: inherit; color: inherit; }
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 30px rgba(0,0,0,.4);
   min-width: 0;
 }
-.deck { display: grid; gap: 12px; align-content: start; }
+.deck { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; }
 .deck-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .deck-head .tag { font: 700 13px/1 var(--font-label); letter-spacing: .16em; padding: 5px 8px; border-radius: 4px; background: var(--dc); color: var(--screen); }
 .deck-head select, .deck-head .file {
@@ -361,6 +361,48 @@ button { font: inherit; color: inherit; }
 .xf .ends span:first-child { color: var(--deck1); }
 .xf .ends span:last-child { color: var(--deck2); }
 
+/* ---------- crate: your own records ---------- */
+.crate { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px; padding: 12px; display: grid; gap: 10px; }
+.crate.drop { border-color: var(--coach); box-shadow: 0 0 0 1px var(--coach); }
+.crate-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.crate-head h2 { margin: 0 4px 0 0; font: 700 15px/1 var(--font-label); letter-spacing: .2em; }
+.crate-head input[type="search"] {
+  flex: 1 1 220px; min-width: 0;
+  background: #101115; border: 1px solid var(--edge); color: var(--ink);
+  border-radius: 6px; padding: 7px 10px; font: 500 13px var(--font-ui);
+}
+.crate-head .file { cursor: pointer; }
+.crate-info { color: var(--muted); font-size: 12px; margin: 0; }
+.crate-prog { display: grid; gap: 4px; }
+.crate-prog div { font-size: 12.5px; color: var(--ink); display: flex; gap: 8px; align-items: baseline; }
+.crate-prog div b { font: 700 11px/1 var(--font-label); letter-spacing: .14em; text-transform: uppercase; color: var(--coach); flex: none; }
+.crate-prog div.fail b { color: var(--bad); }
+.crate-prog div.ok b { color: var(--good); }
+.crate-list { display: grid; gap: 2px; max-height: 248px; overflow-y: auto; overscroll-behavior: contain; }
+.crate-empty { color: #cfc7b4; font-size: 13.5px; max-width: 80ch; margin: 4px 0; }
+.crow { display: grid; grid-template-columns: 44px minmax(0, 1fr) 70px 48px 74px auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 8px; }
+.crow:hover { background: var(--panel-2); }
+.crow.on1 { box-shadow: inset 3px 0 0 var(--deck1); }
+.crow.on2 { box-shadow: inset -3px 0 0 var(--deck2); }
+.crow.on1.on2 { box-shadow: inset 3px 0 0 var(--deck1), inset -3px 0 0 var(--deck2); }
+.kchip { font: 700 12px/1 var(--font-num); text-align: center; padding: 6px 0; border-radius: 5px; color: #0b0b0d; background: hsl(var(--kh) 78% 62%); }
+.kchip.maj { background: hsl(var(--kh) 70% 76%); }
+.kchip.none { background: #2a2d34; color: var(--muted); }
+.cmeta { min-width: 0; display: grid; gap: 2px; }
+.cmeta b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmeta small { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+.cfit { font: 700 11px/1 var(--font-label); letter-spacing: .1em; text-transform: uppercase; color: var(--good); margin-right: 6px; }
+.cfit.meh { color: var(--warn); }
+.cbpm { font: 600 13px/1 var(--font-num); text-align: right; }
+.clen { font: 400 12px/1 var(--font-num); color: var(--muted); text-align: right; }
+.cgrid { font: 600 10px/1 var(--font-label); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: center; border: 1px solid var(--edge); border-radius: 4px; padding: 4px 0; }
+.cbtns { display: flex; gap: 6px; justify-content: flex-end; }
+.cbtns .hwbtn { padding: 6px 9px; }
+.cbtns .del { color: var(--muted); }
+.cbtns .del.sure { color: var(--bad); border-color: var(--bad); }
+.strip .key { color: var(--ink); }
+.strip .key.shift { color: var(--warn); }
+
 .foot { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 12px; }
 .foot kbd { font: 600 11px var(--font-num); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--edge); color: var(--ink); }
 .loading { font: 600 12px/1 var(--font-label); letter-spacing: .14em; color: var(--muted); text-transform: uppercase; }
@@ -385,6 +427,9 @@ button { font: inherit; color: inherit; }
   .tbtn { width: 56px; height: 56px; }
   .pitch .vfader { height: 190px; }
   .foot .keys { display: none; }
+  .crow { grid-template-columns: 40px minmax(0, 1fr) 54px auto; gap: 8px; padding-inline: 4px; }
+  .crow .clen, .crow .cgrid, .cbtns .wide { display: none; }
+  .crate-list { max-height: 420px; }
 }
 @media (max-width: 420px) {
   .deck-main { gap: 8px; }
@@ -402,6 +447,7 @@ button { font: inherit; color: inherit; }
   <header class="top">
     <div class="brand"><b>CUE<i>·</i>LAB</b><span>A practice controller for learning to mix</span></div>
     <div class="spacer"></div>
+    <button class="hwbtn" id="cratebtn" type="button" aria-pressed="true" aria-controls="crate">Crate</button>
     <button class="hwbtn" id="learn" type="button" aria-pressed="true">Coach</button>
     <button class="hwbtn" id="quant" type="button" aria-pressed="true" title="Snap cues and loops to the nearest beat">Quantize</button>
     <button class="hwbtn" id="split" type="button" aria-pressed="false" title="Master in your right ear, the CUE'd channel in your left">Split cue</button>
@@ -415,6 +461,7 @@ button { font: inherit; color: inherit; }
         <span class="title" id="t1">Loading…</span>
         <span class="phrase" id="ph1" aria-label="Bar within the 8-bar phrase"></span>
         <span class="stat"><em>Bar</em><span id="bar1">–</span></span>
+        <span class="stat"><em>Key</em><span class="key" id="key1">–</span></span>
         <span class="stat"><em>Pitch</em><span id="pp1">0.00%</span></span>
         <span class="stat"><em>Left</em><span id="rem1">–</span></span>
         <span class="stat bpm" id="bpm1">–</span>
@@ -440,6 +487,7 @@ button { font: inherit; color: inherit; }
         <span class="title" id="t2">Loading…</span>
         <span class="phrase" id="ph2" aria-label="Bar within the 8-bar phrase"></span>
         <span class="stat"><em>Bar</em><span id="bar2">–</span></span>
+        <span class="stat"><em>Key</em><span class="key" id="key2">–</span></span>
         <span class="stat"><em>Pitch</em><span id="pp2">0.00%</span></span>
         <span class="stat"><em>Left</em><span id="rem2">–</span></span>
         <span class="stat bpm" id="bpm2">–</span>
@@ -456,6 +504,19 @@ button { font: inherit; color: inherit; }
       <p id="ctext">Press PLAY on deck 1.</p>
       <div class="dots" id="cdots"></div>
     </div>
+  </section>
+
+  <section class="crate" id="crate" aria-label="Your crate">
+    <div class="crate-head">
+      <h2>CRATE</h2>
+      <input type="search" id="cratesearch" placeholder="Search title, artist, BPM or key (8A)" aria-label="Search your crate">
+      <button class="hwbtn" id="cratesort" type="button" title="Change the order">Newest</button>
+      <input type="file" id="crateadd" multiple hidden accept="audio/*,.mp3,.m4a,.aac,.wav,.aif,.aiff,.flac">
+      <label class="hwbtn file" for="crateadd" tabindex="0" id="crateaddbtn">Add music</label>
+    </div>
+    <div class="crate-prog" id="crateprog" aria-live="polite"></div>
+    <div class="crate-list" id="cratelist" role="list"></div>
+    <p class="crate-info" id="crateinfo">Opening your crate…</p>
   </section>
 
   <main class="body">
@@ -515,6 +576,208 @@ button { font: inherit; color: inherit; }
   const HOT = ["#ff3b30", "#ff9500", "#ffd60a", "#34c759", "#00c7be", "#0a84ff", "#bf5af2", "#ff2d92"];
 
   // =====================================================================
+  // Keys, on the Camelot wheel DJs use: the same number, or one step either way with the same letter, mixes in key.
+  // =====================================================================
+  const NOTE = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+  const CAM = { A: { 8: 1, 3: 2, 10: 3, 5: 4, 0: 5, 7: 6, 2: 7, 9: 8, 4: 9, 11: 10, 6: 11, 1: 12 }, B: { 11: 1, 6: 2, 1: 3, 8: 4, 3: 5, 10: 6, 5: 7, 0: 8, 7: 9, 2: 10, 9: 11, 4: 12 } };
+  const camelot = (pc, minor) => CAM[minor ? "A" : "B"][((pc % 12) + 12) % 12] + (minor ? "A" : "B");
+  function splitKey(code) {
+    const m = /^(\d{1,2})([AB])$/.exec(code || "");
+    return m && +m[1] >= 1 && +m[1] <= 12 ? { n: +m[1], m: m[2] } : null;
+  }
+  function keyName(code) {
+    const k = splitKey(code);
+    if (!k) return "";
+    const pc = Object.keys(CAM[k.m]).find((p) => CAM[k.m][p] === k.n);
+    return NOTE[pc] + (k.m === "A" ? " minor" : " major");
+  }
+  // Reads the ways files spell a key: "8A", "8A - Am", Open Key "1m", or musical "Am", "F#m", "Eb minor", "C major".
+  function parseKey(s) {
+    if (!s) return "";
+    s = String(s).trim();
+    let m = /(?:^|\D)(\d{1,2})\s*([AB])(?![a-z])/i.exec(s);
+    if (m && +m[1] >= 1 && +m[1] <= 12) return +m[1] + m[2].toUpperCase();
+    m = /^(\d{1,2})\s*([md])$/i.exec(s);
+    if (m && +m[1] >= 1 && +m[1] <= 12) return (((+m[1] + 6) % 12) + 1) + (m[2].toLowerCase() === "m" ? "A" : "B");
+    m = /^([A-Ga-g])\s*([#♯b♭]?)\s*(.*)$/.exec(s);
+    if (!m) return "";
+    let pc = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1].toUpperCase()];
+    if (m[2] === "#" || m[2] === "♯") pc++;
+    else if (m[2]) pc--;
+    const rest = m[3].trim();
+    const minor = /^m(?!aj)/.test(rest) || /^(min|minor|moll)/i.test(rest);
+    if (rest && !minor && !/^(M|maj|major|dur)\b/i.test(rest)) return "";
+    return camelot(pc, minor);
+  }
+  // Without key lock the tempo fader moves the key too: about a semitone for every 6%, which is 7 steps round the wheel.
+  function shiftKey(code, rate) {
+    const k = splitKey(code);
+    if (!k) return { code: "", semis: 0 };
+    const s = 12 * Math.log2(rate), st = Math.abs(s) < 0.75 ? 0 : Math.round(s);
+    return { code: ((((k.n - 1 + 7 * st) % 12) + 12) % 12 + 1) + k.m, semis: st };
+  }
+  function keyFit(a, b) {
+    const x = splitKey(a), y = splitKey(b);
+    if (!x || !y) return "";
+    if (x.n === y.n) return x.m === y.m ? "same" : "relative";
+    const d = (y.n - x.n + 12) % 12;
+    return x.m === y.m && (d === 1 || d === 11) ? "next" : "clash";
+  }
+  const keyHue = (code) => { const k = splitKey(code); return k ? ((k.n - 1) * 30 + 15) % 360 : 0; };
+
+  // =====================================================================
+  // Tags: title, artist, BPM and key read from the file itself (ID3, MP4/M4A, FLAC, AIFF and WAV),
+  // so music bought from Beatport, Bandcamp, Traxsource or Juno arrives with its tempo and key.
+  // =====================================================================
+  const asc = (u, p, n) => { let s = ""; for (let i = 0; i < n && p + i < u.length; i++) s += String.fromCharCode(u[p + i]); return s; };
+  const be32 = (u, p) => u[p] * 16777216 + (u[p + 1] << 16) + (u[p + 2] << 8) + u[p + 3];
+  const le32 = (u, p) => u[p] + (u[p + 1] << 8) + (u[p + 2] << 16) + u[p + 3] * 16777216;
+  const syncsafe = (u, p) => ((u[p] & 127) << 21) | ((u[p + 1] & 127) << 14) | ((u[p + 2] & 127) << 7) | (u[p + 3] & 127);
+  const dec = (enc, u) => { try { return new TextDecoder(enc).decode(u); } catch { return ""; } };
+  function id3Text(body) {
+    const enc = body[0], u = body.subarray(1);
+    const s = enc === 1 ? dec(u[0] === 0xfe ? "utf-16be" : "utf-16le", u) : enc === 2 ? dec("utf-16be", u) : enc === 3 ? dec("utf-8", u) : dec("latin1", u);
+    return s.replace(/[﻿￾]/g, "").split("\u0000").map((x) => x.trim());
+  }
+  function readID3(u, p, out) {
+    const ver = u[p + 3], flags = u[p + 5];
+    if (ver < 2 || ver > 4) return;
+    const end = Math.min(u.length, p + 10 + syncsafe(u, p + 6));
+    p += 10;
+    if (flags & 0x40 && ver > 2) p += ver === 4 ? syncsafe(u, p) : be32(u, p) + 4;
+    const v2 = ver === 2, hd = v2 ? 6 : 10;
+    while (p + hd <= end) {
+      const id = asc(u, p, v2 ? 3 : 4);
+      if (!/^[A-Z0-9]+$/.test(id)) break;
+      const size = v2 ? (u[p + 3] << 16) | (u[p + 4] << 8) | u[p + 5] : ver === 4 ? syncsafe(u, p + 4) : be32(u, p + 4);
+      const body = u.subarray(p + hd, Math.min(end, p + hd + size));
+      p += hd + size;
+      if (id[0] !== "T" || body.length < 2) continue;
+      const parts = id3Text(body), v = parts.find(Boolean) || "";
+      if (id === "TIT2" || id === "TT2") out.title = out.title || v;
+      else if (id === "TPE1" || id === "TP1") out.artist = out.artist || v;
+      else if (id === "TBPM" || id === "TBP") out.bpm = out.bpm || v;
+      else if (id === "TKEY" || id === "TKE") out.key = out.key || v;
+      else if (id === "TXXX" || id === "TXX") {
+        const desc = parts[0].toUpperCase(), val = parts.slice(1).find(Boolean) || "";
+        if (desc === "BPM" || desc === "TEMPO") out.bpm = out.bpm || val;
+        if (desc === "INITIALKEY" || desc === "INITIAL KEY" || desc === "KEY") out.key = out.key || val;
+      }
+    }
+  }
+  function readMP4(u, out) {
+    const kids = (s, e) => {
+      const r = [];
+      while (s + 8 <= e) {
+        let size = be32(u, s), hd = 8;
+        if (size === 1) { size = be32(u, s + 8) * 4294967296 + be32(u, s + 12); hd = 16; }
+        else if (size === 0) size = e - s;
+        if (size < hd || s + size > e) break;
+        r.push({ t: asc(u, s + 4, 4), s: s + hd, e: s + size });
+        s += size;
+      }
+      return r;
+    };
+    const get = (list, t) => list.find((a) => a.t === t);
+    const moov = get(kids(0, u.length), "moov");
+    const udta = moov && get(kids(moov.s, moov.e), "udta");
+    const meta = udta && get(kids(udta.s, udta.e), "meta");
+    if (!meta) return;
+    // "meta" is normally a full box (4 bytes of version and flags first); some writers leave those out.
+    const ilst = get(kids(asc(u, meta.s + 4, 4) === "hdlr" ? meta.s : meta.s + 4, meta.e), "ilst");
+    if (!ilst) return;
+    const utf8 = (a, b) => dec("utf-8", u.subarray(a, b)).trim();
+    for (const it of kids(ilst.s, ilst.e)) {
+      const sub = kids(it.s, it.e), data = get(sub, "data");
+      if (!data || data.e - data.s < 8) continue;
+      const ps = data.s + 8, pe = data.e;
+      if (it.t === "©nam") out.title = utf8(ps, pe);
+      else if (it.t === "©ART") out.artist = utf8(ps, pe);
+      else if (it.t === "aART") out.albumArtist = utf8(ps, pe);
+      else if (it.t === "tmpo" && pe - ps >= 2) out.bpm = String((u[ps] << 8) | u[ps + 1]);
+      else if (it.t === "----") {
+        const nm = get(sub, "name"), name = nm ? utf8(nm.s + 4, nm.e).toUpperCase() : "";
+        if (name === "INITIALKEY" || name === "KEY") out.key = utf8(ps, pe);
+        if (name === "BPM") out.bpm = out.bpm || utf8(ps, pe);
+      }
+    }
+    out.artist = out.artist || out.albumArtist;
+  }
+  function readVorbis(u, p, end, out) {
+    p += 4 + le32(u, p);
+    const n = le32(u, p);
+    p += 4;
+    for (let i = 0; i < n && p + 4 <= end; i++) {
+      const len = le32(u, p), s = dec("utf-8", u.subarray(p + 4, p + 4 + len));
+      p += 4 + len;
+      const eq = s.indexOf("=");
+      if (eq < 0) continue;
+      const k = s.slice(0, eq).toUpperCase(), v = s.slice(eq + 1).trim();
+      if (k === "TITLE") out.title = out.title || v;
+      else if (k === "ARTIST") out.artist = out.artist || v;
+      else if (k === "BPM" || k === "TEMPO") out.bpm = out.bpm || v;
+      else if (k === "INITIALKEY" || k === "KEY") out.key = out.key || v;
+    }
+  }
+  function readFLAC(u, p, out) {
+    while (p + 4 <= u.length) {
+      const last = u[p] & 128, type = u[p] & 127, size = (u[p + 1] << 16) | (u[p + 2] << 8) | u[p + 3];
+      p += 4;
+      if (type === 4) readVorbis(u, p, Math.min(u.length, p + size), out);
+      p += size;
+      if (last) break;
+    }
+  }
+  // AIFF (big-endian) and WAV (little-endian) are lists of chunks; tags sit in an "ID3 " chunk, or AIFF NAME/AUTH and WAV LIST/INFO.
+  function readChunks(u, p, big, out) {
+    const len = big ? be32 : le32;
+    const txt = (a, b) => dec("latin1", u.subarray(a, b)).replace(/\u0000[\s\S]*$/, "").trim();
+    for (p += 12; p + 8 <= u.length;) {
+      const id = asc(u, p, 4), size = len(u, p + 4), s = p + 8;
+      if (/^id3 $/i.test(id) && asc(u, s, 3) === "ID3") readID3(u, s, out);
+      else if (big && id === "NAME") out.title = out.title || txt(s, s + size);
+      else if (big && id === "AUTH") out.artist = out.artist || txt(s, s + size);
+      else if (!big && id === "LIST" && asc(u, s, 4) === "INFO") {
+        for (let q = s + 4; q + 8 <= Math.min(u.length, s + size);) {
+          const sid = asc(u, q, 4), sl = le32(u, q + 4);
+          if (sid === "INAM") out.title = out.title || txt(q + 8, q + 8 + sl);
+          if (sid === "IART") out.artist = out.artist || txt(q + 8, q + 8 + sl);
+          q += 8 + sl + (sl & 1);
+        }
+      }
+      p = s + size + (size & 1);
+    }
+  }
+  function readTags(u, fileName) {
+    const out = {};
+    try {
+      let p = 0;
+      if (asc(u, 0, 3) === "ID3") { readID3(u, 0, out); p = 10 + syncsafe(u, 6) + (u[5] & 0x10 ? 10 : 0); }
+      const sig = asc(u, p, 4);
+      if (sig === "fLaC") readFLAC(u, p + 4, out);
+      else if (sig === "FORM" && /^AIF[FC]$/.test(asc(u, p + 8, 4))) readChunks(u, p, true, out);
+      else if (sig === "RIFF" && asc(u, p + 8, 4) === "WAVE") readChunks(u, p, false, out);
+      else if (asc(u, 4, 4) === "ftyp") readMP4(u, out);
+      if (!out.title && u.length > 128 && asc(u, u.length - 128, 3) === "TAG") {
+        const v1 = (a, n) => dec("latin1", u.subarray(u.length - 128 + a, u.length - 128 + a + n)).replace(/\u0000[\s\S]*$/, "").trim();
+        out.title = v1(3, 30);
+        out.artist = out.artist || v1(33, 30);
+      }
+    } catch {}
+    // Store downloads are usually named "Artist - Title (Mix)", so use that when a tag is missing.
+    const base = fileName.replace(/\.[a-z0-9]{2,5}$/i, "").replace(/_/g, " ").replace(/^(\d{1,3}\s*[.)\-]\s*|\d{2}\s+)/, "").trim() || fileName;
+    const parts = base.split(/\s+[-–—]\s+/);
+    let bpm = parseFloat(String(out.bpm || "").replace(",", "."));
+    bpm = bpm >= 60 && bpm <= 200 ? Math.round(bpm * 100) / 100 : 0;
+    return {
+      title: (out.title || (parts.length > 1 ? parts.slice(1).join(" - ") : base)).slice(0, 200),
+      artist: (out.artist || (parts.length > 1 ? parts[0] : "")).slice(0, 200),
+      bpm,
+      key: parseKey(out.key),
+    };
+  }
+
+  // =====================================================================
   // Demo tracks, generated in the browser so there's music to practise on.
   // Each has a DJ-friendly arrangement: drum intro, bass, full groove, breakdown, drop, drum outro, in 8-bar phrases.
   // =====================================================================
@@ -523,6 +786,7 @@ button { font: inherit; color: inherit; }
     { id: "nightbus", title: "Night Bus", artist: "Cue Lab demo · Tech house", bpm: 126, root: 41, style: "tech", prog: [[0, 3, 7], [0, 3, 7], [-4, 0, 3], [-2, 1, 5]], bassRoots: [0, 0, -4, -2] },
     { id: "slowburn", title: "Slow Burn", artist: "Cue Lab demo · Disco house", bpm: 118, root: 38, style: "disco", prog: [[0, 3, 7, 10], [0, 3, 7, 10], [5, 9, 12, 15], [5, 9, 12, 15]], bassRoots: [0, 0, 5, 5] },
   ];
+  DEMOS.forEach((s) => { s.key = camelot(s.root % 12, true); });
   const SR = 32000;
   const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
@@ -715,7 +979,8 @@ button { font: inherit; color: inherit; }
     return { amp, col, n };
   }
 
-  function detectTempo(buffer) {
+  // With a BPM from the file's tags only the beat phase is found; otherwise the tempo is detected too.
+  function detectTempo(buffer, knownBpm) {
     const sr = buffer.sampleRate, a = buffer.getChannelData(0), b = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : a;
     const hop = 512, frames = Math.floor(a.length / hop);
     const lpA = 1 - Math.exp(-2 * Math.PI * 200 / sr);
@@ -729,10 +994,22 @@ button { font: inherit; color: inherit; }
       prev = v;
     }
     const fps = sr / hop;
-    const minLag = Math.floor(fps * 60 / 180), maxLag = Math.ceil(fps * 60 / 70);
-    const ac = new Float32Array(maxLag + 2);
     const N = Math.min(frames, Math.floor(fps * 120));
     const start = Math.floor(Math.min(frames - N, fps * 20));
+    const bpm = knownBpm || refineBpm(flux, fps, findBpm(flux, fps, N, start));
+    const period = fps * 60 / bpm;
+    let bestO = 0, bestOS = -1;
+    for (let o = 0; o < period; o += 0.5) {
+      let s = 0;
+      for (let k = 0; ; k++) { const i = Math.round(start + o + k * period); if (i >= start + N) break; s += flux[i]; }
+      if (s > bestOS) { bestOS = s; bestO = o; }
+    }
+    let first = ((start + bestO) / fps) % (60 / bpm);
+    return { bpm, firstBeat: first };
+  }
+  function findBpm(flux, fps, N, start) {
+    const minLag = Math.floor(fps * 60 / 180), maxLag = Math.ceil(fps * 60 / 70);
+    const ac = new Float32Array(maxLag + 2);
     for (let lag = minLag; lag <= maxLag + 1; lag++) {
       let s = 0;
       for (let i = start; i < start + N - lag; i++) s += flux[i] * flux[i + lag];
@@ -752,15 +1029,21 @@ button { font: inherit; color: inherit; }
     while (bpm > 165) bpm /= 2;
     if (Math.abs(bpm - Math.round(bpm)) < 0.25) bpm = Math.round(bpm);
     else bpm = Math.round(bpm * 10) / 10;
-    const period = fps * 60 / bpm;
-    let bestO = 0, bestOS = -1;
-    for (let o = 0; o < period; o += 0.5) {
-      let s = 0;
-      for (let k = 0; ; k++) { const i = Math.round(start + o + k * period); if (i >= start + N) break; s += flux[i]; }
-      if (s > bestOS) { bestOS = s; bestO = o; }
+    return bpm;
+  }
+  // The coarse guess can be a few tenths out, enough to drift off the grid over a whole track. So test tempos close to it
+  // across the full track, keeping the one whose beat lines up best with the onsets (the strongest beat-rate frequency).
+  function refineBpm(flux, fps, bpm0) {
+    let best = bpm0, bestM = -1;
+    for (let b = bpm0 - 1.2; b <= bpm0 + 1.2; b += 0.02) {
+      const w = 2 * Math.PI * b / 60 / fps;
+      let re = 0, im = 0;
+      for (let i = 0; i < flux.length; i++) { const v = flux[i]; if (v) { re += v * Math.cos(w * i); im += v * Math.sin(w * i); } }
+      const m = re * re + im * im;
+      if (m > bestM) { bestM = m; best = b; }
     }
-    let first = ((start + bestO) / fps) % (60 / bpm);
-    return { bpm, firstBeat: first };
+    // Dance music is almost always made at a whole-number tempo.
+    return Math.abs(best - Math.round(best)) < 0.12 ? Math.round(best) : Math.round(best * 10) / 10;
   }
 
   // =====================================================================
@@ -903,6 +1186,8 @@ button { font: inherit; color: inherit; }
     get rate() { return (1 + this.pitch) * (1 + this.bend); }
     get bpm() { return this.track ? this.track.bpm * (1 + this.pitch) : 0; }
     get beatLen() { return this.track ? 60 / this.track.bpm : 0.5; }
+    get key() { return this.track ? shiftKey(this.track.key, 1 + this.pitch) : { code: "", semis: 0 }; }
+    saveCues() { if (this.track && this.track.crateId) crate.saveCues(this.track.crateId, this.hot, this.cue); }
     now() { return A ? A.ctx.currentTime : performance.now() / 1000; }
     getPos() {
       if (!this.playing || this.scr) return this.pos;
@@ -925,9 +1210,11 @@ button { font: inherit; color: inherit; }
       this.playing = false;
       this.scr = null;
       this.track = track;
-      this.pos = track.firstBeat;
-      this.cue = track.firstBeat;
-      this.hot = Array(8).fill(null);
+      // A crate track comes back with the cue and hot cues you left on it.
+      const sv = track.saved;
+      this.cue = sv && typeof sv.cue === "number" ? sv.cue : track.firstBeat;
+      this.pos = this.cue;
+      this.hot = Array.from({ length: 8 }, (_, k) => (sv && sv.hot && typeof sv.hot[k] === "number" ? sv.hot[k] : null));
       this.loop = null;
       this.pitch = 0;
       this.range = 0.08;
@@ -990,7 +1277,7 @@ button { font: inherit; color: inherit; }
       if (!this.track) return;
       if (this.playing) { this.pause(); this.seek(this.cue); return; }
       const here = this.getPos();
-      if (Math.abs(here - this.cue) > 0.02) { this.cue = this.snap(here); this.seek(this.cue); }
+      if (Math.abs(here - this.cue) > 0.02) { this.cue = this.snap(here); this.seek(this.cue); this.saveCues(); }
       coach.event("cue" + this.i);
       this.cueHeld = true;
       this.play();
@@ -1003,7 +1290,7 @@ button { font: inherit; color: inherit; }
     }
     hotPad(k) {
       if (!this.track) return;
-      if (this.hot[k] == null) { this.hot[k] = this.snap(this.getPos()); coach.event("hot" + this.i); }
+      if (this.hot[k] == null) { this.hot[k] = this.snap(this.getPos()); coach.event("hot" + this.i); this.saveCues(); }
       else { this.seek(this.hot[k]); if (!this.playing) this.play(); }
       ui.refreshDeck(this);
     }
@@ -1136,7 +1423,10 @@ button { font: inherit; color: inherit; }
 
   function makeTrack(buf, meta) {
     const an = analyse(buf);
-    return { buf, title: meta.title, artist: meta.artist, bpm: meta.bpm, firstBeat: meta.firstBeat || 0, dur: buf.duration, wave: an, demo: !!meta.demo, ovCache: null };
+    return {
+      buf, title: meta.title, artist: meta.artist, bpm: meta.bpm, key: meta.key || "", firstBeat: meta.firstBeat || 0, dur: buf.duration, wave: an,
+      demo: !!meta.demo, crateId: meta.crateId || null, saved: null, ovCache: null,
+    };
   }
 
   // =====================================================================
@@ -1229,15 +1519,19 @@ button { font: inherit; color: inherit; }
     },
     buildDeck(d) {
       const root = $("#deck" + (d.i + 1));
-      const sel = h("select", { id: "demo" + (d.i + 1), "aria-label": "Load a demo track onto deck " + (d.i + 1) },
-        h("option", { value: "", text: "Load demo track…" }), DEMOS.map((s) => h("option", { value: s.id, text: s.title + " · " + s.bpm + " BPM" })));
-      sel.addEventListener("change", async () => { if (sel.value) { await loadDemo(d, sel.value); sel.value = ""; } });
-      const fileIn = h("input", { type: "file", accept: "audio/*", id: "file" + (d.i + 1), hidden: true });
-      fileIn.addEventListener("change", () => { if (fileIn.files[0]) loadFile(d, fileIn.files[0]); fileIn.value = ""; });
-      const fileBtn = h("label", { class: "file", for: "file" + (d.i + 1), tabindex: "0", text: "Your music…" });
+      const sel = h("select", { id: "pick" + (d.i + 1), "aria-label": "Load a track onto deck " + (d.i + 1) });
+      sel.addEventListener("change", () => {
+        const [kind, id] = sel.value.split(":");
+        sel.value = "";
+        if (kind === "demo") loadDemo(d, id);
+        else if (kind === "crate") loadCrate(d, id);
+      });
+      const fileIn = h("input", { type: "file", accept: AUDIO_ACCEPT, id: "file" + (d.i + 1), hidden: true });
+      fileIn.addEventListener("change", () => { if (fileIn.files[0]) crate.add([fileIn.files[0]], d); fileIn.value = ""; });
+      const fileBtn = h("label", { class: "file", for: "file" + (d.i + 1), tabindex: "0", text: "Add music…", title: "Add a track to your crate and load it here" });
       fileBtn.addEventListener("keydown", (e) => { if (e.key === "Enter") fileIn.click(); });
       root.addEventListener("dragover", (e) => { e.preventDefault(); });
-      root.addEventListener("drop", (e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) loadFile(d, f); });
+      root.addEventListener("drop", (e) => { e.preventDefault(); const f = [...e.dataTransfer.files].find(isAudio); if (f) crate.add([f], d); });
 
       const cueBtn = h("button", { class: "tbtn cue", type: "button", "aria-label": "Cue" }, "CUE");
       const playBtn = h("button", { class: "tbtn play", type: "button", "aria-label": "Play or pause", html: ICON.pp });
@@ -1321,7 +1615,7 @@ button { font: inherit; color: inherit; }
           e.preventDefault();
           audio();
           if (d.mode === "hot") {
-            held = setTimeout(() => { held = "long"; if (d.hot[k] != null) { d.hot[k] = null; ui.tip("Hot cue " + (k + 1) + " cleared."); ui.refreshDeck(d); } }, 650);
+            held = setTimeout(() => { held = "long"; if (d.hot[k] != null) { d.hot[k] = null; d.saveCues(); ui.tip("Hot cue " + (k + 1) + " cleared."); ui.refreshDeck(d); } }, 650);
           } else if (d.mode === "loop") d.setLoop(LOOPS[k]);
           else d.rollDown(ROLLS[k]);
         });
@@ -1355,6 +1649,20 @@ button { font: inherit; color: inherit; }
       E.pRead.textContent = (d.pitch >= 0 ? "+" : "−") + Math.abs(d.pitch * 100).toFixed(2) + "%";
       E.rangeBtn.textContent = "±" + Math.round(d.range * 100) + "%";
       $("#pp" + (d.i + 1)).textContent = E.pRead.textContent;
+      const k = d.key, el = $("#key" + (d.i + 1)), orig = d.track && d.track.key;
+      el.textContent = k.code || "–";
+      el.classList.toggle("shift", k.semis !== 0);
+      el.title = !orig ? "Key unknown" : k.semis ? "Pitched " + (k.semis > 0 ? "up" : "down") + " from " + orig + " (" + keyName(orig) + "). Without key lock, the tempo fader changes the key too." : keyName(orig);
+    },
+    fillSelects() {
+      for (const d of decks) {
+        const sel = $("#pick" + (d.i + 1));
+        if (!sel) continue;
+        sel.replaceChildren(
+          h("option", { value: "", text: "Load a track…" }),
+          crate.items.length ? h("optgroup", { label: "Your crate" }, crate.items.map((t) => h("option", { value: "crate:" + t.id, text: (t.artist ? t.artist + " – " : "") + t.title + " · " + fmtBpm(t.bpm) + " BPM" + (t.key ? " · " + t.key : "") }))) : null,
+          h("optgroup", { label: "Demo tracks" }, DEMOS.map((s) => h("option", { value: "demo:" + s.id, text: s.title + " · " + s.bpm + " BPM · " + s.key }))));
+      }
     },
     refreshDeck(d) {
       const E = this.deckEls[d.i];
@@ -1382,6 +1690,7 @@ button { font: inherit; color: inherit; }
       const title = $("#t" + (d.i + 1));
       title.replaceChildren(t ? t.title : "No track", t ? h("small", { text: t.artist }) : null);
       this.refreshPitch(d);
+      crateUI.mark();
     },
     buildMixer() {
       P.ch.forEach((c, i) => {
@@ -1426,7 +1735,7 @@ button { font: inherit; color: inherit; }
   async function demoTrack(id) {
     if (demoCache.has(id)) return demoCache.get(id);
     const spec = DEMOS.find((s) => s.id === id);
-    const p = renderDemo(spec).then((buf) => makeTrack(buf, { title: spec.title, artist: spec.artist, bpm: spec.bpm, firstBeat: 0, demo: true }));
+    const p = renderDemo(spec).then((buf) => Object.assign(makeTrack(buf, { title: spec.title, artist: spec.artist, bpm: spec.bpm, key: spec.key, firstBeat: 0, demo: true }), { ref: "demo:" + id }));
     demoCache.set(id, p);
     return p;
   }
@@ -1436,22 +1745,434 @@ button { font: inherit; color: inherit; }
     d.load(t);
     coach.event("load" + d.i);
   }
-  async function loadFile(d, file) {
+  function decodeAudio(ab) {
+    const a = audio();
+    return new Promise((res, rej) => { const p = a.ctx.decodeAudioData(ab, res, rej); if (p && p.then) p.then(res, rej); });
+  }
+
+  // =====================================================================
+  // The crate: your own records, added once and ready on every visit.
+  // In the Claude artifact they're saved to your account: audio in the artifact's asset store, tags and cues in a
+  // private db folder only you can read. Opened as a plain file, they stay in this browser's IndexedDB.
+  // =====================================================================
+  const AUDIO_ACCEPT = "audio/*,.mp3,.m4a,.aac,.wav,.aif,.aiff,.flac";
+  const isAudio = (f) => /^audio\//.test(f.type) || /\.(mp3|m4a|aac|mp4|wav|aif|aiff|flac|ogg|opus)$/i.test(f.name);
+  const fmtBpm = (b) => (!b ? "–" : Math.abs(b - Math.round(b)) < 0.05 ? String(Math.round(b)) : b.toFixed(1));
+  const fmtBytes = (n) => (n >= 1e9 ? (n / 1e9).toFixed(1) + " GB" : Math.max(1, Math.round(n / 1e6)) + " MB");
+  // The asset store takes text but not audio, so audio is kept as base64 text, in pieces that stay under its 20 MiB file cap.
+  const PIECE = 14 * 1024 * 1024;
+  const MAX_FILE = 250 * 1024 * 1024;
+  function toB64(u) {
+    const parts = [];
+    for (let i = 0; i < u.length; i += 0x8000) parts.push(String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)));
+    return btoa(parts.join(""));
+  }
+  function fromB64(s) {
+    const bin = atob(s.trim()), u = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return u;
+  }
+  function concat(parts) {
+    if (parts.length === 1) return parts[0];
+    const u = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+    let o = 0;
+    for (const p of parts) { u.set(p, o); o += p.length; }
+    return u;
+  }
+  const byNewest = (a, b) => b.addedAt - a.addedAt;
+
+  function cloudStore(db, assets, uid) {
+    const col = db.doc("data/users/" + uid + "/crate").collection("tracks");
+    const upload = async (blob) => {
+      try { return await assets.upload(blob, { type: "text/plain" }); }
+      catch (e) {
+        if (!e || e.code !== "store_unavailable") throw e;
+        await new Promise((r) => setTimeout(r, 1500));
+        return assets.upload(blob, { type: "text/plain" });
+      }
+    };
+    return {
+      kind: "cloud",
+      watch(cb, fail) { return col.orderBy("addedAt", "desc").limit(1000).onSnapshot((snap) => cb(snap.docs.map((d) => ({ ...d.data(), id: d.id }))), fail); },
+      async put(meta, bytes, progress) {
+        const ids = [], n = Math.ceil(bytes.length / PIECE);
+        try {
+          for (let i = 0; i < n; i++) {
+            progress(i / n);
+            const r = await upload(new Blob([toB64(bytes.subarray(i * PIECE, (i + 1) * PIECE))], { type: "text/plain" }));
+            ids.push(r.id);
+          }
+          progress(1);
+          await col.doc(meta.id).set({ ...meta, chunks: ids });
+        } catch (e) {
+          // Nothing points at pieces of a failed save, so clear them out rather than leave them using up space.
+          for (const id of ids) assets.delete(id).catch(() => {});
+          throw e;
+        }
+      },
+      async bytes(item, progress) {
+        const parts = [];
+        for (let i = 0; i < item.chunks.length; i++) {
+          const r = await fetch("/_blob/" + item.chunks[i]);
+          if (!r.ok) throw new Error("missing");
+          parts.push(fromB64(await r.text()));
+          progress((i + 1) / item.chunks.length);
+        }
+        return concat(parts);
+      },
+      async remove(item) {
+        await col.doc(item.id).delete();
+        for (const id of item.chunks || []) await assets.delete(id).catch(() => {});
+      },
+      update: (id, data) => col.doc(id).update(data),
+      usage: () => assets.list().then((r) => r.usage, () => null),
+    };
+  }
+
+  function idbOpen() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open("cuelab", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("tracks", { keyPath: "id" });
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  function localStore(idb) {
+    const run = (mode, fn) => new Promise((res, rej) => {
+      const t = idb.transaction("tracks", mode), req = fn(t.objectStore("tracks"));
+      t.oncomplete = () => res(req && req.result);
+      t.onerror = t.onabort = () => rej(t.error);
+    });
+    let cb = null;
+    const emit = async () => { if (cb) cb((await run("readonly", (st) => st.getAll())).map(({ blob, ...m }) => m).sort(byNewest)); };
+    return {
+      kind: "local",
+      watch(c) { cb = c; emit(); return () => { cb = null; }; },
+      async put(meta, bytes) { await run("readwrite", (st) => st.put({ ...meta, blob: new Blob([bytes]) })); emit(); },
+      async bytes(item) {
+        const r = await run("readonly", (st) => st.get(item.id));
+        if (!r || !r.blob) throw new Error("missing");
+        return new Uint8Array(await r.blob.arrayBuffer());
+      },
+      async remove(item) { await run("readwrite", (st) => st.delete(item.id)); emit(); },
+      async update(id, data) {
+        await run("readwrite", (st) => { const g = st.get(id); g.onsuccess = () => { if (g.result) st.put({ ...g.result, ...data }); }; return null; });
+        emit();
+      },
+      usage: async () => null,
+    };
+  }
+  // Last resort when the browser blocks storage: the crate lasts until the page closes.
+  function memoryStore() {
+    const m = new Map();
+    let cb = null;
+    const emit = () => { if (cb) cb([...m.values()].map((x) => ({ ...x.meta })).sort(byNewest)); };
+    return {
+      kind: "memory",
+      watch(c) { cb = c; emit(); return () => { cb = null; }; },
+      async put(meta, bytes) { m.set(meta.id, { meta: { ...meta }, bytes: bytes.slice() }); emit(); },
+      async bytes(item) { const x = m.get(item.id); if (!x) throw new Error("missing"); return x.bytes.slice(); },
+      async remove(item) { m.delete(item.id); emit(); },
+      async update(id, data) { const x = m.get(id); if (x) Object.assign(x.meta, data); emit(); },
+      usage: async () => null,
+    };
+  }
+
+  function saveError(e) {
+    const c = e && (e.code || e.name);
+    if (c === "quota_or_state") return "Your crate's storage is full. Delete a few tracks to make room.";
+    if (c === "QuotaExceededError") return "This browser is out of storage space.";
+    if (c === "rate_limited") return "Saving too quickly. Wait a moment and add it again.";
+    if (c === "upstream_auth") return "Your sign-in has expired. Reload the page and try again.";
+    if (c === "too_large") return "That file is too big to store.";
+    return "Something went wrong while saving" + (c ? " (" + c + ")" : "") + ".";
+  }
+
+  const crate = {
+    store: null, items: [], usage: null, ready: false, failed: false,
+    adding: new Map(), pending: new Map(), timer: 0, flushing: false, chain: Promise.resolve(),
+    init() {
+      this.initP = (async () => {
+        let s = null;
+        try {
+          if (window.claude && typeof window.claude.use === "function") {
+            const [db, user, assets] = await Promise.all(["db", "user", "assets"].map((n) => window.claude.use(n).catch(() => null)));
+            const uid = db && user && assets ? await user.id().catch(() => null) : null;
+            if (uid) s = cloudStore(db, assets, uid);
+          }
+        } catch {}
+        if (!s && window.indexedDB) { try { s = localStore(await idbOpen()); } catch {} }
+        this.store = s || memoryStore();
+        this.store.watch((items) => {
+          this.items = items;
+          this.ready = true;
+          crateUI.queue();
+          ui.fillSelects();
+        }, () => { this.failed = true; crateUI.queue(); });
+        this.refreshUsage();
+      })();
+      return this.initP;
+    },
+    async refreshUsage() { this.usage = await this.store.usage(); crateUI.queue(); },
+    find(id) { return this.items.find((x) => x.id === id); },
+    // One file at a time, so big files don't pile up in memory.
+    add(files, deck) {
+      const list = [...files].filter(isAudio);
+      if (!list.length) { ui.tip("That isn't an audio file. Cue Lab takes MP3, WAV, FLAC, M4A or AIFF.", "warn", 5000); return this.chain; }
+      list.forEach((f, k) => { this.chain = this.chain.then(() => this.addOne(f, k === 0 ? deck : null)); });
+      return this.chain;
+    },
+    async addOne(file, deck) {
+      await this.initP;
+      const row = crateUI.progress(file.name);
+      const title = deck ? $("#t" + (deck.i + 1)) : null;
+      const say = (t) => { row.set(t); if (title) title.textContent = t; };
+      let track = null;
+      try {
+        if (file.size > MAX_FILE) throw { user: "That file is over 250 MB. Export a smaller copy first." };
+        say("Reading " + file.name + "…");
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const tags = readTags(bytes, file.name);
+        let buf;
+        try { buf = await decodeAudio(bytes.slice().buffer); }
+        catch {
+          throw { user: /\.aiff?$/i.test(file.name) ? "This browser can't play AIFF. Open Cue Lab in Safari, or convert it to WAV or FLAC." : "This browser can't play " + file.name + ". Try MP3, WAV, FLAC or M4A. Tracks downloaded inside streaming apps are locked and won't open." };
+        }
+        say("Finding the beat in " + tags.title + "…");
+        await new Promise((r) => setTimeout(r, 0));
+        const { bpm, firstBeat } = detectTempo(buf, tags.bpm);
+        const meta = {
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+          title: tags.title, artist: tags.artist, bpm, key: tags.key, firstBeat, duration: buf.duration,
+          size: file.size, type: file.type || "", fileName: file.name, grid: tags.bpm ? "tags" : "detected", addedAt: Date.now(),
+          cue: firstBeat, hot: Array(8).fill(null),
+        };
+        track = makeTrack(buf, { ...meta, crateId: meta.id });
+        track.ref = "crate:" + meta.id;
+        cacheTrack(meta.id, Promise.resolve(track));
+        if (deck) {
+          deck.load(track);
+          coach.event("load" + deck.i);
+          ui.tip((tags.bpm ? "Tempo " + fmtBpm(bpm) + " BPM from the file's tags" : "Detected " + fmtBpm(bpm) + " BPM. If the grid looks off, the true tempo may be double or half") + (tags.key ? ". Key " + tags.key + " (" + keyName(tags.key) + ")." : ". No key in the tags."), "", 6000);
+        }
+        this.adding.set(meta.id, meta);
+        row.set("Saving " + meta.title + "…");
+        try {
+          await this.store.put(meta, bytes, (f) => row.set("Saving " + meta.title + " · " + Math.round(f * 100) + "%"));
+        } catch (e) {
+          track.crateId = null;
+          trackCache.delete(meta.id);
+          row.fail(saveError(e) + (deck ? " It's on the deck for this session." : ""));
+          return;
+        } finally { this.adding.delete(meta.id); }
+        row.done((meta.artist ? meta.artist + " – " : "") + meta.title + " · " + fmtBpm(bpm) + " BPM" + (meta.key ? " · " + meta.key : ""));
+        this.refreshUsage();
+      } catch (e) {
+        row.fail(e && e.user ? e.user : "Couldn't add " + file.name + ".", "Can't add");
+        if (deck && !track) { ui.refreshDeck(deck); ui.tip(e && e.user ? e.user : "Couldn't read that file.", "bad", 7000); }
+      }
+    },
+    async remove(item) {
+      trackCache.delete(item.id);
+      this.pending.delete(item.id);
+      decks.forEach((d) => { if (d.track && d.track.crateId === item.id) d.track.crateId = null; });
+      try { await this.store.remove(item); }
+      catch { ui.tip("Couldn't delete " + item.title + ". Try again in a moment.", "bad", 5000); }
+      this.refreshUsage();
+    },
+    // Cue and hot-cue edits are saved a moment after you stop changing them, one write at a time.
+    saveCues(id, hot, cue) {
+      const r = (x) => Math.round(x * 1000) / 1000;
+      const data = { hot: hot.map((x) => (x == null ? null : r(x))), cue: r(cue) };
+      const item = this.find(id);
+      if (item) Object.assign(item, data);
+      const m = this.adding.get(id);
+      if (m) { Object.assign(m, data); return; }
+      this.pending.set(id, data);
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => this.flush(), 900);
+    },
+    async flush() {
+      if (this.flushing) return;
+      this.flushing = true;
+      try {
+        while (this.pending.size) {
+          const [id, data] = this.pending.entries().next().value;
+          this.pending.delete(id);
+          try { await this.store.update(id, data); } catch {}
+        }
+      } finally { this.flushing = false; }
+    },
+  };
+
+  // Decoded tracks stay in memory for quick reloads; only the last few, since each is tens of MB.
+  const trackCache = new Map();
+  function cacheTrack(id, p) {
+    trackCache.delete(id);
+    trackCache.set(id, p);
+    while (trackCache.size > 4) trackCache.delete(trackCache.keys().next().value);
+  }
+  async function loadCrate(d, id) {
+    const item = crate.find(id);
+    if (!item) return;
     const title = $("#t" + (d.i + 1));
-    title.textContent = "Reading " + file.name + "…";
     try {
-      const a = audio();
-      const data = await file.arrayBuffer();
-      const buf = await new Promise((res, rej) => { const p = a.ctx.decodeAudioData(data, res, rej); if (p && p.then) p.then(res, rej); });
-      const { bpm, firstBeat } = detectTempo(buf);
-      const name = file.name.replace(/\.[a-z0-9]+$/i, "").replace(/[_]+/g, " ");
-      d.load(makeTrack(buf, { title: name, artist: "Your track · tempo detected", bpm, firstBeat }));
-      ui.tip("Detected " + bpm + " BPM. If the grid looks off, the true tempo may be double or half.", "", 5000);
+      let p = trackCache.get(id);
+      if (!p) {
+        title.textContent = "Opening " + item.title + "…";
+        p = crate.store.bytes(item, (f) => { title.textContent = "Opening " + item.title + " · " + Math.round(f * 100) + "%"; })
+          .then((u) => decodeAudio(u.buffer))
+          .then((buf) => { const t = makeTrack(buf, { ...item, crateId: id }); t.ref = "crate:" + id; return t; });
+        p.catch(() => trackCache.delete(id));
+      }
+      cacheTrack(id, p);
+      const t = await p;
+      const now = crate.find(id) || item;
+      Object.assign(t, { title: now.title, artist: now.artist, key: now.key || "", crateId: id, saved: { hot: now.hot, cue: now.cue } });
+      d.load(t);
       coach.event("load" + d.i);
     } catch {
-      title.textContent = "Couldn't read that file. Try an MP3, WAV, M4A or AAC.";
+      ui.refreshDeck(d);
+      ui.tip("Couldn't open " + item.title + ". Its audio may be missing: delete it and add the file again.", "bad", 7000);
     }
   }
+  // The deck you're hearing most is the one the next track has to fit.
+  function onAir() {
+    let best = null, bw = 0;
+    decks.forEach((d, i) => {
+      if (!d.track || !d.playing) return;
+      const w = P.ch[i].fader * (i === 0 ? Math.min(1, 2 * (1 - P.xfade)) : Math.min(1, 2 * P.xfade));
+      if (w > bw) { bw = w; best = d; }
+    });
+    return best;
+  }
+
+  const SORTS = { new: "Newest", bpm: "BPM", key: "Key", fit: "Best fit" };
+  const crateUI = {
+    q: "", sort: store.get("crateSort", "new"), confirm: null, queued: false, sig: "",
+    build() {
+      const panel = $("#crate"), btn = $("#cratebtn");
+      const setOpen = (o) => { panel.hidden = !o; btn.setAttribute("aria-pressed", String(o)); store.set("crateOpen", o); };
+      setOpen(store.get("crateOpen", true));
+      btn.addEventListener("click", () => setOpen(panel.hidden));
+      $("#cratesearch").addEventListener("input", (e) => { this.q = e.target.value; this.render(); });
+      const sb = $("#cratesort");
+      sb.textContent = SORTS[this.sort] || "Newest";
+      sb.addEventListener("click", () => {
+        const ks = Object.keys(SORTS);
+        this.sort = ks[(ks.indexOf(this.sort) + 1) % ks.length];
+        sb.textContent = SORTS[this.sort];
+        store.set("crateSort", this.sort);
+        this.render();
+      });
+      const inp = $("#crateadd");
+      inp.addEventListener("change", () => { if (inp.files.length) crate.add(inp.files); inp.value = ""; });
+      $("#crateaddbtn").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inp.click(); } });
+      panel.addEventListener("dragover", (e) => { e.preventDefault(); panel.classList.add("drop"); });
+      panel.addEventListener("dragleave", (e) => { if (!panel.contains(e.relatedTarget)) panel.classList.remove("drop"); });
+      panel.addEventListener("drop", (e) => { e.preventDefault(); panel.classList.remove("drop"); crate.add(e.dataTransfer.files); });
+      this.render();
+    },
+    queue() { if (!this.queued) { this.queued = true; requestAnimationFrame(() => this.render()); } },
+    // Re-mark rows only when what they're compared against changes (a new track, the on-air deck, or a key shift).
+    mark() {
+      const a = onAir();
+      const sig = decks.map((d) => (d.track ? d.track.ref : "")).join("|") + "|" + (a ? a.i + a.key.code + Math.round(a.bpm) : "");
+      if (sig !== this.sig) this.queue();
+    },
+    rows() {
+      const mine = crate.items.map((t) => ({ ref: "crate:" + t.id, title: t.title, artist: t.artist, bpm: t.bpm, key: t.key, dur: t.duration, grid: t.grid, addedAt: t.addedAt, item: t }));
+      const demos = DEMOS.map((s) => ({ ref: "demo:" + s.id, title: s.title, artist: s.artist, bpm: s.bpm, key: s.key, dur: 0, grid: "demo", addedAt: 0 }));
+      return mine.concat(demos);
+    },
+    render() {
+      this.queued = false;
+      const a = onAir();
+      this.sig = decks.map((d) => (d.track ? d.track.ref : "")).join("|") + "|" + (a ? a.i + a.key.code + Math.round(a.bpm) : "");
+      const ref = a ? { i: a.i, key: a.key.code, bpm: a.bpm, tref: a.track.ref } : null;
+      const fitOf = (r) => {
+        if (!ref || r.ref === ref.tref) return null;
+        const kf = keyFit(ref.key, r.key), kOk = kf === "same" || kf === "relative" || kf === "next";
+        const bOk = r.bpm && Math.abs(r.bpm - ref.bpm) / ref.bpm < 0.08;
+        return { score: (kOk ? 0 : 2) + (bOk ? 0 : 1) + (r.bpm ? Math.abs(r.bpm - ref.bpm) / ref.bpm : 1), kOk, bOk, kf };
+      };
+      const terms = this.q.toLowerCase().split(/\s+/).filter(Boolean);
+      let rows = this.rows().filter((r) => {
+        const hay = (r.title + " " + r.artist + " " + r.key + " " + fmtBpm(r.bpm)).toLowerCase();
+        return terms.every((t) => hay.includes(t));
+      });
+      const kv = (r) => { const k = splitKey(r.key); return k ? k.n * 2 + (k.m === "B" ? 1 : 0) : 99; };
+      if (this.sort === "bpm") rows.sort((x, y) => (x.bpm || 999) - (y.bpm || 999));
+      else if (this.sort === "key") rows.sort((x, y) => kv(x) - kv(y) || (x.bpm || 0) - (y.bpm || 0));
+      else if (this.sort === "fit" && ref) rows.sort((x, y) => (fitOf(x) ? fitOf(x).score : 9) - (fitOf(y) ? fitOf(y).score : 9));
+      const loaded = decks.map((d) => (d.track ? d.track.ref : null));
+
+      const els = rows.map((r) => {
+        const f = fitOf(r);
+        let fit = null;
+        if (f && f.kOk && f.bOk) fit = h("span", { class: "cfit", text: "Fits deck " + (ref.i + 1), title: "Key " + r.key + " sits " + (f.kf === "same" ? "on the same key as" : f.kf === "relative" ? "on the relative key of" : "next to") + " deck " + (ref.i + 1) + "'s " + ref.key + ", and the tempo is close" });
+        else if (f && f.kOk) fit = h("span", { class: "cfit meh", text: "Key fits deck " + (ref.i + 1), title: "The key works, but the tempo is more than 8% away" });
+        const code = r.key;
+        const chip = h("span", { class: "kchip" + (code ? (code.endsWith("B") ? " maj" : "") : " none"), style: "--kh:" + keyHue(code), title: code ? keyName(code) : "Key unknown", text: code || "–" });
+        const btn = (i) => {
+          const b = h("button", { class: "hwbtn", type: "button", style: "--led: var(--deck" + (i + 1) + ")", "aria-pressed": String(loaded[i] === r.ref), "aria-label": "Load " + r.title + " on deck " + (i + 1) }, h("span", { class: "wide", text: "Deck " }), String(i + 1));
+          b.addEventListener("click", () => { const [kind, id] = r.ref.split(":"); kind === "demo" ? loadDemo(decks[i], id) : loadCrate(decks[i], id); });
+          return b;
+        };
+        let del = null;
+        if (r.item) {
+          const sure = this.confirm === r.ref;
+          del = h("button", { class: "hwbtn del" + (sure ? " sure" : ""), type: "button", "aria-label": sure ? "Confirm: delete " + r.title + " for good" : "Delete " + r.title, title: sure ? "Click again to delete for good" : "Delete from your crate", text: sure ? "Delete?" : "✕" });
+          del.addEventListener("click", () => {
+            if (this.confirm === r.ref) { this.confirm = null; crate.remove(r.item); return; }
+            this.confirm = r.ref;
+            this.render();
+            clearTimeout(this.ct);
+            this.ct = setTimeout(() => { if (this.confirm === r.ref) { this.confirm = null; this.render(); } }, 4000);
+          });
+        }
+        const gridText = r.grid === "demo" ? "Demo" : r.grid === "tags" ? "Tagged" : "Detected";
+        const gridTitle = r.grid === "demo" ? "Built-in practice track" : r.grid === "tags" ? "BPM read from the file's tags" : "BPM detected from the audio";
+        return h("div", { class: "crow" + (loaded[0] === r.ref ? " on1" : "") + (loaded[1] === r.ref ? " on2" : ""), role: "listitem" },
+          chip,
+          h("span", { class: "cmeta" }, h("b", { text: r.title }), h("small", null, fit, r.artist || "Unknown artist")),
+          h("span", { class: "cbpm", text: fmtBpm(r.bpm) }),
+          h("span", { class: "clen", text: r.dur ? fmtTime(r.dur) : "" }),
+          h("span", { class: "cgrid", text: gridText, title: gridTitle }),
+          h("span", { class: "cbtns" }, btn(0), btn(1), del));
+      });
+      const list = $("#cratelist");
+      const empty = !crate.items.length && crate.ready && !terms.length
+        ? h("p", { class: "crate-empty", text: "Your crate is empty. Add music you own: MP3, WAV, FLAC or M4A, plus AIFF in Safari. Stores like Beatport, Bandcamp, Traxsource and Juno sell DRM-free downloads with the BPM and key already tagged. Tracks saved inside streaming apps are locked and won't open." })
+        : !rows.length ? h("p", { class: "crate-empty", text: "Nothing matches “" + this.q.trim() + "”." }) : null;
+      const top = list.scrollTop;
+      list.replaceChildren(...(empty ? [empty] : []), ...els);
+      list.scrollTop = top;
+      this.info();
+    },
+    info() {
+      const n = crate.items.length, u = crate.usage, kind = crate.store && crate.store.kind;
+      let t;
+      if (crate.failed) t = "Couldn't reach your crate. Reload the page to try again.";
+      else if (!crate.ready) t = "Opening your crate…";
+      else {
+        t = kind === "cloud" ? "Saved to your Claude account, private to you" : kind === "local" ? "Saved in this browser only" : "Not saved: this browser blocks storage, so tracks last until you close the page";
+        t += " · " + n + (n === 1 ? " track" : " tracks");
+        if (u && u.bytes) t += " · " + fmtBytes(u.bytes) + (u.maxBytes ? " of " + fmtBytes(u.maxBytes) : "") + " of storage used";
+        t += ". Your cue and hot cues are kept with each track.";
+      }
+      $("#crateinfo").textContent = t;
+    },
+    progress(name) {
+      const b = h("b", { text: "Adding" }), sp = h("span", { text: name }), el = h("div", null, b, sp);
+      $("#crateprog").append(el);
+      return {
+        set(t) { sp.textContent = t; },
+        done(t) { el.className = "ok"; b.textContent = "Added"; sp.textContent = t; setTimeout(() => el.remove(), 5000); },
+        fail(t, label) { el.className = "fail"; b.textContent = label || "Not saved"; sp.textContent = t; setTimeout(() => el.remove(), 14000); },
+      };
+    },
+  };
 
   // =====================================================================
   // Screen drawing
@@ -1671,8 +2392,10 @@ button { font: inherit; color: inherit; }
     const tt = $("#tempotip");
     if (a.track && b.track) {
       const diff = b.bpm - a.bpm;
-      if (Math.abs(diff) < 0.06) { tt.className = "tip good"; $("b", tt).textContent = "Tempo"; $("#tempotext").textContent = "Matched at " + a.bpm.toFixed(2) + " BPM."; }
-      else { tt.className = "tip"; $("b", tt).textContent = "Tempo"; $("#tempotext").textContent = "Deck 2 is " + Math.abs(diff).toFixed(2) + " BPM " + (diff > 0 ? "faster: move its tempo fader up." : "slower: move its tempo fader down."); }
+      const ka = a.key.code, kb = b.key.code, kf = keyFit(ka, kb);
+      const keys = !kf ? "" : kf === "clash" ? " Keys " + ka + " and " + kb + " clash, so keep the overlap short." : " Keys " + ka + " and " + kb + (kf === "same" ? " match." : " sit side by side on the wheel.");
+      if (Math.abs(diff) < 0.06) { tt.className = "tip good"; $("b", tt).textContent = "Tempo"; $("#tempotext").textContent = "Matched at " + a.bpm.toFixed(2) + " BPM." + keys; }
+      else { tt.className = "tip"; $("b", tt).textContent = "Tempo"; $("#tempotext").textContent = "Deck 2 is " + Math.abs(diff).toFixed(2) + " BPM " + (diff > 0 ? "faster: move its tempo fader up." : "slower: move its tempo fader down.") + keys; }
     } else { tt.className = "tip"; $("#tempotext").textContent = "Load two tracks to compare tempos."; }
 
     // Meters.
@@ -1700,6 +2423,7 @@ button { font: inherit; color: inherit; }
     }
 
     coach.tick(dt);
+    crateUI.mark();
     requestAnimationFrame(frame);
   }
 
@@ -1758,6 +2482,9 @@ button { font: inherit; color: inherit; }
   ui.buildDeck(decks[0]);
   ui.buildDeck(decks[1]);
   ui.buildMixer();
+  crateUI.build();
+  ui.fillSelects();
+  crate.init();
   decks.forEach((d) => ui.refreshDeck(d));
   $("#t1").textContent = "Pressing Golden Hour…";
   $("#t2").textContent = "Pressing Night Bus…";
