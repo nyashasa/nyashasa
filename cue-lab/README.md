@@ -24,28 +24,49 @@ Live app: https://claude.ai/artifact/BfKPfaChJD4oA7xYxpur12
 
 ## Runway: a reimagined deck
 
-Switch the top bar from **Classic** to **Runway**. Classic is laid out like club gear. Runway rebuilds the deck around the three decisions left to a DJ once beatmatching is automatic: what to play next, when it comes in, and how the blend sounds. It uses the same audio engine, crate and keys.
+Switch the top bar from **Classic** to **Runway**. Classic is laid out like club gear. Runway rebuilds the deck around the decisions left to a DJ once beatmatching is automatic: what to play next, when it comes in, and how the blend sounds. It uses the same audio engine, crate and keys, in its own deep-navy glass look.
 
-- **The runway.** Now and Next scroll toward a fixed playhead on one shared grid of bars, with 8-bar phrase lines in amber.
-  - A queued track sits on a phrase line with a **DROP** flag. When the playhead reaches it, it starts on the one, tempo-matched and sample-locked to Now.
-  - Drag it along the runway, or use **Earlier** and **Later**, to choose the line. Snap is 8 bars or 1 bar. **Hold** keeps it floating a few bars ahead until you're ready.
-- **One ribbon for the whole transition.** Choose a shape, then perform it by sliding from Now to Next. Each shape moves the levels, EQ, filters and echo together:
-  - **Bass swap:** Next comes up, the basslines swap at the centre line, then Now fades.
-  - **Filter wash:** Next opens from a low-pass while Now thins to a high-pass.
-  - **Echo out:** Now is cut at the centre line and its echo keeps ringing.
-  - **Cut:** a hard switch.
-  - Pick 8, 16 or 32 bars. **Guide** shows where an even mix would be, and **Auto ride** follows it until you touch the ribbon. When the ribbon reaches Next, Now stops and Next becomes Now.
-- **Lanes.** Low, Mid and High lanes per track (bass and kick, vocals and keys, hats and air) let you shape what's audible, or mute a lane outright. They're frequency bands standing in for true stems, which need a separation model a browser can't run comfortably.
-- **The map.** What's playing sits in the centre, with its key at the top of the Camelot wheel.
-  - Each track's angle is its key once it's pitched to the current tempo. Its distance from the centre is how far its tempo is changed.
-  - Filled dots are minor keys and rings are major; dot size is energy. The green wedge is in key.
-  - Tap a dot to select it. The list underneath ranks the best next picks and says why: key fit, tempo change, and energy.
-- **Energy.** A strip along the top steps through your set, one track at a time, with the room's loudness drawn over it.
-  - Choose **Ease off**, **Steady** or **Lift**, and the picks favour tracks that take the energy that way.
-  - Energy is a rough 1–10 estimate from how dense, bright and fast a track is. It's for comparing tracks, not a measurement.
-- Keys: space plays or pauses Now, and ← → move the ribbon.
+- **Screen.** Now and Next sit in cards with their cover art (read from the file's tags, or a generated tile).
+  - Between the cards, a bar runs from A to B: the countdown to the drop on one side, the mix's progress on the other.
+  - Below, both waveforms scroll toward a fixed playhead on one grid of bars, with 8-bar phrase lines.
+  - A queued track starts on its phrase line, tempo-matched and sample-locked to Now. Drag it to another line, or use the card's buttons to move it, hold it, or take it off.
+- **Stem lanes.** Each track's drums, bass, melody and vocals are drawn as blocks per beat: Now on top of each row, Next underneath. Tap a stem's name on either side to mute it or bring it back.
+- **Transition.** Choose a shape and a length (8, 16 or 32 bars), then slide the ribbon from Now to Next. The ribbon draws the shape itself: how loud Now and Next are at every point. A dashed **Guide** shows the pace of an even mix, and **Auto ride** follows it until you touch the ribbon. The shapes:
+  - **Bass swap:** the basslines trade places at the centre line.
+  - **Stem blend:** Next's drums come in first and Now's vocal leaves, then the basslines swap, then Next's melody and vocal take over.
+  - **Filter wash**, **Echo out** (the echo keeps ringing after the cut) and **Hard cut**.
+- **Map.** Tempo runs up the side and steps around the key wheel run across, with what's playing in the middle. The green band is in key, colour is energy, and good fits glow.
+  - Beside it, a Camelot wheel shows the current key and the keys that mix with it.
+  - Tap a dot, or use the picks list, which says why each track fits.
+- **Stem faders.** Four faders (drums, bass, melody, vocals) for Now or Next. They set each stem's level on top of what the transition is doing.
+- **DROP and tempo.**
+  - **DROP** (or the D key) brings the queued track in on the very next bar.
+  - The tempo strip speeds up or slows down the whole set, and both tracks stay locked.
+  - The header shows the set's tempo and key.
+- **Energy line.** It traces your set and shows where the next pick would take it. Choose **Ease off**, **Steady** or **Lift** to steer which picks rank first.
+- **How a mix goes.** The four steps along the bottom light up as you go, with a live tip underneath.
+- Keys: space plays or pauses Now, ← → move the ribbon, and D drops.
 
 Nothing drops or mixes unless you set it up. The timing and the choice of track stay yours.
+
+## Stems
+
+Every track can play as four stems (drums, bass, melody and vocals) in lockstep. In Classic, the pads get a **Stems** mode:
+- Pads 1–4 switch each part on or off.
+- Pads 5–8 are acapella, instrumental, drums only and all on.
+
+Stems come from three places:
+- **Stem files: the real thing.**
+  - NI Stems files (`.stem.mp4`), which some stores sell, are read directly.
+  - You can also add a set of separate stem files, for example the four files a separator such as Demucs, Ultimate Vocal Remover or LALAL.AI exports. Name them like `Track (Drums).wav`, or keep the bare `drums.wav / bass.wav / other.wav / vocals.wav` and pick the full mix along with them. They're grouped into one track and saved in your crate together.
+- **The demo tracks** render each part separately, including a synthesised vocal hook, so their stems are exact.
+- **The quick split** handles any other track, in your browser, while it plays. It uses signal processing rather than an AI model:
+  - Sustained sounds are separated from hits, then divided by frequency (bass) and by how centred they are in the stereo field (vocals).
+  - The four stems always add back up to the original exactly.
+  - It's rough. Tested against the demos' true stems, it separates vocals well (about 11 dB), drums fairly (about 7 dB), and melody and bass poorly (about 2 dB and 0 dB). For comparison, AI separators average roughly 7–9 dB on real music. So kick and bass bleed into each other.
+  - It takes about 3 seconds per minute of audio and swaps in seamlessly when ready.
+
+Stems are held at 32 kHz to keep memory down. A track with stems uses roughly 60 MB per minute while it's loaded.
 
 ## The coach
 
