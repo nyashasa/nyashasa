@@ -22,6 +22,31 @@ Live app: https://claude.ai/artifact/BfKPfaChJD4oA7xYxpur12
   - Formats: MP3, WAV, FLAC and M4A/AAC in every browser. AIFF only plays in Safari. Tracks downloaded inside streaming apps (Spotify, Apple Music, Tidal) are DRM-locked and won't open.
 - **Demo tracks.** Three tracks are generated in the browser: Golden Hour (122 BPM house), Night Bus (126 BPM tech house) and Slow Burn (118 BPM disco house). Each has a DJ-friendly arrangement in 8-bar phrases: a drum intro, then bass, the full groove, a breakdown, a drop and a drum outro.
 
+## Runway: a reimagined deck
+
+Switch the top bar from **Classic** to **Runway**. Classic is laid out like club gear. Runway rebuilds the deck around the three decisions left to a DJ once beatmatching is automatic: what to play next, when it comes in, and how the blend sounds. It uses the same audio engine, crate and keys.
+
+- **The runway.** Now and Next scroll toward a fixed playhead on one shared grid of bars, with 8-bar phrase lines in amber.
+  - A queued track sits on a phrase line with a **DROP** flag. When the playhead reaches it, it starts on the one, tempo-matched and sample-locked to Now.
+  - Drag it along the runway, or use **Earlier** and **Later**, to choose the line. Snap is 8 bars or 1 bar. **Hold** keeps it floating a few bars ahead until you're ready.
+- **One ribbon for the whole transition.** Choose a shape, then perform it by sliding from Now to Next. Each shape moves the levels, EQ, filters and echo together:
+  - **Bass swap:** Next comes up, the basslines swap at the centre line, then Now fades.
+  - **Filter wash:** Next opens from a low-pass while Now thins to a high-pass.
+  - **Echo out:** Now is cut at the centre line and its echo keeps ringing.
+  - **Cut:** a hard switch.
+  - Pick 8, 16 or 32 bars. **Guide** shows where an even mix would be, and **Auto ride** follows it until you touch the ribbon. When the ribbon reaches Next, Now stops and Next becomes Now.
+- **Lanes.** Low, Mid and High lanes per track (bass and kick, vocals and keys, hats and air) let you shape what's audible, or mute a lane outright. They're frequency bands standing in for true stems, which need a separation model a browser can't run comfortably.
+- **The map.** What's playing sits in the centre, with its key at the top of the Camelot wheel.
+  - Each track's angle is its key once it's pitched to the current tempo. Its distance from the centre is how far its tempo is changed.
+  - Filled dots are minor keys and rings are major; dot size is energy. The green wedge is in key.
+  - Tap a dot to select it. The list underneath ranks the best next picks and says why: key fit, tempo change, and energy.
+- **Energy.** A strip along the top steps through your set, one track at a time, with the room's loudness drawn over it.
+  - Choose **Ease off**, **Steady** or **Lift**, and the picks favour tracks that take the energy that way.
+  - Energy is a rough 1–10 estimate from how dense, bright and fast a track is. It's for comparing tracks, not a measurement.
+- Keys: space plays or pauses Now, and ← → move the ribbon.
+
+Nothing drops or mixes unless you set it up. The timing and the choice of track stay yours.
+
 ## The coach
 
 Twelve lessons that watch what you do and move on when you've done it:

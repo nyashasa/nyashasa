@@ -403,11 +403,102 @@ button { font: inherit; color: inherit; }
 .strip .key { color: var(--ink); }
 .strip .key.shift { color: var(--warn); }
 
+/* ---------- mode switch ---------- */
+.seg { display: inline-flex; border: 1px solid var(--edge); border-radius: 8px; padding: 2px; background: #0c0d10; }
+.seg button { border: 0; background: none; padding: 6px 12px; border-radius: 6px; font: 700 12px/1 var(--font-label); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--panel-2); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 0 1px var(--edge); }
+
+/* ---------- Runway: the reimagined deck ---------- */
+.runway { display: grid; gap: 12px; }
+.rw-energy {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  background: var(--screen); border: 1px solid var(--edge); border-radius: 12px; padding: 8px 12px;
+}
+.rw-elabel { display: grid; gap: 4px; }
+.rw-elabel small, .rw-maphead small { color: var(--muted); font-size: 12px; }
+#rwEnergy { width: 100%; height: 64px; display: block; }
+.rw-dir { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.rw-dir .hwbtn { padding: 6px 9px; font-size: 11px; }
+.rw-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 12px; align-items: start; }
+.rw-main, .rw-side { display: grid; gap: 10px; min-width: 0; }
+.rw-main { background: var(--screen); border: 1px solid var(--edge); border-radius: 12px; padding: 10px 12px 12px; }
+.rw-canvas { width: 100%; height: 260px; display: block; border-radius: 8px; background: #0b0c0f; touch-action: none; }
+.rw-deckrow { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr) minmax(0, 230px); gap: 12px; align-items: start; }
+.rw-deck { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 10px; display: grid; gap: 8px; min-width: 0; align-content: start; }
+.rw-deck .head { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.rw-deck .role { font: 700 12px/1 var(--font-label); letter-spacing: .16em; padding: 4px 6px; border-radius: 4px; color: var(--screen); background: var(--dc); flex: none; }
+.rw-deck .name { min-width: 0; display: grid; gap: 2px; }
+.rw-deck .name b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rw-deck .name small { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+.rw-deck .stats { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 600 12px/1.2 var(--font-num); }
+.rw-deck .stats em { font: 400 11px var(--font-label); letter-spacing: .1em; color: var(--muted); font-style: normal; margin-right: 3px; text-transform: uppercase; }
+.rw-deck .stats .warn { color: var(--warn); }
+.rw-deck .count { font: 700 20px/1.1 var(--font-label); letter-spacing: .06em; color: var(--dc); }
+.rw-deck .count small { display: block; font: 500 12px/1.3 var(--font-ui); letter-spacing: 0; color: var(--muted); }
+.rw-deck .ctrls { display: flex; flex-wrap: wrap; gap: 6px; }
+.rw-deck .ctrls .hwbtn { padding: 6px 8px; font-size: 11px; }
+.rw-deck .play { --led: var(--good); }
+.rw-deck .empty { color: #cfc7b4; font-size: 13px; margin: 0; }
+.lanes { display: grid; gap: 6px; }
+.lane { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 8px; align-items: center; }
+.lane button { border: 1px solid var(--edge); background: #101115; color: var(--ink); border-radius: 4px; padding: 4px 0; font: 700 10px/1 var(--font-label); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+.lane button[aria-pressed="true"] { color: var(--bad); border-color: var(--bad); }
+.lane input { width: 100%; accent-color: var(--dc); }
+.lanes-note { font-size: 11px; color: var(--muted); margin: 0; }
+.rw-mix { display: grid; gap: 10px; min-width: 0; padding-top: 2px; }
+.rw-chips { display: flex; flex-wrap: wrap; gap: 6px 12px; justify-content: center; }
+.rw-shapes, .rw-bars { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.rw-chips .hwbtn { padding: 6px 8px; font-size: 11px; }
+.ribbon {
+  position: relative; height: 64px; border-radius: 14px; touch-action: none; cursor: ew-resize;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--now) 30%, #0b0c0f), #121318 50%, color-mix(in srgb, var(--next) 30%, #0b0c0f));
+  box-shadow: inset 0 0 0 1px var(--edge), inset 0 8px 18px rgba(0,0,0,.5);
+}
+.ribbon .rb-fill { position: absolute; inset: 6px auto 6px 6px; width: calc(15px + (100% - 42px) * var(--r, 0)); border-radius: 10px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--next) 45%, transparent)); }
+.ribbon .rb-mark { position: absolute; top: 10px; bottom: 10px; left: calc(21px + (100% - 42px) * var(--m, .5)); width: 2px; margin-left: -1px; background: #3a3e47; border-radius: 1px; }
+.ribbon .rb-ghost { position: absolute; top: 4px; bottom: 4px; width: 0; left: calc(21px + (100% - 42px) * var(--g, 0)); border-left: 2px dashed var(--coach); opacity: .9; }
+.ribbon .rb-thumb {
+  position: absolute; top: 4px; bottom: 4px; width: 30px; margin-left: -15px; left: calc(21px + (100% - 42px) * var(--r, 0)); border-radius: 10px;
+  background: linear-gradient(90deg, #3a3d45, #24262c 45%, #1b1d22); box-shadow: 0 2px 8px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.14), 0 0 0 1px #000;
+}
+.ribbon .rb-thumb::after { content: ""; position: absolute; top: 10px; bottom: 10px; left: 50%; width: 2px; margin-left: -1px; background: var(--ink); border-radius: 1px; }
+.ribbon[data-guide="off"] .rb-ghost, .ribbon[data-armed="off"] .rb-ghost { display: none; }
+.rw-ends { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; font: 600 11px/1.2 var(--font-label); letter-spacing: .12em; text-transform: uppercase; }
+.rw-ends span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rw-ends span:first-child { color: var(--now); }
+.rw-ends span:nth-child(2) { color: var(--muted); text-align: center; letter-spacing: .06em; text-transform: none; font: 500 12px/1.2 var(--font-ui); white-space: normal; }
+.rw-ends span:last-child { color: var(--next); text-align: right; }
+.rw-helpers { display: flex; gap: 6px; justify-content: center; }
+.rw-helpers .hwbtn { padding: 6px 9px; font-size: 11px; }
+.rw-side { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px; padding: 10px 12px 12px; }
+.rw-maphead { display: grid; gap: 4px; }
+.rw-map { width: 100%; aspect-ratio: 1; display: block; border-radius: 10px; background: var(--screen); cursor: pointer; touch-action: manipulation; }
+.rw-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; color: var(--muted); }
+.rw-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.rw-legend .lg-a { background: #8fb8ff; }
+.rw-legend .lg-b { box-shadow: inset 0 0 0 2px #8fb8ff; }
+.rw-legend .lg-fit { background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 35%, transparent); }
+.rw-picks { display: grid; gap: 4px; }
+.rw-picks h3 { margin: 4px 0 0; font: 700 11px/1 var(--font-label); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.pick { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px; border-radius: 8px; border: 1px solid transparent; }
+.pick.sel { border-color: var(--coach); background: #1a1812; }
+.pick .why { color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick .why .ok { color: var(--good); }
+.pick .why .bad { color: var(--warn); }
+.pick .hwbtn { padding: 6px 9px; font-size: 11px; }
+.pick b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.pick .kchip { font-size: 11px; }
+
 .foot { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 12px; }
 .foot kbd { font: 600 11px var(--font-num); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--edge); color: var(--ink); }
 .loading { font: 600 12px/1 var(--font-label); letter-spacing: .14em; color: var(--muted); text-transform: uppercase; }
 
 @media (max-width: 1100px) {
+  .rw-grid { grid-template-columns: minmax(0, 1fr); }
+  .rw-side { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); align-items: start; }
+  .rw-side .rw-maphead, .rw-side .rw-legend { grid-column: 1; }
+  .rw-side .rw-map { grid-column: 1; }
+  .rw-side .rw-picks { grid-column: 2; grid-row: 1 / span 3; }
   .body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .mixer { grid-column: 1 / -1; order: 3; }
   .deck[data-side="2"] { order: 2; }
@@ -428,6 +519,15 @@ button { font: inherit; color: inherit; }
   .pitch .vfader { height: 190px; }
   .foot .keys { display: none; }
   .crow { grid-template-columns: 40px minmax(0, 1fr) 54px auto; gap: 8px; padding-inline: 4px; }
+  .rw-energy { grid-template-columns: minmax(0, 1fr); }
+  .rw-elabel { grid-template-columns: auto 1fr; align-items: baseline; }
+  .rw-dir { justify-content: flex-start; }
+  .rw-canvas { height: 210px; }
+  .rw-deckrow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .rw-mix { grid-column: 1 / -1; order: -1; }
+  .rw-side { grid-template-columns: minmax(0, 1fr); }
+  .rw-side .rw-picks { grid-column: 1; grid-row: auto; }
+  .top .seg { order: 5; }
   .crow .clen, .crow .cgrid, .cbtns .wide { display: none; }
   .crate-list { max-height: 420px; }
 }
@@ -446,6 +546,10 @@ button { font: inherit; color: inherit; }
 <div class="unit">
   <header class="top">
     <div class="brand"><b>CUE<i>·</i>LAB</b><span>A practice controller for learning to mix</span></div>
+    <div class="seg" role="group" aria-label="Layout">
+      <button type="button" id="modeClassic" aria-pressed="true" title="Two decks and a mixer, like club gear">Classic</button>
+      <button type="button" id="modeRunway" aria-pressed="false" title="A reimagined deck: drop tracks on the phrase and mix with one ribbon">Runway</button>
+    </div>
     <div class="spacer"></div>
     <button class="hwbtn" id="cratebtn" type="button" aria-pressed="true" aria-controls="crate">Crate</button>
     <button class="hwbtn" id="learn" type="button" aria-pressed="true">Coach</button>
@@ -503,6 +607,49 @@ button { font: inherit; color: inherit; }
       </div>
       <p id="ctext">Press PLAY on deck 1.</p>
       <div class="dots" id="cdots"></div>
+    </div>
+  </section>
+
+  <section class="runway" id="runway" aria-label="Runway" hidden>
+    <div class="rw-energy">
+      <div class="rw-elabel"><span class="lbl">Energy</span><small>your set so far</small></div>
+      <canvas id="rwEnergy" aria-label="Energy of your set over time, one step per track"></canvas>
+      <div class="rw-dir" role="group" aria-label="Where to take the energy next">
+        <span class="lbl">Next pick</span>
+        <button class="hwbtn" type="button" data-dir="drop">Ease off</button>
+        <button class="hwbtn" type="button" data-dir="keep">Steady</button>
+        <button class="hwbtn" type="button" data-dir="lift">Lift</button>
+      </div>
+    </div>
+    <div class="rw-grid">
+      <div class="rw-main">
+        <div class="tip" id="rwtip"><b>Runway</b><span id="rwtiptext">Pick a first track from the map.</span></div>
+        <canvas class="rw-canvas" id="rwCanvas" aria-label="Runway. Both tracks scroll toward the playhead on a shared grid of bars; amber lines mark 8-bar phrases. Drag the next track to move where it drops."></canvas>
+        <div class="rw-deckrow">
+          <div class="rw-deck" id="rwNow"></div>
+          <div class="rw-mix">
+            <div class="rw-chips">
+              <div class="rw-shapes" id="rwShapes" role="group" aria-label="Transition shape"></div>
+              <div class="rw-bars" id="rwBars" role="group" aria-label="Transition length"></div>
+            </div>
+            <div class="ribbon" id="ribbon" role="slider" tabindex="0" aria-label="Transition from Now to Next" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span class="rb-fill"></span><span class="rb-window"></span><span class="rb-mark"></span><span class="rb-ghost"></span><span class="rb-thumb"></span>
+            </div>
+            <div class="rw-ends"><span id="ribNow">Now</span><span id="ribHint"></span><span id="ribNext">Next</span></div>
+            <div class="rw-helpers">
+              <button class="hwbtn" type="button" id="rwGuide" aria-pressed="true" title="Show where the ribbon would be if you mixed evenly over the chosen length">Guide</button>
+              <button class="hwbtn" type="button" id="rwAuto" aria-pressed="false" title="Move the ribbon for you along the guide. Touch the ribbon to take over">Auto ride</button>
+            </div>
+          </div>
+          <div class="rw-deck" id="rwNext"></div>
+        </div>
+      </div>
+      <aside class="rw-side" aria-label="Choose the next track">
+        <div class="rw-maphead"><span class="lbl">Map</span><small>Centre is what's playing. Up top is in key; closer in is closer in tempo.</small></div>
+        <canvas class="rw-map" id="rwMap" aria-label="Map of your tracks around the one playing. Choose from the list below it."></canvas>
+        <div class="rw-legend"><span><i class="lg-a"></i>minor</span><span><i class="lg-b"></i>major</span><span><i class="lg-fit"></i>good fit</span><span>bigger dot = more energy</span></div>
+        <div class="rw-picks" id="rwPicks" role="list"></div>
+      </aside>
     </div>
   </section>
 
@@ -976,7 +1123,15 @@ button { font: inherit; color: inherit; }
       bl = Math.round(255 * (0.2 + 0.8 * bl / m) * lum);
       col[c] = "rgb(" + r + "," + g + "," + bl + ")";
     }
-    return { amp, col, n };
+    // Features for the energy estimate: how full the loud parts stay (density) and how much top end there is (air).
+    let sa = 0, na = 0, SL = 0, SM = 0, SH = 0;
+    for (let c = 0; c < n; c++) { if (amp[c] > 0.08) { sa += amp[c]; na++; } SL += lo[c]; SM += mi[c]; SH += hi[c]; }
+    return { amp, col, n, feat: { density: na ? sa / na : 0, air: SH / (SL + SM + SH + 1e-9) } };
+  }
+  // A rough 1–10 energy score from density, brightness and tempo. It's an estimate to compare tracks, not a measurement.
+  function energyOf(wave, bpm) {
+    const f = wave.feat, ramp = (x, a, b) => clamp((x - a) / (b - a), 0, 1);
+    return Math.round(1 + 9 * clamp(0.5 * ramp(f.density, 0.15, 0.6) + 0.2 * ramp(f.air, 0.02, 0.15) + 0.3 * ramp(bpm || 120, 100, 140), 0, 1));
   }
 
   // With a BPM from the file's tags only the beat phase is found; otherwise the tempo is detected too.
@@ -1221,7 +1376,7 @@ button { font: inherit; color: inherit; }
       this.sync = false;
       ui.refreshDeck(this);
     }
-    startSource(at) {
+    startSource(at, whenAt) {
       const a = audio();
       const s = a.ctx.createBufferSource();
       s.buffer = this.track.buf;
@@ -1229,7 +1384,7 @@ button { font: inherit; color: inherit; }
       if (this.loop) { s.loop = true; s.loopStart = this.loop.start; s.loopEnd = this.loop.end; }
       s.connect(a.chans[this.i].input);
       // Start a moment ahead on the audio clock, so the position maths matches exactly when the sound begins.
-      const when = a.ctx.currentTime + 0.02;
+      const when = whenAt || a.ctx.currentTime + 0.02;
       s.start(when, clamp(at, 0, this.track.dur - 0.01));
       s.onended = () => { if (this.src === s && this.playing && !this.loop) { this.pos = this.track.dur; this.playing = false; this.src = null; ui.refreshDeck(this); } };
       this.src = s;
@@ -1424,7 +1579,7 @@ button { font: inherit; color: inherit; }
   function makeTrack(buf, meta) {
     const an = analyse(buf);
     return {
-      buf, title: meta.title, artist: meta.artist, bpm: meta.bpm, key: meta.key || "", firstBeat: meta.firstBeat || 0, dur: buf.duration, wave: an,
+      buf, title: meta.title, artist: meta.artist, bpm: meta.bpm, key: meta.key || "", firstBeat: meta.firstBeat || 0, dur: buf.duration, wave: an, energy: energyOf(an, meta.bpm),
       demo: !!meta.demo, crateId: meta.crateId || null, saved: null, ovCache: null,
     };
   }
@@ -1735,7 +1890,7 @@ button { font: inherit; color: inherit; }
   async function demoTrack(id) {
     if (demoCache.has(id)) return demoCache.get(id);
     const spec = DEMOS.find((s) => s.id === id);
-    const p = renderDemo(spec).then((buf) => Object.assign(makeTrack(buf, { title: spec.title, artist: spec.artist, bpm: spec.bpm, key: spec.key, firstBeat: 0, demo: true }), { ref: "demo:" + id }));
+    const p = renderDemo(spec).then((buf) => { const t = makeTrack(buf, { title: spec.title, artist: spec.artist, bpm: spec.bpm, key: spec.key, firstBeat: 0, demo: true }); t.ref = "demo:" + id; spec.energy = t.energy; return t; });
     demoCache.set(id, p);
     return p;
   }
@@ -1949,6 +2104,7 @@ button { font: inherit; color: inherit; }
         };
         track = makeTrack(buf, { ...meta, crateId: meta.id });
         track.ref = "crate:" + meta.id;
+        meta.energy = track.energy;
         cacheTrack(meta.id, Promise.resolve(track));
         if (deck) {
           deck.load(track);
@@ -1983,12 +2139,15 @@ button { font: inherit; color: inherit; }
     // Cue and hot-cue edits are saved a moment after you stop changing them, one write at a time.
     saveCues(id, hot, cue) {
       const r = (x) => Math.round(x * 1000) / 1000;
-      const data = { hot: hot.map((x) => (x == null ? null : r(x))), cue: r(cue) };
+      this.patch(id, { hot: hot.map((x) => (x == null ? null : r(x))), cue: r(cue) });
+    },
+    // Small metadata changes are merged and saved a moment later, one write at a time.
+    patch(id, data) {
       const item = this.find(id);
       if (item) Object.assign(item, data);
       const m = this.adding.get(id);
       if (m) { Object.assign(m, data); return; }
-      this.pending.set(id, data);
+      this.pending.set(id, { ...(this.pending.get(id) || {}), ...data });
       clearTimeout(this.timer);
       this.timer = setTimeout(() => this.flush(), 900);
     },
@@ -2029,6 +2188,7 @@ button { font: inherit; color: inherit; }
       const t = await p;
       const now = crate.find(id) || item;
       Object.assign(t, { title: now.title, artist: now.artist, key: now.key || "", crateId: id, saved: { hot: now.hot, cue: now.cue } });
+      if (now.energy == null) crate.patch(id, { energy: t.energy });
       d.load(t);
       coach.event("load" + d.i);
     } catch {
@@ -2119,6 +2279,11 @@ button { font: inherit; color: inherit; }
           b.addEventListener("click", () => { const [kind, id] = r.ref.split(":"); kind === "demo" ? loadDemo(decks[i], id) : loadCrate(decks[i], id); });
           return b;
         };
+        const qbtn = () => {
+          const b = h("button", { class: "hwbtn", type: "button", text: liveD().playing ? "Queue" : "Load", "aria-label": (liveD().playing ? "Queue " : "Load ") + r.title + " on the runway" });
+          b.addEventListener("click", () => rwQueue(r.ref));
+          return b;
+        };
         let del = null;
         if (r.item) {
           const sure = this.confirm === r.ref;
@@ -2139,7 +2304,7 @@ button { font: inherit; color: inherit; }
           h("span", { class: "cbpm", text: fmtBpm(r.bpm) }),
           h("span", { class: "clen", text: r.dur ? fmtTime(r.dur) : "" }),
           h("span", { class: "cgrid", text: gridText, title: gridTitle }),
-          h("span", { class: "cbtns" }, btn(0), btn(1), del));
+          h("span", { class: "cbtns" }, R.on ? qbtn() : [btn(0), btn(1)], del));
       });
       const list = $("#cratelist");
       const empty = !crate.items.length && crate.ready && !terms.length
@@ -2173,6 +2338,735 @@ button { font: inherit; color: inherit; }
       };
     },
   };
+
+  // =====================================================================
+  // Runway: a reimagined deck on the same audio engine.
+  // Tracks scroll toward a fixed playhead on a shared phrase grid. The next track is dropped onto a phrase line and
+  // starts there already in time; one ribbon then performs the whole transition (levels, EQ, filter and echo at once),
+  // with frequency lanes standing in for stems. Timing and choice stay with you: nothing drops or mixes unless you set it up.
+  // =====================================================================
+  const PHRASE = 32;
+  const ramp = (x, a, b) => clamp((x - a) / (b - a), 0, 1);
+  const FULL = { fader: 1, low: 1, mid: 1, hi: 1, filter: 0.5, send: 0 };
+  const side = (o) => ({ ...FULL, ...o });
+  const SHAPES = {
+    bass: {
+      name: "Bass swap", mark: 0.5,
+      hint: "Bring Next up, swap the basslines at the centre line, then fade Now out.",
+      fn: (r) => ({
+        out: side({ fader: 1 - ramp(r, 0.7, 1), low: r >= 0.5 ? 0 : 1, mid: 1 - 0.45 * ramp(r, 0.5, 0.9), hi: 1 - 0.5 * ramp(r, 0.55, 1) }),
+        inn: side({ fader: ramp(r, 0, 0.3), low: r >= 0.5 ? 1 : 0, mid: 0.55 + 0.45 * ramp(r, 0.2, 0.6), hi: 0.5 + 0.5 * ramp(r, 0, 0.4) }),
+      }),
+    },
+    filter: {
+      name: "Filter wash", mark: 0.6,
+      hint: "Next opens up from a muffled low-pass while Now thins out to a high-pass and disappears.",
+      fn: (r) => ({
+        out: side({ fader: 1 - ramp(r, 0.8, 1), low: 1 - ramp(r, 0.3, 0.6), filter: 0.5 + 0.45 * ramp(r, 0.25, 0.95) }),
+        inn: side({ fader: ramp(r, 0, 0.15), low: ramp(r, 0.55, 0.75), filter: 0.04 + 0.46 * ramp(r, 0, 0.65) }),
+      }),
+    },
+    echo: {
+      name: "Echo out", mark: 0.5,
+      hint: "Now gets an echo that keeps repeating after it's cut at the centre line; Next lands in the echoes.",
+      fn: (r) => ({
+        out: side({ fader: 1 - ramp(r, 0.45, 0.55), low: 1 - ramp(r, 0.2, 0.45), send: r > 0.02 ? 1 : 0 }),
+        inn: side({ fader: ramp(r, 0.5, 0.62), low: ramp(r, 0.5, 0.62) }),
+      }),
+    },
+    cut: {
+      name: "Cut", mark: 0.5,
+      hint: "A hard switch at the centre line. Cut exactly on the drop for the cleanest change.",
+      fn: (r) => ({ out: side({ fader: r < 0.5 ? 1 : 0 }), inn: side({ fader: r < 0.5 ? 0 : 1 }) }),
+    },
+  };
+  const LANES = [["Low", "Bass and kick"], ["Mid", "Vocals and keys"], ["High", "Hats and air"]];
+  const R = {
+    on: false, live: 0, r: 0, shape: store.get("rwShape", "bass"), bars: store.get("rwBars", 16),
+    guide: store.get("rwGuide", true), auto: false, drag: false,
+    queued: false, target: 0, hold: false, snap: PHRASE, scheduled: false, when: 0, inPos: 0,
+    lanes: [[1, 1, 1], [1, 1, 1]], dir: "keep", sel: null, pts: [], picksSig: "", panelSig: "",
+    hist: [], loud: [], t0: 0, histKey: "", lastLoud: 0, tipText: "",
+  };
+  if (!SHAPES[R.shape]) R.shape = "bass";
+  const liveD = () => decks[R.live], nextD = () => decks[1 - R.live];
+  const rwBeat = () => (liveD().track ? liveD().beatPos(liveD().getPos()) : 0);
+  const rwDropped = () => R.queued && R.scheduled && A && A.ctx.currentTime >= R.when;
+  const deckColor = (i) => (i === 0 ? "var(--deck1)" : "var(--deck2)");
+  const deckHex = (i) => (i === 0 ? "#27c4ff" : "#ff5d4d");
+
+  // Set every mixer control from the ribbon, the shape and the lanes.
+  function rwApply() {
+    const sh = SHAPES[R.shape].fn(R.r);
+    const set = (i, sd) => {
+      const c = P.ch[i], l = R.lanes[i];
+      c.fader = sd.fader; c.low = 0.5 * sd.low * l[0]; c.mid = 0.5 * sd.mid * l[1]; c.hi = 0.5 * sd.hi * l[2]; c.filter = sd.filter; c.cue = false;
+    };
+    set(R.live, sh.out);
+    set(1 - R.live, R.queued ? sh.inn : side({ fader: 0 }));
+    P.xfade = 0.5;
+    P.fxType = "echo"; P.fxBeats = 0.5; P.fxWet = 0.55;
+    P.fxOn = R.shape === "echo";
+    P.fxTo = [false, false];
+    P.fxTo[R.live] = R.shape === "echo" && sh.out.send > 0;
+    applyMixer();
+    applyFx();
+    rwRibbonDraw();
+  }
+  function rwMatchTempo() {
+    const L = liveD(), N = nextD();
+    if (!L.track || !N.track) return;
+    N.sync = false; N.bend = 0; N.range = 0.5;
+    N.pitch = clamp(L.bpm / N.track.bpm - 1, -0.5, 0.5);
+    N.applyRate();
+    ui.refreshPitch(N);
+  }
+  // The next phrase line at least 4 bars ahead, kept inside what's left of the track playing.
+  function rwDefaultTarget() {
+    const L = liveD(), B = rwBeat();
+    let t = Math.ceil((B + 16) / PHRASE) * PHRASE;
+    const end = L.track ? L.beatPos(L.track.dur) - 2 : Infinity;
+    if (t > end) t = Math.max(Math.ceil(B + 2), Math.floor(end / 4) * 4);
+    return t;
+  }
+  function rwSnapTarget(raw) {
+    const L = liveD(), B = rwBeat(), unit = R.snap;
+    const min = B + 2, end = L.track ? L.beatPos(L.track.dur) - 2 : Infinity;
+    let t = Math.round(raw / unit) * unit;
+    if (t < min) t = Math.ceil(min / unit) * unit;
+    if (t > end) t = Math.floor(end / unit) * unit;
+    return Math.max(t, Math.ceil(min));
+  }
+  function rwSchedule() {
+    const L = liveD(), N = nextD(), a = audio();
+    const t = a.ctx.currentTime;
+    let when = t + (L.track.firstBeat + R.target * L.beatLen - L.getPos()) / L.rate;
+    let at = R.inPos;
+    if (when < t + 0.02) { at += (t + 0.02 - when) * N.rate; when = t + 0.02; }
+    N.stop();
+    N.loop = null;
+    N.playing = true;
+    N.startSource(at, when);
+    R.scheduled = true;
+    R.when = when;
+    ui.refreshDeck(N);
+  }
+  function rwUnschedule() {
+    if (!R.scheduled) return;
+    const N = nextD();
+    N.stop();
+    N.playing = false;
+    N.pos = R.inPos;
+    R.scheduled = false;
+    ui.refreshDeck(N);
+  }
+  function rwComplete() {
+    const L = liveD();
+    L.pause();
+    R.live = 1 - R.live;
+    R.queued = false; R.scheduled = false; R.hold = false; R.drag = false;
+    R.r = 0;
+    rwApply();
+    rwPanels(true);
+    rwSay("Mix done. " + liveD().track.title + " is playing: pick what comes next.", "good", 5000);
+  }
+  async function rwQueue(ref) {
+    const [kind, id] = ref.split(":");
+    const L = liveD();
+    const intoNow = !L.track || !L.playing;
+    if (!intoNow && rwDropped()) { rwSay("Finish this mix first: take the ribbon all the way to Next.", "warn", 4000); return; }
+    const d = intoNow ? L : nextD();
+    if (!intoNow) { rwUnschedule(); R.queued = false; }
+    if (kind === "demo") await loadDemo(d, id); else await loadCrate(d, id);
+    if (!d.track || d.track.ref !== ref) return;
+    d.sync = false;
+    if (intoNow) {
+      if (R.queued) rwMatchTempo();
+      rwSay("Press Play on Now. Then choose a next track.", "", 4000);
+    } else {
+      const fb = d.track.firstBeat, bl = d.beatLen;
+      R.inPos = fb + Math.max(0, Math.round((d.cue - fb) / bl)) * bl;
+      d.pos = R.inPos;
+      R.queued = true; R.hold = false; R.scheduled = false;
+      rwMatchTempo();
+      R.target = rwDefaultTarget();
+    }
+    R.sel = null;
+    rwApply();
+    rwPanels(true);
+  }
+  function rwEject() {
+    const N = nextD();
+    rwUnschedule();
+    if (N.playing) N.pause();
+    R.queued = false;
+    R.r = 0;
+    rwApply();
+    rwPanels(true);
+  }
+  function rwPlayPause() {
+    const L = liveD(), N = nextD();
+    if (!L.track) return;
+    audio();
+    if (A.ctx.state !== "running") A.ctx.resume();
+    if (L.playing) {
+      const both = rwDropped();
+      L.pause();
+      if (both) N.pause(); else rwUnschedule();
+      R.paused2 = both;
+    } else {
+      // Resume both together on one clock time so a mix in progress stays locked.
+      const when = A.ctx.currentTime + 0.03;
+      L.playing = true; L.startSource(L.pos, when);
+      if (R.paused2 && R.queued && N.track) { N.playing = true; N.startSource(N.pos, when); R.scheduled = true; R.when = when; }
+      R.paused2 = false;
+      ui.refreshDeck(L); ui.refreshDeck(N);
+      coach.event("play" + L.i);
+    }
+    rwPanels(true);
+  }
+
+  // ---------- the tip line ----------
+  let rwTipLock = 0;
+  function rwSay(text, kind, ms) {
+    const t = $("#rwtip");
+    t.className = "tip " + (kind || "");
+    $("b", t).textContent = kind === "warn" ? "Heads up" : kind === "good" ? "Nice" : "Runway";
+    $("#rwtiptext").textContent = text;
+    rwTipLock = performance.now() + (ms || 0);
+  }
+  function rwAdvice() {
+    const L = liveD(), N = nextD(), B = rwBeat();
+    if (!L.track) return "Pick a first track: tap a dot on the map or choose from the list.";
+    if (!L.playing) return R.queued && rwDropped() ? "Paused mid-mix. Press Play to carry on." : "Press Play on Now.";
+    const left = L.beatPos(L.track.dur) - B;
+    if (!R.queued) return left < 32 * 4 ? "Under 32 bars left on Now. Queue the next track soon." : "Choose the next track. Dots near the top of the map, close to the centre, will mix best.";
+    const bars = Math.ceil((R.target - B) / 4);
+    if (!rwDropped()) return R.hold ? "Next is holding a few bars ahead. Press Arm, or drag it onto a phrase line." : "Next drops in " + bars + (bars === 1 ? " bar" : " bars") + ", on the beat. Get ready to move the ribbon.";
+    const sinceBars = (B - R.target) / 4;
+    if (R.r < 0.05 && sinceBars > 4) return "Next is playing, but you can't hear it yet. Slide the ribbon toward Next.";
+    return SHAPES[R.shape].hint;
+  }
+
+  // ---------- panels ----------
+  function laneEls(i) {
+    return h("div", { class: "lanes" }, LANES.map(([name, desc], k) => {
+      const mute = h("button", { type: "button", "aria-pressed": String(R.lanes[i][k] === 0), title: desc + ". Tap to mute or bring back", text: name });
+      const sl = h("input", { type: "range", min: "0", max: "100", value: String(Math.round(R.lanes[i][k] * 100)), "aria-label": name + " lane (" + desc + ") on deck " + (i + 1) });
+      sl.addEventListener("input", () => { R.lanes[i][k] = sl.value / 100; mute.setAttribute("aria-pressed", String(R.lanes[i][k] === 0)); rwApply(); });
+      mute.addEventListener("click", () => {
+        R.lanes[i][k] = R.lanes[i][k] === 0 ? 1 : 0;
+        sl.value = String(R.lanes[i][k] * 100);
+        mute.setAttribute("aria-pressed", String(R.lanes[i][k] === 0));
+        rwApply();
+      });
+      return h("div", { class: "lane" }, mute, sl);
+    }), h("p", { class: "lanes-note", text: "Frequency lanes stand in for stems." }));
+  }
+  const R_EL = {};
+  function rwPanels(force) {
+    const L = liveD(), N = nextD();
+    const sig = [R.live, L.track && L.track.ref, L.playing, N.track && N.track.ref, R.queued, R.hold, R.snap].join("|");
+    if (!force && sig === R.panelSig) return;
+    R.panelSig = sig;
+    const rw = $("#runway");
+    rw.style.setProperty("--now", deckColor(R.live));
+    rw.style.setProperty("--next", deckColor(1 - R.live));
+    const nowP = $("#rwNow"), nextP = $("#rwNext");
+    nowP.style.setProperty("--dc", deckColor(R.live));
+    nextP.style.setProperty("--dc", deckColor(1 - R.live));
+    const name = (t) => h("span", { class: "name" }, h("b", { text: t.title }), h("small", { text: t.artist || "Unknown artist" }));
+    if (L.track) {
+      const play = h("button", { class: "hwbtn play", type: "button", "aria-pressed": String(L.playing), text: L.playing ? "Pause" : "Play" });
+      play.addEventListener("click", rwPlayPause);
+      R_EL.nowStats = h("div", { class: "stats" });
+      nowP.replaceChildren(
+        h("div", { class: "head" }, h("span", { class: "role", text: "NOW" }), name(L.track)),
+        R_EL.nowStats,
+        h("div", { class: "ctrls" }, play),
+        laneEls(R.live));
+    } else {
+      R_EL.nowStats = null;
+      nowP.replaceChildren(h("div", { class: "head" }, h("span", { class: "role", text: "NOW" })), h("p", { class: "empty", text: "Nothing loaded. Pick a first track from the map." }));
+    }
+    if (R.queued && N.track) {
+      R_EL.count = h("div", { class: "count" });
+      R_EL.nextStats = h("div", { class: "stats" });
+      const btn = (text, title, fn, pressed) => { const b = h("button", { class: "hwbtn", type: "button", text, title, "aria-pressed": pressed == null ? null : String(pressed) }); b.addEventListener("click", fn); return b; };
+      const move = (dir) => () => { if (rwDropped() || R.scheduled) return; R.hold = false; R.target = rwSnapTarget(R.target + dir * R.snap); rwPanels(true); };
+      nextP.replaceChildren(
+        h("div", { class: "head" }, h("span", { class: "role", text: "NEXT" }), name(N.track)),
+        R_EL.nextStats,
+        R_EL.count,
+        h("div", { class: "ctrls" },
+          btn(R.hold ? "Arm" : "Hold", R.hold ? "Fix the drop to the line shown" : "Keep it floating a few bars ahead until you're ready", () => { if (rwDropped()) return; rwUnschedule(); R.hold = !R.hold; if (!R.hold) R.target = rwDefaultTarget(); rwPanels(true); }),
+          btn("Earlier", "Drop it one " + (R.snap === PHRASE ? "phrase" : "bar") + " earlier", move(-1)),
+          btn("Later", "Drop it one " + (R.snap === PHRASE ? "phrase" : "bar") + " later", move(1)),
+          btn(R.snap === PHRASE ? "Snap 8 bars" : "Snap 1 bar", "Choose what dragging and Earlier/Later snap to", () => { R.snap = R.snap === PHRASE ? 4 : PHRASE; rwPanels(true); }),
+          btn("✕", "Take it off the runway", rwEject)),
+        laneEls(1 - R.live));
+      R_EL.ejectable = true;
+    } else {
+      R_EL.count = null; R_EL.nextStats = null;
+      nextP.replaceChildren(h("div", { class: "head" }, h("span", { class: "role", text: "NEXT" })),
+        h("p", { class: "empty", text: L.track ? "Empty. Choose the next track from the map or the list." : "Load Now first." }));
+    }
+    $("#ribNow").textContent = "Now" + (L.track ? " · " + L.track.title : "");
+    $("#ribNext").textContent = (R.queued && N.track ? N.track.title + " · " : "") + "Next";
+    rwRibbonDraw();
+  }
+  function rwPanelTick() {
+    const L = liveD(), N = nextD(), B = rwBeat();
+    if (R_EL.nowStats && L.track) {
+      const k = L.key;
+      R_EL.nowStats.replaceChildren(
+        h("span", null, h("em", { text: "BPM" }), L.bpm.toFixed(1)),
+        h("span", { class: k.semis ? "warn" : null }, h("em", { text: "Key" }), k.code || "–"),
+        h("span", null, h("em", { text: "Bar" }), String(Math.max(1, Math.floor(B / 4) + 1))),
+        h("span", null, h("em", { text: "Left" }), fmtTime((L.track.dur - L.getPos()) / L.rate)));
+    }
+    if (R_EL.count && N.track) {
+      const pct = N.pitch * 100, k = N.key;
+      R_EL.nextStats.replaceChildren(
+        h("span", { class: Math.abs(pct) > 8 ? "warn" : null, title: "How much its tempo is changed to match Now" }, h("em", { text: "Tempo" }), (pct >= 0 ? "+" : "−") + Math.abs(pct).toFixed(1) + "%"),
+        h("span", { class: k.semis ? "warn" : null, title: k.semis ? "Pitching it moved the key from " + N.track.key : "" }, h("em", { text: "Key" }), k.code || "–"),
+        h("span", null, h("em", { text: "Energy" }), String(N.track.energy)));
+      const bars = Math.ceil((R.target - B) / 4);
+      let t, sub;
+      if (rwDropped()) { const into = Math.max(0, (B - R.target) / 4); t = "In · bar " + Math.floor(into + 1); sub = "Mix window: " + R.bars + " bars"; }
+      else if (R.hold) { t = "Holding"; sub = "Floats " + bars + " bars ahead"; }
+      else { t = "Drops in " + bars + (bars === 1 ? " bar" : " bars"); sub = L.playing ? "On the one, in time" : "Waiting for Now to play"; }
+      R_EL.count.replaceChildren(t, h("small", { text: sub }));
+    }
+  }
+
+  // ---------- ribbon ----------
+  function rwRibbonDraw() {
+    const rb = $("#ribbon");
+    if (!rb) return;
+    rb.style.setProperty("--r", R.r.toFixed(4));
+    rb.style.setProperty("--m", SHAPES[R.shape].mark);
+    rb.setAttribute("aria-valuenow", String(Math.round(R.r * 100)));
+    rb.setAttribute("aria-valuetext", Math.round(R.r * 100) + "% toward Next");
+    rb.dataset.guide = R.guide ? "on" : "off";
+    rb.dataset.armed = R.queued ? "on" : "off";
+  }
+  function rwSetR(v) {
+    R.r = clamp(v, 0, 1);
+    rwApply();
+    coach.event("xfade");
+  }
+  function rwBuildControls() {
+    const rb = $("#ribbon");
+    const fromX = (e) => { const r = rb.getBoundingClientRect(); return (e.clientX - r.left - 21) / (r.width - 42); };
+    bindDrag(rb, {
+      onStart: (e) => { audio(); R.drag = true; setAuto(false); rwSetR(fromX(e)); },
+      onMove: (e) => { if (R.drag) rwSetR(fromX(e)); },
+      onEnd: () => { R.drag = false; },
+    });
+    rb.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 0.1 : 0.02;
+      const v = { ArrowLeft: R.r - step, ArrowDown: R.r - step, ArrowRight: R.r + step, ArrowUp: R.r + step, Home: 0, End: 1 }[e.key];
+      if (v == null) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setAuto(false);
+      rwSetR(v);
+    });
+    const shapes = Object.entries(SHAPES).map(([k, sh]) => {
+      const b = h("button", { class: "hwbtn", type: "button", "aria-pressed": String(R.shape === k), text: sh.name, title: sh.hint });
+      b.addEventListener("click", () => {
+        R.shape = k; store.set("rwShape", k);
+        shapes.forEach((x, j) => x.setAttribute("aria-pressed", String(Object.keys(SHAPES)[j] === k)));
+        rwApply();
+        rwSay(sh.hint, "", 3500);
+      });
+      return b;
+    });
+    $("#rwShapes").replaceChildren(...shapes);
+    const lens = [8, 16, 32].map((n) => {
+      const b = h("button", { class: "hwbtn", type: "button", "aria-pressed": String(R.bars === n), text: n + " bars", title: "How long the guide takes to cross the ribbon" });
+      b.addEventListener("click", () => { R.bars = n; store.set("rwBars", n); lens.forEach((x, j) => x.setAttribute("aria-pressed", String([8, 16, 32][j] === n))); });
+      return b;
+    });
+    $("#rwBars").replaceChildren(...lens);
+    const guide = $("#rwGuide"), auto = $("#rwAuto");
+    guide.setAttribute("aria-pressed", String(R.guide));
+    guide.addEventListener("click", () => { R.guide = !R.guide; store.set("rwGuide", R.guide); guide.setAttribute("aria-pressed", String(R.guide)); rwRibbonDraw(); });
+    function setAuto(v) { R.auto = v; auto.setAttribute("aria-pressed", String(v)); }
+    auto.addEventListener("click", () => setAuto(!R.auto));
+    document.querySelectorAll(".rw-dir button").forEach((b) => {
+      b.setAttribute("aria-pressed", String(b.dataset.dir === R.dir));
+      b.addEventListener("click", () => { R.dir = b.dataset.dir; document.querySelectorAll(".rw-dir button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); });
+    });
+
+    // Dragging the next track along the runway moves where it drops, snapping to phrase (or bar) lines.
+    const cv = $("#rwCanvas");
+    let grab = null;
+    bindDrag(cv, {
+      onStart: (e) => {
+        const g = R.geo;
+        if (!g || !R.queued || R.scheduled) return;
+        const y = e.offsetY * g.dpr, x = e.offsetX * g.dpr;
+        if (y < g.nextY - 6 * g.dpr || y > g.nextY + g.laneH + 6 * g.dpr) return;
+        grab = (x - g.x0) / g.ppb + g.B - R.target;
+        if (grab < -2 || grab > 64) grab = 0;
+        R.hold = false;
+      },
+      onMove: (e) => {
+        const g = R.geo;
+        if (grab == null || !g || R.scheduled) return;
+        R.target = rwSnapTarget(rwBeat() + (e.offsetX * g.dpr - g.x0) / g.ppb - grab);
+        rwPanels(true);
+      },
+      onEnd: () => { grab = null; },
+    });
+
+    // Tapping the map selects the nearest dot.
+    const map = $("#rwMap");
+    map.addEventListener("click", (e) => {
+      const dpr = map.width / map.clientWidth, x = e.offsetX * dpr, y = e.offsetY * dpr;
+      let best = null, bd = 18 * dpr;
+      for (const p of R.pts) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } }
+      R.sel = best ? best.ref : null;
+      R.picksSig = "";
+    });
+  }
+
+  // ---------- choosing the next track ----------
+  function rwCandidates() {
+    const L = liveD(), N = nextD();
+    const now = L.track, refBpm = now ? L.bpm : 0, refKey = now ? L.key.code : "";
+    const nowE = now ? now.energy : 5;
+    const want = R.dir === "lift" ? 1.5 : R.dir === "drop" ? -1.5 : 0;
+    const all = crate.items.map((t) => ({ ref: "crate:" + t.id, title: t.title, artist: t.artist, bpm: t.bpm, key: t.key, energy: t.energy }))
+      .concat(DEMOS.map((s) => ({ ref: "demo:" + s.id, title: s.title, artist: s.artist, bpm: s.bpm, key: s.key, energy: s.energy })));
+    return all.filter((c) => !(now && c.ref === now.ref) && !(R.queued && N.track && c.ref === N.track.ref)).map((c) => {
+      const pct = now && c.bpm ? refBpm / c.bpm - 1 : 0;
+      const eff = now ? shiftKey(c.key, 1 + pct) : { code: c.key, semis: 0 };
+      const fit = now ? keyFit(refKey, eff.code) : "";
+      const kPen = !now ? 0 : fit === "same" || fit === "relative" ? 0 : fit === "next" ? 0.15 : fit === "clash" ? 1 : 0.6;
+      const ePen = c.energy == null ? 0.2 : 0.12 * Math.abs(c.energy - nowE - want);
+      const score = kPen + Math.abs(pct) * 5 + (now ? ePen : 0);
+      return { ...c, pct, eff, fit, score };
+    }).sort((a, b) => a.score - b.score);
+  }
+  function rwPicks(cands) {
+    const sig = [liveD().track && liveD().track.ref, liveD().key.code, R.queued && nextD().track && nextD().track.ref, R.dir, R.sel, cands.length, cands.filter((c) => c.energy != null).length].join("|");
+    if (sig === R.picksSig) return;
+    R.picksSig = sig;
+    const now = liveD().track;
+    let top = cands.slice(0, 6);
+    const sel = R.sel && cands.find((c) => c.ref === R.sel);
+    if (sel) top = [sel].concat(top.filter((c) => c !== sel)).slice(0, 6);
+    const why = (c) => {
+      if (!now) return [h("span", { text: fmtBpm(c.bpm) + " BPM" + (c.key ? " · " + c.key : "") })];
+      const k = c.fit === "same" ? ["Same key", "ok"] : c.fit === "relative" ? ["Relative key", "ok"] : c.fit === "next" ? ["Next door on the wheel", "ok"] : c.fit === "clash" ? ["Keys clash", "bad"] : ["Key unknown", ""];
+      const pct = (c.pct >= 0 ? "+" : "−") + Math.abs(c.pct * 100).toFixed(1) + "%";
+      return [h("span", { class: k[1] || null, text: k[0] }), " · ", h("span", { class: Math.abs(c.pct) > 0.08 ? "bad" : null, text: pct }),
+        c.eff.semis ? " · plays in " + c.eff.code : "", c.energy != null ? " · energy " + c.energy : ""];
+    };
+    const busy = rwDropped();
+    $("#rwPicks").replaceChildren(
+      h("h3", { text: now ? (R.queued ? "Or swap the next track for" : "Best next picks") : "Start with" }),
+      ...top.map((c) => {
+        const q = h("button", { class: "hwbtn", type: "button", text: !now || !liveD().playing ? "Load" : "Queue", disabled: busy, title: busy ? "Finish the mix in progress first" : null, "aria-label": (now && liveD().playing ? "Queue " : "Load ") + c.title });
+        q.addEventListener("click", () => rwQueue(c.ref));
+        const code = c.eff.code || c.key;
+        const row = h("div", { class: "pick" + (c.ref === R.sel ? " sel" : ""), role: "listitem" },
+          h("span", { class: "kchip" + (code ? (code.endsWith("B") ? " maj" : "") : " none"), style: "--kh:" + keyHue(code), title: code ? keyName(code) : "Key unknown", text: code || "–" }),
+          h("span", { style: "min-width:0" }, h("b", { text: c.title }), h("span", { class: "why" }, ...why(c))),
+          q);
+        row.addEventListener("click", (e) => { if (e.target !== q) { R.sel = c.ref; R.picksSig = ""; } });
+        return row;
+      }));
+  }
+
+  // ---------- drawing ----------
+  function drawRunway(c) {
+    const dpr = fitCanvas(c), ctx = c.getContext("2d"), W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    const L = liveD(), N = nextD();
+    const x0 = Math.round(W * 0.24), span = c.clientWidth < 640 ? 56 : 96, ppb = W / span;
+    const B = rwBeat();
+    const top = 18 * dpr, gap = 10 * dpr, laneH = (H - top - gap - 4 * dpr) / 2;
+    const nowY = top, nextY = top + laneH + gap;
+    R.geo = { dpr, x0, ppb, B, laneH, nextY };
+    const X = (b) => x0 + (b - B) * ppb;
+    const sh = SHAPES[R.shape].fn(R.r);
+    const lvl = (sd, i) => sd.fader * (0.4 + 0.6 * (sd.low * R.lanes[i][0] + sd.mid * R.lanes[i][1] + sd.hi * R.lanes[i][2]) / 3);
+    // grid
+    ctx.font = "600 " + 10 * dpr + "px JetBrains Mono, monospace";
+    ctx.textBaseline = "top";
+    for (let b = Math.floor(B - x0 / ppb); b <= B + (W - x0) / ppb; b++) {
+      if (b % 4) continue;
+      const x = Math.round(X(b)) + 0.5, phrase = b % PHRASE === 0;
+      ctx.fillStyle = phrase ? "rgba(255,197,61,.55)" : "rgba(255,255,255,.07)";
+      ctx.fillRect(x, top - (phrase ? 4 * dpr : 0), phrase ? dpr * 1.5 : dpr, H - top);
+      if (phrase && L.track) {
+        ctx.fillStyle = "rgba(255,197,61,.8)";
+        if (b > B) ctx.fillText("+" + Math.ceil((b - B) / 4), x + 3 * dpr, 2 * dpr);
+      }
+    }
+    // a waveform lane: beat b on the runway → position in the track
+    const wave = (d, y, posOf, alpha, color) => {
+      const t = d.track;
+      if (!t) return;
+      const w = t.wave, step = Math.max(1, Math.round(2 * dpr));
+      ctx.globalAlpha = alpha;
+      for (let x = 0; x < W; x += step) {
+        const p = posOf(B + (x - x0) / ppb);
+        if (p < 0 || p > t.dur) continue;
+        const ci = Math.min(w.n - 1, Math.floor((p / t.dur) * w.n));
+        const a = w.amp[ci] * laneH * 0.46;
+        ctx.fillStyle = color || w.col[ci];
+        ctx.fillRect(x, y + laneH / 2 - a, step, a * 2 || dpr);
+      }
+      ctx.globalAlpha = 1;
+    };
+    ctx.fillStyle = "#101116";
+    ctx.fillRect(0, nowY, W, laneH);
+    ctx.fillRect(0, nextY, W, laneH);
+    if (L.track) wave(L, nowY, (b) => L.track.firstBeat + b * L.beatLen, 0.3 + 0.7 * lvl(sh.out, R.live));
+    if (R.queued && N.track) {
+      const bin = (R.inPos - N.track.firstBeat) / N.beatLen;
+      const posOf = (b) => N.track.firstBeat + (bin + b - R.target) * N.beatLen;
+      const dropped = rwDropped();
+      wave(N, nextY, posOf, dropped ? 0.3 + 0.7 * lvl(sh.inn, 1 - R.live) : 0.55);
+      // the mix window and the drop line
+      const xd = X(R.target), xe = X(R.target + R.bars * 4);
+      ctx.fillStyle = "rgba(255,197,61,.07)";
+      ctx.fillRect(xd, nowY, Math.max(0, xe - xd), nextY + laneH - nowY);
+      ctx.strokeStyle = deckHex(1 - R.live);
+      ctx.lineWidth = 2 * dpr;
+      if (R.hold) ctx.setLineDash([5 * dpr, 4 * dpr]);
+      ctx.beginPath(); ctx.moveTo(xd, nowY); ctx.lineTo(xd, nextY + laneH); ctx.stroke();
+      ctx.setLineDash([]);
+      const label = dropped ? "IN" : R.hold ? "HOLDING" : "DROP";
+      ctx.font = "700 " + 11 * dpr + "px Barlow Condensed, Arial Narrow, sans-serif";
+      const tw = ctx.measureText(label).width + 10 * dpr;
+      ctx.fillStyle = deckHex(1 - R.live);
+      ctx.fillRect(xd, nextY + laneH - 16 * dpr, tw, 16 * dpr);
+      ctx.fillStyle = "#07080a";
+      ctx.fillText(label, xd + 5 * dpr, nextY + laneH - 14 * dpr);
+      if (xe < W && R.bars) {
+        ctx.fillStyle = "rgba(255,197,61,.75)";
+        ctx.fillText(R.bars + "-bar mix", Math.max(xd + tw + 6 * dpr, Math.min(xe - 60 * dpr, W - 60 * dpr)), nextY + laneH - 14 * dpr);
+      }
+    }
+    // labels
+    ctx.font = "700 " + 11 * dpr + "px Barlow Condensed, Arial Narrow, sans-serif";
+    const tag = (txt, y, color) => {
+      const w = ctx.measureText(txt).width + 10 * dpr;
+      ctx.fillStyle = "rgba(7,8,10,.75)"; ctx.fillRect(4 * dpr, y + 4 * dpr, w, 16 * dpr);
+      ctx.fillStyle = color; ctx.fillText(txt, 9 * dpr, y + 6 * dpr);
+    };
+    tag("NOW" + (L.track ? " · " + L.track.title.toUpperCase() : ""), nowY, deckHex(R.live));
+    tag("NEXT" + (R.queued && N.track ? " · " + N.track.title.toUpperCase() : " · PICK FROM THE MAP"), nextY, deckHex(1 - R.live));
+    // playhead
+    ctx.fillStyle = "#eceef2";
+    ctx.fillRect(x0 - dpr, top - 4 * dpr, 2 * dpr, H - top + 4 * dpr);
+  }
+
+  function drawMap(c, cands) {
+    const dpr = fitCanvas(c), ctx = c.getContext("2d"), W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2, Rr = Math.min(W, H) / 2 - 26 * dpr, MAXP = 0.14;
+    const L = liveD(), now = L.track;
+    const refK = splitKey(now ? L.key.code : "") || { n: 8, m: "A" };
+    // in-key wedge: the same number and one step either way
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Rr);
+    g.addColorStop(0, "rgba(61,220,132,.22)"); g.addColorStop(1, "rgba(61,220,132,.04)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, Rr, -Math.PI / 2 - Math.PI / 4, -Math.PI / 2 + Math.PI / 4); ctx.closePath(); ctx.fill();
+    // tempo rings
+    ctx.strokeStyle = "rgba(255,255,255,.08)"; ctx.lineWidth = dpr;
+    ctx.font = "400 " + 9 * dpr + "px JetBrains Mono, monospace"; ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    [0.04, 0.08, 0.12].forEach((p) => { const r = (p / MAXP) * Rr; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke(); if (now) ctx.fillText("±" + Math.round(p * 100) + "%", cx + r * 0.71 + 3 * dpr, cy + r * 0.71); });
+    // wheel numbers, with what's playing at the top
+    ctx.font = "600 " + 10 * dpr + "px JetBrains Mono, monospace"; ctx.textAlign = "center";
+    for (let k = 0; k < 12; k++) {
+      const a = -Math.PI / 2 + (k * Math.PI) / 6, n = ((refK.n - 1 + k) % 12) + 1;
+      ctx.fillStyle = k === 0 || k === 1 || k === 11 ? "rgba(61,220,132,.9)" : "rgba(255,255,255,.4)";
+      ctx.fillText(String(n), cx + Math.cos(a) * (Rr + 14 * dpr), cy + Math.sin(a) * (Rr + 14 * dpr));
+    }
+    // tracks
+    R.pts = [];
+    let unknown = 0;
+    const hash = (s) => { let x = 0; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) | 0; return ((x >>> 0) % 1000) / 1000; };
+    for (const cd of cands) {
+      const k = splitKey(cd.eff.code);
+      let a, rad;
+      if (k) {
+        a = -Math.PI / 2 + (((k.n - refK.n + 12) % 12) * Math.PI) / 6 + (hash(cd.ref) - 0.5) * 0.32;
+        rad = now ? Math.min(1, Math.abs(cd.pct) / MAXP) : Math.min(1, Math.abs((cd.bpm || 124) - 124) / 124 / MAXP);
+        rad = Math.max(0.1, rad) * Rr;
+      } else { a = Math.PI / 2 + (unknown++ - 2) * 0.18; rad = Rr * 0.97; }
+      const x = cx + Math.cos(a) * rad, y = cy + Math.sin(a) * rad;
+      const size = (3.5 + (cd.energy == null ? 4 : cd.energy) * 0.55) * dpr;
+      const good = now && cd.score < 0.35;
+      if (good) { ctx.fillStyle = "rgba(61,220,132,.28)"; ctx.beginPath(); ctx.arc(x, y, size + 5 * dpr, 0, Math.PI * 2); ctx.fill(); }
+      const col = k ? "hsl(" + keyHue(cd.eff.code) + " 78% 66%)" : "#5b606b";
+      ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2);
+      if (k && k.m === "B") { ctx.strokeStyle = col; ctx.lineWidth = 2.2 * dpr; ctx.stroke(); }
+      else { ctx.fillStyle = col; ctx.fill(); }
+      if (cd.ref === R.sel) { ctx.strokeStyle = "#ffc53d"; ctx.lineWidth = 2 * dpr; ctx.beginPath(); ctx.arc(x, y, size + 4 * dpr, 0, Math.PI * 2); ctx.stroke(); }
+      R.pts.push({ x, y, ref: cd.ref });
+    }
+    // the queued next track
+    const N = nextD();
+    if (R.queued && N.track && now) {
+      const k = N.key, sk = splitKey(k.code);
+      if (sk) {
+        const a = -Math.PI / 2 + (((sk.n - refK.n + 12) % 12) * Math.PI) / 6, rad = Math.max(0.1, Math.min(1, Math.abs(N.pitch) / MAXP)) * Rr;
+        ctx.strokeStyle = deckHex(1 - R.live); ctx.lineWidth = 2.5 * dpr;
+        ctx.beginPath(); ctx.arc(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad, 11 * dpr, 0, Math.PI * 2); ctx.stroke();
+      }
+    }
+    // centre: what's playing
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    if (now) {
+      ctx.fillStyle = deckHex(R.live);
+      ctx.beginPath(); ctx.arc(cx, cy, 16 * dpr, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#07080a"; ctx.font = "700 " + 11 * dpr + "px JetBrains Mono, monospace";
+      ctx.fillText(L.key.code || "?", cx, cy);
+    } else {
+      ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "600 " + 12 * dpr + "px Barlow, sans-serif";
+      ctx.fillText("Pick a first track", cx, cy);
+    }
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  }
+
+  function drawEnergy(c) {
+    const dpr = fitCanvas(c), ctx = c.getContext("2d"), W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    const t = R.t0 ? performance.now() / 1000 - R.t0 : 0;
+    const dur = Math.max(10 * 60, t * 1.15 + 120);
+    const X = (s) => (s / dur) * W, pad = 6 * dpr, Y = (e) => H - pad - ((e - 1) / 9) * (H - 2 * pad);
+    ctx.strokeStyle = "rgba(255,255,255,.06)"; ctx.lineWidth = dpr;
+    for (const e of [1, 4, 7, 10]) { ctx.beginPath(); ctx.moveTo(0, Y(e) + 0.5); ctx.lineTo(W, Y(e) + 0.5); ctx.stroke(); }
+    for (let m = 5; m * 60 < dur; m += 5) { const x = X(m * 60); ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.font = "400 " + 9 * dpr + "px JetBrains Mono, monospace"; ctx.fillText(m + "m", x + 2 * dpr, H - 2 * dpr); }
+    ctx.font = "600 " + 10 * dpr + "px Barlow, sans-serif";
+    for (const s of R.hist) {
+      const x1 = X(s.t0), x2 = X(s.t1 == null ? t : s.t1), y = Y(s.e);
+      ctx.fillStyle = s.i === 0 ? "rgba(39,196,255,.22)" : "rgba(255,93,77,.22)";
+      ctx.fillRect(x1, y, Math.max(dpr, x2 - x1), H - pad - y);
+      ctx.fillStyle = s.i === 0 ? "#27c4ff" : "#ff5d4d";
+      ctx.fillRect(x1, y - dpr, Math.max(dpr, x2 - x1), 2 * dpr);
+      if (x2 - x1 > 70 * dpr) { ctx.fillStyle = "rgba(236,238,242,.75)"; ctx.fillText(s.title.slice(0, 40), x1 + 4 * dpr, Math.max(11 * dpr, y - 4 * dpr)); }
+    }
+    // the room's loudness, as a faint line
+    if (R.loud.length > 1) {
+      ctx.strokeStyle = "rgba(236,238,242,.35)"; ctx.lineWidth = dpr; ctx.beginPath();
+      R.loud.forEach((p, k) => { const x = X(p.t), y = Y(1 + 9 * p.v); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.stroke();
+    }
+    // where the next pick would take it
+    const N = nextD(), sel = R.sel && rwCandidates().find((c2) => c2.ref === R.sel);
+    const e = R.queued && N.track ? N.track.energy : sel && sel.energy != null ? sel.energy : null;
+    if (e != null && R.t0) {
+      ctx.setLineDash([4 * dpr, 4 * dpr]); ctx.strokeStyle = "#ffc53d"; ctx.lineWidth = 2 * dpr;
+      ctx.beginPath(); ctx.moveTo(X(t), Y(e)); ctx.lineTo(Math.min(W, X(t + 180)), Y(e)); ctx.stroke(); ctx.setLineDash([]);
+    }
+    ctx.fillStyle = "#eceef2"; ctx.fillRect(X(t), 0, dpr, H);
+  }
+
+  // ---------- each frame ----------
+  function rwFrame() {
+    const L = liveD(), N = nextD();
+    if (R.queued && N.track && L.track) {
+      const B = rwBeat();
+      if (R.hold && !R.scheduled) R.target = rwDefaultTarget();
+      if (!R.scheduled && L.playing && A && !R.paused2) {
+        const secs = ((R.target - B) * L.beatLen) / L.rate;
+        if (secs < 0.5) rwSchedule();
+      }
+      const dropped = rwDropped();
+      if (dropped && R.auto && !R.drag) {
+        const g = R.shape === "cut" ? 1 : ramp(B - R.target, 0, R.bars * 4);
+        if (Math.abs(g - R.r) > 0.002) rwSetR(g);
+      }
+      $("#ribbon").style.setProperty("--g", (dropped ? (R.shape === "cut" ? 1 : ramp(B - R.target, 0, R.bars * 4)) : 0).toFixed(4));
+      if (dropped && R.r >= 0.995) rwComplete();
+      else if (dropped && !L.playing && L.pos >= L.track.dur - 0.15) { R.r = 1; rwComplete(); }
+    }
+    // the set's history: one step per track while it's the one playing
+    const key = L.playing && L.track ? L.track.ref + "@" + R.live : "";
+    const ts = performance.now() / 1000;
+    if (key !== R.histKey) {
+      if (key && !R.t0) R.t0 = ts;
+      const t = R.t0 ? ts - R.t0 : 0;
+      const open = R.hist[R.hist.length - 1];
+      if (open && open.t1 == null) open.t1 = t;
+      if (key) R.hist.push({ t0: t, t1: null, e: L.track.energy, title: L.track.title, i: R.live });
+      R.histKey = key;
+    }
+    if (R.t0 && A && ts - R.lastLoud > 0.5) {
+      R.lastLoud = ts;
+      const v = meter(A.mAnal, mdata);
+      const prev = R.loud.length ? R.loud[R.loud.length - 1].v : v;
+      R.loud.push({ t: ts - R.t0, v: prev * 0.7 + clamp(v, 0, 1) * 0.3 });
+      if (R.loud.length > 20000) R.loud.splice(0, 5000);
+    }
+    const cands = rwCandidates();
+    drawRunway($("#rwCanvas"));
+    drawMap($("#rwMap"), cands);
+    drawEnergy($("#rwEnergy"));
+    rwPanels(false);
+    rwPanelTick();
+    rwPicks(cands);
+    const hint = R.queued && rwDropped() ? SHAPES[R.shape].name + (R.shape !== "cut" ? ": centre line is the swap" : "") : "";
+    $("#ribHint").textContent = hint;
+    if (performance.now() > rwTipLock) {
+      const a = rwAdvice();
+      if (a !== R.tipText) { R.tipText = a; rwSay(a, "", 0); }
+    }
+  }
+
+  // ---------- switching modes ----------
+  // Take over whatever is on the decks: the one you're hearing becomes Now, the other is queued and holding.
+  function rwAdopt() {
+    const a = onAir();
+    R.live = a ? a.i : decks[0].track ? 0 : decks[1].track ? 1 : 0;
+    const L = liveD(), N = nextD();
+    if (N.playing) N.pause();
+    R.queued = !!(N.track && L.track);
+    R.scheduled = false; R.hold = true; R.r = 0;
+    if (R.queued) {
+      rwMatchTempo();
+      const fb = N.track.firstBeat;
+      R.inPos = fb + Math.max(0, Math.round((N.cue - fb) / N.beatLen)) * N.beatLen;
+      N.pos = R.inPos;
+      R.target = rwDefaultTarget();
+    }
+    rwApply();
+    rwPanels(true);
+  }
+  function setMode(mode) {
+    const run = mode === "runway";
+    store.set("mode", mode);
+    $("#modeClassic").setAttribute("aria-pressed", String(!run));
+    $("#modeRunway").setAttribute("aria-pressed", String(run));
+    $(".screen").hidden = run;
+    $("main.body").hidden = run;
+    $("#runway").hidden = !run;
+    $("#learn").hidden = run;
+    $("#quant").hidden = run;
+    if (run === R.on) return;
+    R.on = run;
+    if (run) {
+      decks.forEach((d) => { d.sync = false; d.bend = 0; if (d.loop) d.exitLoop(); });
+      rwAdopt();
+      R.tipText = "";
+    } else {
+      if (R.scheduled && !rwDropped()) rwUnschedule();
+      P.fxOn = false; P.fxTo = [false, false];
+      applyMixer(); applyFx();
+      ui.draws.forEach((f) => f());
+      decks.forEach((d) => ui.refreshDeck(d));
+    }
+    crateUI.queue();
+  }
 
   // =====================================================================
   // Screen drawing
@@ -2356,8 +3250,7 @@ button { font: inherit; color: inherit; }
       if (d.sync && d.other().track) d.followTempo();
       if (d.scr) d.scratchIdle();
       if (d.playing) d.pos = d.getPos();
-      drawWave(d, $("#wave" + (i + 1)));
-      drawOverview(d, $("#ov" + (i + 1)));
+      if (!R.on) { drawWave(d, $("#wave" + (i + 1))); drawOverview(d, $("#ov" + (i + 1))); }
       const E = ui.deckEls[i];
       const t = d.track;
       const pos = d.getPos();
@@ -2422,7 +3315,7 @@ button { font: inherit; color: inherit; }
       $("#tiptext").textContent = text;
     }
 
-    coach.tick(dt);
+    if (R.on) rwFrame(); else coach.tick(dt);
     crateUI.mark();
     requestAnimationFrame(frame);
   }
@@ -2433,6 +3326,12 @@ button { font: inherit; color: inherit; }
   const KEYS = { q: [0, "cue"], w: [0, "play"], e: [0, "sync"], a: [0, "nm"], s: [0, "np"], i: [1, "cue"], o: [1, "play"], p: [1, "sync"], k: [1, "nm"], l: [1, "np"] };
   document.addEventListener("keydown", (e) => {
     if (e.target.closest("input, select, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (R.on) {
+      // Runway: space plays or pauses Now, the arrows move the ribbon.
+      if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); rwPlayPause(); }
+      else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !e.target.closest("[role=slider]")) { e.preventDefault(); rwSetR(R.r + (e.key === "ArrowLeft" ? -0.04 : 0.04)); }
+      return;
+    }
     if (e.key === "ArrowLeft" && !e.target.closest("[role=slider]")) { P.xfade = clamp(P.xfade - 0.05, 0, 1); applyMixer(); ui.draws.forEach((f) => f()); return; }
     if (e.key === "ArrowRight" && !e.target.closest("[role=slider]")) { P.xfade = clamp(P.xfade + 0.05, 0, 1); applyMixer(); ui.draws.forEach((f) => f()); return; }
     const m = KEYS[e.key.toLowerCase()];
@@ -2444,6 +3343,7 @@ button { font: inherit; color: inherit; }
     if (m[1] === "nm" || m[1] === "np") { d.bend = m[1] === "nm" ? -0.04 : 0.04; d.applyRate(); coach.event("nudge" + d.i); }
   });
   document.addEventListener("keyup", (e) => {
+    if (R.on) return;
     const m = KEYS[e.key.toLowerCase()];
     if (!m) return;
     const d = decks[m[0]];
@@ -2485,6 +3385,10 @@ button { font: inherit; color: inherit; }
   crateUI.build();
   ui.fillSelects();
   crate.init();
+  rwBuildControls();
+  $("#modeClassic").addEventListener("click", () => setMode("classic"));
+  $("#modeRunway").addEventListener("click", () => setMode("runway"));
+  setMode(store.get("mode", "classic"));
   decks.forEach((d) => ui.refreshDeck(d));
   $("#t1").textContent = "Pressing Golden Hour…";
   $("#t2").textContent = "Pressing Night Bus…";
@@ -2492,6 +3396,7 @@ button { font: inherit; color: inherit; }
   (async () => {
     await loadDemo(decks[0], "golden");
     await loadDemo(decks[1], "nightbus");
+    if (R.on && !liveD().playing) rwAdopt();
     demoTrack("slowburn");
   })();
 })();
