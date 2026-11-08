@@ -44,7 +44,7 @@ Two things I'd call out:
 
 ---
 
-### Fooba — retail payments wallet · [fooba.co.za](https://fooba.co,za)
+### Fooba — retail payments wallet · [fooba.co.za](https://fooba.co.za)
 *CTO (part-time) · 2025 – present*
 
 Ledger and money-movement architecture for a South African retail wallet. Pilot live with Big Save, targeting university students in Pretoria; SASSA and NSFAS disbursement integrations in progress.
