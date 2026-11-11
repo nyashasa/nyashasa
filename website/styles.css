@@ -1766,29 +1766,23 @@ a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; 
   background: radial-gradient(closest-side, var(--glow), transparent);
   pointer-events: none;
 }
-/* Signature in the name font, written in from left to right */
-.signature {
+/* Stacked logo in Contact, wiped in from left to right as it arrives */
+.contact-logo {
+  display: block;
   align-self: start;
-  margin: 0;
-  color: var(--fg);
-  font-family: var(--font-name);
-  font-size: clamp(2.6rem, 1.2rem + 3.2vw, 4.4rem);
-  line-height: 1.05;
-  white-space: nowrap;
+  width: min(100%, 360px);
+  aspect-ratio: 341 / 201;
+  background: var(--fg);
+  -webkit-mask: url("assets/brand/logo-stacked.svg") left center / contain no-repeat;
+  mask: url("assets/brand/logo-stacked.svg") left center / contain no-repeat;
 }
-.signature span {
-  display: inline-block;
-  padding: 0.1em 0.2em 0.2em 0;
-  transform: rotate(-5deg);
-  transform-origin: 0 100%;
+.motion .contact-logo.is-in { animation: logo-wipe 1.4s 0.15s cubic-bezier(0.65, 0, 0.35, 1) both; }
+@keyframes logo-wipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
 }
-.motion .signature span {
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 1.8s 0.2s cubic-bezier(0.65, 0, 0.35, 1);
-}
-.motion .signature.is-in span { clip-path: inset(0 0 0 0); }
 @media (max-width: 860px) {
-  .signature { font-size: clamp(2.6rem, 1.6rem + 6vw, 3.6rem); margin-bottom: 8px; }
+  .contact-logo { width: min(100%, 240px); margin-bottom: 8px; }
 }
 
 .contact-lead {
@@ -1860,20 +1854,8 @@ a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; 
 
 /* Footer */
 .site-footer {
-  padding-block: clamp(48px, 7vw, 96px) calc(32px + env(safe-area-inset-bottom, 0px));
+  padding-block: 32px calc(32px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--line);
-}
-.footer-logo {
-  display: block;
-  width: min(100%, 520px);
-  aspect-ratio: 341 / 201;
-  margin-bottom: clamp(32px, 5vw, 64px);
-  background: var(--fg);
-  -webkit-mask: url("assets/brand/logo-stacked.svg") left center / contain no-repeat;
-  mask: url("assets/brand/logo-stacked.svg") left center / contain no-repeat;
-}
-@media (max-width: 560px) {
-  .footer-logo { width: min(100%, 300px); }
 }
 .footer-inner {
   display: flex;
