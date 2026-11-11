@@ -8,7 +8,6 @@ A single-page personal site: plain HTML, CSS and JavaScript, with no build step.
 | `styles.css` | Colour and type tokens at the top (light and dark), then the layout and motion |
 | `main.js` | Spring reveals and scroll-linked motion, counters, the Hello greeting, theme toggle, mobile menu, nav highlight, logo strip, portrait tilt, magnetic buttons and the copy-email button |
 | `vendor/motion-14.6.0.js` | [Motion](https://motion.dev) 14.6.0, MIT licence in `vendor/motion-LICENSE.md` |
-| `fonts/wine.woff2` | Nyasha's name font (Wine), subset to the letters of "Nyasha Samhembere" (9 KB) |
 | `favicon.svg` | Tab icon: the "N" from the logo on orange |
 | `assets/brand/` | Nyasha's logo: the one-line version in the header, the stacked version in Contact |
 | `assets/nyasha.jpg` | Portrait (400 × 400), stored here because LinkedIn image links expire |
@@ -32,7 +31,6 @@ The Community section is deliberately different from the rest: Hello, Zimbabwe a
 
 - Manrope for display and reading, JetBrains Mono for labels and data, Instrument Serif for the Hello panel.
 - The logo (`assets/brand/`) sets the name in the header and in Contact. It is drawn in the text colour through a CSS mask, so it follows the theme.
-- The name font, Wine (`fonts/wine.woff2`), is kept for later use but is not on the page now, so browsers do not download it. It is subset to those letters, so other text set in it would fall back to Manrope. To widen it, regenerate the file from the original OTF with fontTools: `pyftsubset Wine.otf --unicodes=U+20-7E --flavor=woff2 --output-file=fonts/wine.woff2`.
 
 ## Motion
 
@@ -41,7 +39,7 @@ Modelled on America.gov, which uses the same library:
 - Blocks rise in on a soft spring as they enter the viewport, staggered within groups.
 - Scroll-linked movement: the hero title drifts up and fades, the portrait recedes, the background glow moves at its own pace, product screens drift against the page, the About statement brightens word by word, the Hello panel opens out as it arrives and the contact glow swells at the end.
 - The Hello greeting cycles through "Mhoroi", "Salibonani" and "Hello" while the panel is on screen, and the stacked logo in Contact wipes in from left to right.
-- Smaller touches: counters, a scroll progress bar, the nav highlight, a back-to-top ring, a drawn underline, magnetic buttons and a circular theme switch.
+- Smaller touches: counters, a scroll progress bar, the nav highlight, a back-to-top ring, magnetic buttons and a circular theme switch.
 
 All of it switches off when the visitor's system asks for reduced motion. If Motion fails to load, the page falls back to plain CSS reveals; if `main.js` fails to start within three seconds, everything is shown anyway.
 
