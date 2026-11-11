@@ -8,6 +8,10 @@
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
   function motionOK() { return !reduceMotion.matches; }
 
+  /* Motion (vendor/motion-14.6.0.js) gives spring reveals and scroll-linked movement */
+  var M = window.Motion;
+  var useMotion = !!(M && M.animate && M.inView && M.scroll) && motionOK();
+
   /* Each feature runs on its own, so one failing cannot stop the rest */
   function safe(fn) {
     try { fn(); } catch (e) { if (window.console) console.error(e); }
@@ -22,40 +26,127 @@
   syncMotion();
   if (reduceMotion.addEventListener) reduceMotion.addEventListener("change", syncMotion);
 
-  /* Scroll reveal, with staggered children inside [data-stagger] */
+  /* Reveals: springs through Motion where available, CSS transitions otherwise */
   safe(function () {
     each("[data-stagger]", function (group) {
       var i = 0;
       Array.prototype.forEach.call(group.children, function (child) {
         if (child.hasAttribute("data-reveal")) {
+          child.setAttribute("data-delay", String(i * 0.08));
           child.style.setProperty("--d", (i * 90) + "ms");
           i++;
         }
       });
     });
 
-    var targets = document.querySelectorAll("[data-reveal]");
+    var targets = Array.prototype.slice.call(document.querySelectorAll("[data-reveal]"));
 
-    function reveal(el) {
+    function markIn(el) {
       el.classList.add("is-in");
       if (el.classList.contains("stat")) countUp(el);
     }
 
-    if ("IntersectionObserver" in window) {
+    if (useMotion) {
+      root.classList.add("m-ready");
+      targets.forEach(function (el) {
+        var done = false;
+        var stop = M.inView(el, function () {
+          if (done) return;
+          done = true;
+          if (stop) stop();
+          var delay = parseFloat(el.getAttribute("data-delay") || "0");
+          markIn(el);
+          M.animate(el, { opacity: [0, 1] }, { duration: 0.8, delay: delay, ease: [0.22, 1, 0.36, 1] });
+          if (!(el instanceof SVGElement)) {
+            M.animate(el, { y: [40, 0] }, { type: "spring", stiffness: 70, damping: 18, mass: 1, delay: delay });
+          }
+        }, { margin: "0px 0px -10% 0px", amount: 0.05 });
+      });
+    } else if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
-            reveal(entry.target);
+            markIn(entry.target);
             io.unobserve(entry.target);
           }
         });
       }, { rootMargin: "0px 0px -10% 0px", threshold: 0.01 });
-      Array.prototype.forEach.call(targets, function (el) { io.observe(el); });
+      targets.forEach(function (el) { io.observe(el); });
     } else {
-      Array.prototype.forEach.call(targets, reveal);
+      targets.forEach(markIn);
     }
     window.__revealReady = true;
   });
+
+  /* Scroll-linked movement, in the manner of America.gov: the hero recedes as you
+     leave it, product screens drift against the page, the statement brightens word
+     by word and the contact glow swells as the page ends. */
+  safe(function () {
+    if (!useMotion) return;
+    var hero = document.querySelector(".hero");
+    var heroOut = { target: hero, offset: ["start start", "end start"] };
+    var linear = { ease: "linear" };
+
+    var title = document.querySelector(".hero-title-wrap");
+    if (hero && title) M.scroll(M.animate(title, { y: [0, -80], opacity: [1, 0.1] }, linear), heroOut);
+    var portrait = document.querySelector(".portrait-move");
+    if (hero && portrait) M.scroll(M.animate(portrait, { y: [0, 90], scale: [1, 0.84] }, linear), heroOut);
+    var heroBg = document.querySelector(".hero-bg");
+    if (hero && heroBg) M.scroll(M.animate(heroBg, { y: [0, 240] }, linear), heroOut);
+
+    each("[data-parallax]", function (el) {
+      var box = el.closest(".case") || el;
+      M.scroll(M.animate(el, { y: [48, -48] }, linear), { target: box, offset: ["start end", "end start"] });
+    });
+
+    var glow = document.querySelector(".contact-glow");
+    var contact = document.getElementById("contact");
+    if (glow && contact) M.scroll(M.animate(glow, { scale: [0.6, 1.15], opacity: [0.3, 1] }, linear), { target: contact, offset: ["start end", "end end"] });
+
+    var statement = document.querySelector("[data-scrub]");
+    if (statement) {
+      var words = splitWords(statement);
+      var n = words.length;
+      var last = [];
+      M.scroll(function (progress) {
+        var t = progress * (n + 8);
+        for (var i = 0; i < n; i++) {
+          var o = Math.round((0.16 + 0.84 * Math.min(Math.max((t - i) / 8, 0), 1)) * 100) / 100;
+          if (last[i] !== o) {
+            words[i].style.opacity = String(o);
+            last[i] = o;
+          }
+        }
+      }, { target: statement, offset: ["start 0.92", "end 0.55"] });
+    }
+  });
+
+  /* Wrap each word of an element in a span, keeping inner elements such as .muted */
+  function splitWords(el) {
+    var out = [];
+    Array.prototype.slice.call(el.childNodes).forEach(function (node) {
+      if (node.nodeType === 3) {
+        var parts = node.textContent.split(/(\s+)/);
+        var frag = document.createDocumentFragment();
+        parts.forEach(function (part) {
+          if (!part) return;
+          if (/^\s+$/.test(part)) {
+            frag.appendChild(document.createTextNode(part));
+          } else {
+            var span = document.createElement("span");
+            span.className = "w";
+            span.textContent = part;
+            frag.appendChild(span);
+            out.push(span);
+          }
+        });
+        node.parentNode.replaceChild(frag, node);
+      } else if (node.nodeType === 1) {
+        out = out.concat(splitWords(node));
+      }
+    });
+    return out;
+  }
 
   /* Count the stats up from zero the first time they appear */
   function countUp(stat) {
@@ -212,11 +303,10 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(movePill);
   });
 
-  /* Scroll progress, header shadow, back-to-top button and a gentle hero parallax */
+  /* Scroll progress, header shadow and the back-to-top button */
   safe(function () {
     var header = document.querySelector(".site-header");
     var fab = document.querySelector(".fab-top");
-    var heroBg = document.querySelector(".hero-bg");
     var ticking = false;
 
     function update() {
@@ -233,9 +323,6 @@
           if (show) fab.removeAttribute("aria-hidden");
           else fab.setAttribute("aria-hidden", "true");
         }
-      }
-      if (heroBg && motionOK() && y < window.innerHeight * 1.5) {
-        heroBg.style.setProperty("--hero-shift", (y * 0.25).toFixed(1) + "px");
       }
     }
 
@@ -276,7 +363,7 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(setSpeed);
   });
 
-  /* Pointer effects: portrait tilt, spotlight glow and magnetic buttons */
+  /* Pointer effects: a gentle portrait tilt and magnetic buttons */
   safe(function () {
     if (!finePointer.matches || !motionOK()) return;
 
@@ -291,8 +378,8 @@
         cancelAnimationFrame(frame);
         frame = requestAnimationFrame(function () {
           portrait.classList.add("is-tilting");
-          card.style.setProperty("--rx", ((0.5 - py) * 12).toFixed(2) + "deg");
-          card.style.setProperty("--ry", ((px - 0.5) * 14).toFixed(2) + "deg");
+          card.style.setProperty("--rx", ((0.5 - py) * 10).toFixed(2) + "deg");
+          card.style.setProperty("--ry", ((px - 0.5) * 12).toFixed(2) + "deg");
           portrait.style.setProperty("--gx", (px * 100).toFixed(1) + "%");
           portrait.style.setProperty("--gy", (py * 100).toFixed(1) + "%");
         });
@@ -304,14 +391,6 @@
         card.style.setProperty("--ry", "0deg");
       });
     }
-
-    each("[data-spotlight]", function (el) {
-      el.addEventListener("pointermove", function (event) {
-        var r = el.getBoundingClientRect();
-        el.style.setProperty("--mx", (event.clientX - r.left).toFixed(0) + "px");
-        el.style.setProperty("--my", (event.clientY - r.top).toFixed(0) + "px");
-      });
-    });
 
     each("[data-magnetic]", function (el) {
       el.addEventListener("pointermove", function (event) {
