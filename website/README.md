@@ -9,7 +9,8 @@ A single-page personal site: plain HTML, CSS and JavaScript, with no build step.
 | `main.js` | Spring reveals and scroll-linked motion, counters, the Hello greeting, theme toggle, mobile menu, nav highlight, logo strip, portrait tilt, magnetic buttons and the copy-email button |
 | `vendor/motion-14.6.0.js` | [Motion](https://motion.dev) 14.6.0, MIT licence in `vendor/motion-LICENSE.md` |
 | `fonts/wine.woff2` | Nyasha's name font (Wine), subset to the letters of "Nyasha Samhembere" (9 KB) |
-| `favicon.svg` | Pixel "N" icon |
+| `favicon.svg` | Tab icon: the "N" from the logo on orange |
+| `assets/brand/` | Nyasha's logo: the one-line version in the header, the stacked version in the footer |
 | `assets/nyasha.jpg` | Portrait (400 × 400), stored here because LinkedIn image links expire |
 | `assets/logos/` | Employer and venture logos, cleaned of scripts and external links |
 | `assets/stack/` | Technology icons for the Stack section |
@@ -30,7 +31,8 @@ The Community section is deliberately different from the rest: Hello, Zimbabwe a
 ## Type
 
 - Manrope for display and reading, JetBrains Mono for labels and data, Instrument Serif for the Hello panel.
-- The name font, Wine, is used only for Nyasha's name: in the header and as the signature in Contact. It is subset to those letters, so other text set in it would fall back to Manrope. To widen it, regenerate the file from the original OTF with fontTools: `pyftsubset Wine.otf --unicodes=U+20-7E --flavor=woff2 --output-file=fonts/wine.woff2`.
+- The logo (`assets/brand/`) sets the name in the header and footer. It is drawn in the text colour through a CSS mask, so it follows the theme.
+- The name font, Wine, is used only for the signature in Contact. It is subset to those letters, so other text set in it would fall back to Manrope. To widen it, regenerate the file from the original OTF with fontTools: `pyftsubset Wine.otf --unicodes=U+20-7E --flavor=woff2 --output-file=fonts/wine.woff2`.
 
 ## Motion
 

@@ -16,7 +16,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
-<link rel="preload" href="fonts/wine.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/nyasha.jpg" as="image" fetchpriority="high">
 <link rel="stylesheet" href="styles.css">
 <script>
@@ -58,11 +57,7 @@
   <div class="wrap">
     <div class="bar">
       <a class="brand" href="#top" aria-label="Nyasha Samhembere, back to top">
-        <svg class="brand-mark" viewBox="0 0 9 9" width="22" height="22" aria-hidden="true" shape-rendering="crispEdges">
-          <rect class="mark-bg" width="9" height="9"/>
-          <path class="mark-fg" d="M1 1h1v7H1zM7 1h1v7H7zM2 2h1v1H2zM3 3h1v1H3zM4 4h1v1H4zM5 5h1v1H5zM6 6h1v1H6z"/>
-        </svg>
-        <span class="brand-name">Nyasha Samhembere</span>
+        <span class="brand-logo" aria-hidden="true"></span>
       </a>
 
       <nav class="nav" aria-label="Primary">
@@ -647,6 +642,9 @@
 </main>
 
 <footer class="site-footer">
+  <div class="wrap">
+    <span class="footer-logo" aria-hidden="true" data-reveal></span>
+  </div>
   <div class="wrap footer-inner">
     <p>© <span id="year">2026</span> Nyasha Samhembere</p>
     <p>Johannesburg, South Africa</p>
