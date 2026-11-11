@@ -15,7 +15,8 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="preload" href="fonts/wine.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/nyasha.jpg" as="image" fetchpriority="high">
 <link rel="stylesheet" href="styles.css">
 <script>
@@ -138,9 +139,7 @@
           </div>
           <figcaption class="portrait-tag"><span class="live-dot" aria-hidden="true"></span>Open to partnerships</figcaption>
         </figure>
-      </div>
 
-      <div class="hero-grid">
         <div class="hero-copy">
           <p class="lede">I'm <strong>Nyasha Samhembere</strong>, a founder and product leader. I've founded or co-founded three technology companies and serve as fractional CTO of a fourth, building them with partners such as Golden Arrow Bus Services and Big Save. Before that, I spent ten years in product design for brands including Toyota, FCB Health and MultiChoice, and advised 29 African startups on their business models.</p>
           <div class="hero-actions">
@@ -153,23 +152,6 @@
             <a class="btn btn-ghost" href="mailto:nyashasa@gmail.com">nyashasa@gmail.com</a>
           </div>
         </div>
-
-        <figure class="log" role="img" aria-label="Sample event stream from four ventures: device heartbeats, WiFi sign-ins, ledger entries and bookings">
-          <figcaption class="log-head">
-            <span class="log-lights" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span>ventures / live events</span>
-            <span class="log-note"><span class="log-dot" aria-hidden="true"></span>Sample data</span>
-          </figcaption>
-          <ol class="log-lines" id="log-lines">
-            <li class="log-line"><span class="log-time">09:41:02</span><span class="log-tag" data-p="noeva">NOEVA</span><span class="log-msg"><b>rut-0412</b> heartbeat · rssi −71 dBm · up 12d</span></li>
-            <li class="log-line"><span class="log-time">09:41:04</span><span class="log-tag" data-p="ubuntu">UBUNTU</span><span class="log-msg"><b>portal</b> sign-in · WhatsApp verified · consent ✓</span></li>
-            <li class="log-line"><span class="log-time">09:41:07</span><span class="log-tag" data-p="fooba">FOOBA</span><span class="log-msg"><b>ledger</b> txn 8f2c · debits 120.00 = credits 120.00</span></li>
-            <li class="log-line"><span class="log-time">09:41:09</span><span class="log-tag" data-p="noeva">NOEVA</span><span class="log-msg"><b>vault</b> PrDP · driver 2208 · expires in 14 days</span></li>
-            <li class="log-line"><span class="log-time">09:41:11</span><span class="log-tag" data-p="chef">CHEF</span><span class="log-msg"><b>booking</b> dinner for 6 · cook verified ✓</span></li>
-            <li class="log-line"><span class="log-time">09:41:14</span><span class="log-tag" data-p="ubuntu">UBUNTU</span><span class="log-msg"><b>ads</b> campaign 118 · route 7 · 1,204 impressions</span></li>
-            <li class="log-line"><span class="log-time">09:41:16</span><span class="log-tag" data-p="noeva">NOEVA</span><span class="log-msg"><b>ota</b> firmware 3.4.1 · 41/41 routers updated</span></li>
-          </ol>
-        </figure>
       </div>
 
       <div class="trust">
@@ -364,33 +346,40 @@
         </div>
       </div>
 
-      <article class="case case-community" aria-labelledby="hello-title" data-reveal>
-        <div class="case-meta">
-          <p class="case-kicker">Independent civic guide · Zimbabwe</p>
-          <h3 class="case-title" id="hello-title">Hello, Zimbabwe</h3>
-          <p class="case-role">Founder · community project</p>
-          <a class="case-link" href="https://hello.org.zw" target="_blank" rel="noopener">hello.org.zw ↗</a>
-        </div>
-        <div class="mini-wrap" data-parallax>
-          <div class="mini mini-hello" role="img" aria-label="Illustration of Hello, Zimbabwe: a greeting in Shona, Ndebele and English, a question box and the Customer Care Index">
-            <div class="mini-head"><span>hello.org.zw</span><span>Sample</span></div>
-            <p class="h-greet">Mhoroi · Salibonani · Hello</p>
-            <p class="h-tag">Good service starts with hello.</p>
-            <div class="p-input h-ask">How do I get a passport?</div>
-            <ul class="h-list">
-              <li><span>Ask a question</span><span aria-hidden="true">→</span></li>
-              <li><span>Find an office</span><span aria-hidden="true">→</span></li>
-              <li><span>Customer Care Index</span><span aria-hidden="true">→</span></li>
-            </ul>
+      <article class="hello" aria-labelledby="hello-title" data-hello>
+        <span class="hello-bg" aria-hidden="true">hello</span>
+        <div class="hello-top">
+          <div>
+            <p class="hello-kicker"><i aria-hidden="true"></i>Founder · independent civic guide</p>
+            <h3 class="hello-greeting" id="hello-title">
+              <span class="sr-only">Hello, Zimbabwe</span>
+              <span class="greet-line" aria-hidden="true"><span class="greet-word">Mhoroi,</span></span>
+              <span class="greet-line" aria-hidden="true">Zimbabwe.</span>
+            </h3>
+            <p class="hello-tag">Good service starts with hello.</p>
           </div>
+          <p class="hello-lead">An independent guide to Zimbabwe's government services. <span>It explains how each service works, what to bring and which office to visit, then sends people to the official office to apply and pay.</span></p>
         </div>
-        <div class="case-body">
-          <p class="case-lead">An independent guide to Zimbabwe's government services. <span class="muted">It explains how each service works, what to bring and which office to visit, then sends people to the official office to apply and pay.</span></p>
-          <ul class="case-points">
-            <li><strong>Plain-language guides.</strong> Nine topics, from IDs, passports and driving to business, tax, pensions and voting.</li>
-            <li><strong>Customer Care Index.</strong> Zimbabweans' own reviews of government offices and services, with an office directory.</li>
-            <li><strong>Built to protect people.</strong> It never asks for money or personal details, and warns users to check the web address before they pay.</li>
-          </ul>
+        <ul class="hello-features" data-stagger>
+          <li data-reveal>
+            <span class="hf-num">01</span>
+            <h4>Plain-language guides</h4>
+            <p>Nine topics, from IDs, passports and driving to business, tax, pensions and voting.</p>
+          </li>
+          <li data-reveal>
+            <span class="hf-num">02</span>
+            <h4>Customer Care Index</h4>
+            <p>Zimbabweans' own reviews of government offices and services, with an office directory.</p>
+          </li>
+          <li data-reveal>
+            <span class="hf-num">03</span>
+            <h4>Built to protect people</h4>
+            <p>It never asks for money or personal details, and warns people to check the web address before they pay.</p>
+          </li>
+        </ul>
+        <div class="hello-foot">
+          <a class="hello-btn" href="https://hello.org.zw" target="_blank" rel="noopener">Visit hello.org.zw <span aria-hidden="true">↗</span></a>
+          <p class="hello-role">Community project · run independently</p>
         </div>
       </article>
     </div>
@@ -628,16 +617,7 @@
         <h2 class="h2" id="contact-title" data-reveal>Let's build something together.</h2>
       </div>
       <div class="split">
-        <svg class="pixel-signal" viewBox="0 0 15 12" aria-hidden="true" shape-rendering="crispEdges" data-reveal>
-          <defs>
-            <pattern id="px-base" width="1" height="1" patternUnits="userSpaceOnUse"><rect class="px-base" width="0.82" height="0.82"/></pattern>
-            <pattern id="px-accent" width="1" height="1" patternUnits="userSpaceOnUse"><rect class="px-accent" width="0.82" height="0.82"/></pattern>
-          </defs>
-          <rect class="sig sig-1" x="0" y="9" width="3" height="3" fill="url(#px-base)"/>
-          <rect class="sig sig-2" x="4" y="6" width="3" height="6" fill="url(#px-base)"/>
-          <rect class="sig sig-3" x="8" y="3" width="3" height="9" fill="url(#px-base)"/>
-          <rect class="sig sig-4" x="12" y="0" width="3" height="12" fill="url(#px-accent)"/>
-        </svg>
+        <p class="signature" aria-hidden="true" data-reveal><span>Nyasha Samhembere</span></p>
         <div class="split-main" data-reveal>
           <p class="contact-lead">I'm open to partnerships, advisory and fractional CTO roles, and to conversations with operators and investors across South Africa and Zimbabwe.</p>
           <dl class="contact-list">

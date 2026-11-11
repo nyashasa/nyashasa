@@ -80,7 +80,8 @@
 
   /* Scroll-linked movement, in the manner of America.gov: the hero recedes as you
      leave it, product screens drift against the page, the statement brightens word
-     by word and the contact glow swells as the page ends. */
+     by word, the Hello panel opens out as it arrives and the contact glow swells as
+     the page ends. */
   safe(function () {
     if (!useMotion) return;
     var hero = document.querySelector(".hero");
@@ -98,6 +99,13 @@
       var box = el.closest(".case") || el;
       M.scroll(M.animate(el, { y: [48, -48] }, linear), { target: box, offset: ["start end", "end start"] });
     });
+
+    var hello = document.querySelector("[data-hello]");
+    if (hello) {
+      M.scroll(M.animate(hello, { scale: [0.88, 1], borderRadius: ["64px", "28px"] }, linear), { target: hello, offset: ["start end", "start 0.35"] });
+      var helloWord = hello.querySelector(".hello-bg");
+      if (helloWord) M.scroll(M.animate(helloWord, { x: [90, -90] }, linear), { target: hello, offset: ["start end", "end start"] });
+    }
 
     var glow = document.querySelector(".contact-glow");
     var contact = document.getElementById("contact");
@@ -444,68 +452,39 @@
     if (year) year.textContent = String(new Date().getFullYear());
   });
 
-  /* Sample event stream in the hero */
+  /* Hello, Zimbabwe: the greeting cycles through Shona, Ndebele and English while the
+     panel is on screen */
   safe(function () {
-    var list = document.getElementById("log-lines");
-    if (!list) return;
-    var MAX_LINES = 7;
-    var INTERVAL = 2300;
+    var panel = document.querySelector("[data-hello]");
+    var wordEl = panel && panel.querySelector(".greet-word");
+    if (!wordEl || !motionOK() || !("IntersectionObserver" in window)) return;
+    var words = ["Mhoroi,", "Salibonani,", "Hello,"];
+    var i = 0;
+    var timer = null;
 
-    var labels = { noeva: "NOEVA", ubuntu: "UBUNTU", fooba: "FOOBA", chef: "CHEF" };
-    var events = [
-      ["fooba", "split", "merchant 114.00 · platform 4.20 · gateway 1.80"],
-      ["noeva", "trk-2208", "codec 8E · 34 records · 0 dropped"],
-      ["ubuntu", "bus-1187", "63 passengers connected"],
-      ["noeva", "trk-0987", "back online · 212 buffered records synced"],
-      ["chef", "payout", "cook 31 · scheduled after the event"],
-      ["fooba", "recon", "GL batch · 0 breaks"],
-      ["noeva", "rut-0412", "heartbeat · rssi −71 dBm · up 12d"],
-      ["ubuntu", "portal", "sign-in · WhatsApp verified · consent ✓"],
-      ["fooba", "ledger", "txn 91ad · debits 64.50 = credits 64.50"],
-      ["noeva", "vault", "roadworthy · bus 1042 · renewed"],
-      ["ubuntu", "ads", "campaign 118 · route 7 · 1,204 impressions"],
-      ["chef", "booking", "lunch for 12 · cook verified ✓"]
-    ];
-
-    function pad(n) { return n < 10 ? "0" + n : String(n); }
-    function stamp(date) { return pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds()); }
-
-    function span(className, text) {
-      var el = document.createElement("span");
-      el.className = className;
-      el.textContent = text;
-      return el;
+    function swap() {
+      if (document.hidden) return;
+      i = (i + 1) % words.length;
+      if (!useMotion) {
+        wordEl.textContent = words[i];
+        return;
+      }
+      var h = wordEl.offsetHeight || 80;
+      M.animate(wordEl, { y: [0, -h], opacity: [1, 0] }, { duration: 0.32, ease: [0.4, 0, 1, 1] }).finished.then(function () {
+        wordEl.textContent = words[i];
+        M.animate(wordEl, { opacity: [0, 1] }, { duration: 0.4, ease: "easeOut" });
+        M.animate(wordEl, { y: [h, 0] }, { type: "spring", stiffness: 150, damping: 20 });
+      });
     }
 
-    function makeLine(product, entity, message, date) {
-      var li = document.createElement("li");
-      li.className = "log-line is-new";
-      li.appendChild(span("log-time", stamp(date)));
-      var tag = span("log-tag", labels[product]);
-      tag.setAttribute("data-p", product);
-      li.appendChild(tag);
-      var msg = span("log-msg", "");
-      var b = document.createElement("b");
-      b.textContent = entity;
-      msg.appendChild(b);
-      msg.appendChild(document.createTextNode(" " + message));
-      li.appendChild(msg);
-      return li;
-    }
-
-    var now = Date.now();
-    var existing = list.querySelectorAll(".log-time");
-    for (var i = 0; i < existing.length; i++) {
-      existing[i].textContent = stamp(new Date(now - (existing.length - 1 - i) * INTERVAL));
-    }
-
-    var next = 0;
-    setInterval(function () {
-      if (document.hidden || !motionOK()) return;
-      var e = events[next % events.length];
-      next++;
-      list.appendChild(makeLine(e[0], e[1], e[2], new Date()));
-      while (list.children.length > MAX_LINES) list.removeChild(list.firstElementChild);
-    }, INTERVAL);
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !timer) timer = setInterval(swap, 2600);
+        else if (!entry.isIntersecting && timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      });
+    }).observe(panel);
   });
 })();
