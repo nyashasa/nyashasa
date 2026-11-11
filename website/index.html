@@ -6,8 +6,8 @@
 <title>Nyasha Samhembere · Product engineer</title>
 <meta name="description" content="Product engineer and technical co-founder in Johannesburg. Fleet telematics, passenger WiFi, payments ledgers and marketplaces, designed, built and run end to end.">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#ECE8E3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#111112" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FCFBFA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0A0B" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Nyasha Samhembere · Product engineer">
 <meta property="og:description" content="Fleet telematics, passenger WiFi, payments ledgers and marketplaces, designed, built and run end to end.">
@@ -15,12 +15,19 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="preload" href="assets/nyasha.jpg" as="image" fetchpriority="high">
 <link rel="stylesheet" href="styles.css">
 <script>
   (function () {
     var root = document.documentElement;
     root.classList.add("js");
+    try {
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) root.classList.add("motion");
+    } catch (e) {}
+    setTimeout(function () {
+      if (!window.__revealReady) root.classList.add("reveal-fallback");
+    }, 3000);
     try {
       var saved = localStorage.getItem("theme");
       if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
@@ -34,6 +41,7 @@
     "name": "Nyasha Samhembere",
     "jobTitle": "Product engineer and technical co-founder",
     "email": "mailto:nyashasa@gmail.com",
+    "image": "assets/nyasha.jpg",
     "address": { "@type": "PostalAddress", "addressLocality": "Johannesburg", "addressCountry": "ZA" },
     "sameAs": ["https://linkedin.com/in/nyashasa", "https://github.com/nyashasa"]
   }
@@ -42,6 +50,7 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><span class="progress-bar"></span></div>
 
 <header class="site-header">
   <div class="wrap">
@@ -55,6 +64,7 @@
       </a>
 
       <nav class="nav" aria-label="Primary">
+        <span class="nav-pill" aria-hidden="true"></span>
         <ul class="nav-links" id="nav-links">
           <li><a href="#work">Work</a></li>
           <li><a href="#services">Services</a></li>
@@ -74,7 +84,7 @@
             <path d="M4 0h1v1H4zM1 1h1v1H1zM7 1h1v1H7zM3 2h3v1H3zM2 3h5v3H2zM0 4h1v1H0zM8 4h1v1H8zM3 6h3v1H3zM1 7h1v1H1zM7 7h1v1H7zM4 8h1v1H4z"/>
           </svg>
         </button>
-        <a class="btn btn-accent bar-cta" href="#contact">
+        <a class="btn btn-accent bar-cta" href="#contact" data-magnetic>
           <span>Get in touch</span>
           <span class="btn-icon" aria-hidden="true">
             <svg viewBox="0 0 7 7" width="14" height="14" shape-rendering="crispEdges" fill="currentColor"><path d="M3 0h1v1H3zM4 1h1v1H4zM5 2h1v1H5zM0 3h7v1H0zM5 4h1v1H5zM4 5h1v1H4zM3 6h1v1H3z"/></svg>
@@ -91,23 +101,47 @@
 <main id="main">
 
   <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true">
+      <span class="aurora aurora-a"></span>
+      <span class="aurora aurora-b"></span>
+      <span class="aurora aurora-c"></span>
+      <span class="dots"></span>
+    </div>
+
     <div class="wrap">
       <div class="hero-meta">
         <span>[ Product engineer · Technical co-founder ]</span>
         <span>[ Johannesburg · Open to remote and relocation ]</span>
       </div>
 
-      <h1 class="hero-title" id="hero-title">
-        <span class="line">Design the flow.</span>
-        <span class="line">Build the backend.</span>
-        <span class="line line-muted">Own it in production.</span>
-      </h1>
+      <div class="hero-top">
+        <div class="hero-title-wrap">
+          <h1 class="hero-title" id="hero-title">
+            <span class="line"><span class="line-inner">Design the flow.</span></span>
+            <span class="line"><span class="line-inner">Build the backend.</span></span>
+            <span class="line line-muted"><span class="line-inner">Own it in <span class="mark">production<svg class="scribble" viewBox="0 0 300 22" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M3 15C52 6 104 4 152 7C199 10 247 12 297 6"/></svg></span>.</span></span>
+          </h1>
+        </div>
+
+        <figure class="portrait" data-tilt>
+          <div class="portrait-card">
+            <span class="portrait-ring" aria-hidden="true"></span>
+            <div class="portrait-frame">
+              <img src="assets/nyasha.jpg" alt="Nyasha Samhembere" width="400" height="400" fetchpriority="high" decoding="async">
+              <span class="portrait-glare" aria-hidden="true"></span>
+            </div>
+            <span class="float-chip chip-a" aria-hidden="true"><b>12</b> yrs shipping</span>
+            <span class="float-chip chip-b" aria-hidden="true"><b>2,000+</b> devices live</span>
+          </div>
+          <figcaption class="portrait-tag"><span class="live-dot" aria-hidden="true"></span>Open to new work</figcaption>
+        </figure>
+      </div>
 
       <div class="hero-grid">
         <div class="hero-copy">
           <p class="lede">I'm <strong>Nyasha Samhembere</strong>, a product engineer and technical co-founder. I spent ten years as a product designer and web developer for Toyota, FCB Health New York, Old Mutual and MultiChoice. For the last two I've built and run production systems end to end: fleet telematics, passenger WiFi, a payments ledger and a marketplace.</p>
           <div class="hero-actions">
-            <a class="btn btn-accent" href="#work">
+            <a class="btn btn-accent" href="#work" data-magnetic>
               <span>See the work</span>
               <span class="btn-icon" aria-hidden="true">
                 <svg viewBox="0 0 7 7" width="14" height="14" shape-rendering="crispEdges" fill="currentColor"><path d="M3 0h1v1H3zM4 1h1v1H4zM5 2h1v1H5zM0 3h7v1H0zM5 4h1v1H5zM4 5h1v1H4zM3 6h1v1H3z"/></svg>
@@ -119,9 +153,9 @@
 
         <figure class="log" role="img" aria-label="Sample event stream from four products: device heartbeats, WiFi sign-ins, ledger entries and bookings">
           <figcaption class="log-head">
-            <span class="log-dot" aria-hidden="true"></span>
+            <span class="log-lights" aria-hidden="true"><i></i><i></i><i></i></span>
             <span>prod / event stream</span>
-            <span class="log-note">Sample data</span>
+            <span class="log-note"><span class="log-dot" aria-hidden="true"></span>Sample data</span>
           </figcaption>
           <ol class="log-lines" id="log-lines">
             <li class="log-line"><span class="log-time">09:41:02</span><span class="log-tag" data-p="noeva">NOEVA</span><span class="log-msg"><b>rut-0412</b> heartbeat · rssi −71 dBm · up 12d</span></li>
@@ -135,6 +169,20 @@
         </figure>
       </div>
 
+      <div class="trust">
+        <p class="trust-label">Ten years designing for</p>
+        <div class="marquee">
+          <ul class="marquee-track" aria-label="Companies I designed for">
+            <li class="brand-chip"><span class="logo-mark" aria-hidden="true" style="--logo: url(assets/logos/toyota.svg); --ratio: 1.54"></span><span class="brand-label">Toyota</span></li>
+            <li class="brand-chip"><span class="logo-mark" aria-hidden="true" style="--logo: url(assets/logos/fcb.png); --ratio: 2.3"></span><span class="brand-label">FCB Health</span></li>
+            <li class="brand-chip"><span class="logo-mark logo-tall" role="img" aria-label="MultiChoice" style="--logo: url(assets/logos/multichoice.svg); --ratio: 1.65"></span></li>
+            <li class="brand-chip"><span class="logo-mark" aria-hidden="true" style="--logo: url(assets/logos/old-mutual.svg); --ratio: 0.92"></span><span class="brand-label">Old Mutual</span></li>
+            <li class="brand-chip"><span class="logo-mark" aria-hidden="true" style="--logo: url(assets/logos/afreximbank.svg); --ratio: 0.95"></span><span class="brand-label">Afreximbank</span></li>
+            <li class="brand-chip"><span class="wordmark">hellocomputer</span></li>
+          </ul>
+        </div>
+      </div>
+
       <ul class="hero-links">
         <li><a href="https://linkedin.com/in/nyashasa" target="_blank" rel="noopener">LinkedIn ↗</a></li>
         <li><a href="https://github.com/nyashasa" target="_blank" rel="noopener">GitHub ↗</a></li>
@@ -145,15 +193,15 @@
 
   <section class="section" id="about" aria-labelledby="about-title">
     <div class="wrap split">
-      <p class="index" aria-hidden="true">01<span>/07</span></p>
+      <p class="index" aria-hidden="true" data-reveal>01<span>/07</span></p>
       <div class="split-main">
         <h2 class="sr-only" id="about-title">About</h2>
-        <p class="statement">Most of my work is commercial and lives in private repos, <span class="muted">so this site is a map of what I've built rather than a code dump. I'm happy to walk through any of it, or share code.</span></p>
-        <dl class="stats">
-          <div class="stat"><dt>Years shipping digital products</dt><dd>12</dd></div>
-          <div class="stat"><dt>Vehicles and devices under management at Noeva</dt><dd>2,000+</dd></div>
-          <div class="stat"><dt>Passengers on UbuntuNet's first three bus routes</dt><dd>12,000</dd></div>
-          <div class="stat"><dt>Ventures I've founded or led as CTO since 2025</dt><dd>4</dd></div>
+        <p class="statement" data-reveal>Most of my work is commercial and lives in private repos, <span class="muted">so this site is a map of what I've built rather than a code dump. I'm happy to walk through any of it, or share code.</span></p>
+        <dl class="stats" data-stagger>
+          <div class="stat" data-reveal><dt>Years shipping digital products</dt><dd><span class="sr-only">12</span><span class="count" aria-hidden="true" data-to="12">12</span></dd></div>
+          <div class="stat" data-reveal><dt>Vehicles and devices under management at Noeva</dt><dd><span class="sr-only">2,000+</span><span class="count" aria-hidden="true" data-to="2000" data-suffix="+">2,000+</span></dd></div>
+          <div class="stat" data-reveal><dt>Passengers on UbuntuNet's first three bus routes</dt><dd><span class="sr-only">12,000</span><span class="count" aria-hidden="true" data-to="12000">12,000</span></dd></div>
+          <div class="stat" data-reveal><dt>Ventures I've founded or led as CTO since 2025</dt><dd><span class="sr-only">4</span><span class="count" aria-hidden="true" data-to="4">4</span></dd></div>
         </dl>
       </div>
     </div>
@@ -162,13 +210,14 @@
   <section class="section" id="work" aria-labelledby="work-title">
     <div class="wrap">
       <div class="split section-head">
-        <p class="index" aria-hidden="true">02<span>/07</span></p>
-        <h2 class="h2" id="work-title">Selected work</h2>
+        <p class="index" aria-hidden="true" data-reveal>02<span>/07</span></p>
+        <h2 class="h2" id="work-title" data-reveal>Selected work</h2>
       </div>
 
       <div class="cases">
-        <article class="case" aria-labelledby="noeva-title">
+        <article class="case" aria-labelledby="noeva-title" data-reveal data-spotlight>
           <div class="case-meta">
+            <span class="case-logo logo-mark" aria-hidden="true" style="--logo: url(assets/logos/noeva.svg); --ratio: 3.58"></span>
             <p class="case-kicker">Fleet compliance SaaS</p>
             <h3 class="case-title" id="noeva-title">Noeva</h3>
             <p class="case-role">Founder &amp; technical architect · <span class="nowrap">2025–present</span></p>
@@ -198,8 +247,9 @@
           </div>
         </article>
 
-        <article class="case" aria-labelledby="ubuntunet-title">
+        <article class="case" aria-labelledby="ubuntunet-title" data-reveal data-spotlight>
           <div class="case-meta">
+            <span class="case-logo logo-mark" aria-hidden="true" style="--logo: url(assets/logos/ubuntunet.svg); --ratio: 2.25"></span>
             <p class="case-kicker">Passenger WiFi and advertising network</p>
             <h3 class="case-title" id="ubuntunet-title">UbuntuNet</h3>
             <p class="case-role">Co-founder &amp; CTO · <span class="nowrap">2025–present</span></p>
@@ -230,8 +280,9 @@
           </div>
         </article>
 
-        <article class="case" aria-labelledby="fooba-title">
+        <article class="case" aria-labelledby="fooba-title" data-reveal data-spotlight>
           <div class="case-meta">
+            <span class="case-logo logo-mark logo-square" aria-hidden="true" style="--logo: url(assets/logos/fooba.svg); --ratio: 0.79"></span>
             <p class="case-kicker">Retail payments wallet</p>
             <h3 class="case-title" id="fooba-title">Fooba</h3>
             <p class="case-role">CTO (part-time) · <span class="nowrap">2025–present</span></p>
@@ -261,8 +312,9 @@
           </div>
         </article>
 
-        <article class="case" aria-labelledby="easychef-title">
+        <article class="case" aria-labelledby="easychef-title" data-reveal data-spotlight>
           <div class="case-meta">
+            <span class="case-logo wordmark" aria-hidden="true">easy chef</span>
             <p class="case-kicker">In-home chef marketplace</p>
             <h3 class="case-title" id="easychef-title">Easy Chef</h3>
             <p class="case-role">Co-founder &amp; CTO · <span class="nowrap">2025–present</span></p>
@@ -298,12 +350,12 @@
   <section class="section" id="services" aria-labelledby="services-title">
     <div class="wrap">
       <div class="split section-head">
-        <p class="index" aria-hidden="true">03<span>/07</span></p>
-        <h2 class="h2" id="services-title">What I do</h2>
+        <p class="index" aria-hidden="true" data-reveal>03<span>/07</span></p>
+        <h2 class="h2" id="services-title" data-reveal>What I do</h2>
       </div>
 
       <ul class="services">
-        <li class="service">
+        <li class="service" data-reveal>
           <div class="service-head">
             <p class="service-label">[ Design ]</p>
             <h3 class="service-title">Product design</h3>
@@ -311,7 +363,7 @@
           <p class="service-desc">Service design, research and prototyping, <span class="muted">carried through to a design system the code actually uses.</span></p>
           <ul class="service-tags"><li>Service design</li><li>Usability research</li><li>Prototyping</li><li>Design systems</li><li>WCAG accessibility</li><li>Design-to-dev handoff</li></ul>
         </li>
-        <li class="service">
+        <li class="service" data-reveal>
           <div class="service-head">
             <p class="service-label">[ Build ]</p>
             <h3 class="service-title">Full-stack engineering</h3>
@@ -319,7 +371,7 @@
           <p class="service-desc">TypeScript from the database to the phone: <span class="muted">schemas, APIs, event pipelines, and the web and mobile apps on top.</span></p>
           <ul class="service-tags"><li>TypeScript</li><li>Node.js</li><li>PostgreSQL</li><li>Event-driven</li><li>React</li><li>React Native</li></ul>
         </li>
-        <li class="service">
+        <li class="service" data-reveal>
           <div class="service-head">
             <p class="service-label">[ Devices ]</p>
             <h3 class="service-title">IoT and telemetry</h3>
@@ -327,7 +379,7 @@
           <p class="service-desc">Device fleets that are always moving and often offline: <span class="muted">ingestion, remote control, OTA firmware and alerting.</span></p>
           <ul class="service-tags"><li>MQTT</li><li>OTA firmware</li><li>JSON-RPC / UCI</li><li>Codec 8 / 8E / 12</li><li>TimescaleDB</li><li>Fleet management</li></ul>
         </li>
-        <li class="service">
+        <li class="service" data-reveal>
           <div class="service-head">
             <p class="service-label">[ Money ]</p>
             <h3 class="service-title">Fintech and ledgers</h3>
@@ -335,7 +387,7 @@
           <p class="service-desc">Money movement an auditor can follow: <span class="muted">double-entry ledgers, multi-party splits, bank rails and reconciliation.</span></p>
           <ul class="service-tags"><li>Double-entry ledgers</li><li>Multi-party splits</li><li>Payment gateways</li><li>Bank rails</li><li>GL reconciliation</li><li>Audit controls</li></ul>
         </li>
-        <li class="service">
+        <li class="service" data-reveal>
           <div class="service-head">
             <p class="service-label">[ Lead ]</p>
             <h3 class="service-title">Technical co&#8209;founder</h3>
@@ -350,61 +402,63 @@
   <section class="section" id="process" aria-labelledby="process-title">
     <div class="wrap">
       <div class="split section-head">
-        <p class="index" aria-hidden="true">04<span>/07</span></p>
-        <h2 class="h2" id="process-title">How I work</h2>
+        <p class="index" aria-hidden="true" data-reveal>04<span>/07</span></p>
+        <h2 class="h2" id="process-title" data-reveal>How I work</h2>
       </div>
-      <ol class="steps">
-        <li class="step">
-          <span class="step-num">Step 01</span>
-          <h3>Design the flow</h3>
-          <p>Service design, research and prototypes with the people who will use the product, before any production code.</p>
-        </li>
-        <li class="step">
-          <span class="step-num">Step 02</span>
-          <h3>Build the backend</h3>
-          <p>Schemas, ledgers and invariants come first. TypeScript and PostgreSQL, event-driven where the data moves.</p>
-        </li>
-        <li class="step">
-          <span class="step-num">Step 03</span>
-          <h3>Ship the app</h3>
-          <p>I ship daily with Claude Code and Cursor. Every component and migration is reviewed against the design system, accessibility rules and data model before it merges.</p>
-        </li>
-        <li class="step">
-          <span class="step-num">Step 04</span>
-          <h3>Own it in production</h3>
-          <p>Monitoring, alerts, OTA rollouts and incident response. I stay responsible for what I ship.</p>
-        </li>
-      </ol>
+      <div class="steps-wrap">
+        <ol class="steps" data-stagger>
+          <li class="step" data-reveal>
+            <span class="step-num">Step 01</span>
+            <h3>Design the flow</h3>
+            <p>Service design, research and prototypes with the people who will use the product, before any production code.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num">Step 02</span>
+            <h3>Build the backend</h3>
+            <p>Schemas, ledgers and invariants come first. TypeScript and PostgreSQL, event-driven where the data moves.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num">Step 03</span>
+            <h3>Ship the app</h3>
+            <p>I ship daily with Claude Code and Cursor. Every component and migration is reviewed against the design system, accessibility rules and data model before it merges.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num">Step 04</span>
+            <h3>Own it in production</h3>
+            <p>Monitoring, alerts, OTA rollouts and incident response. I stay responsible for what I ship.</p>
+          </li>
+        </ol>
+      </div>
     </div>
   </section>
 
   <section class="section" id="stack" aria-labelledby="stack-title">
     <div class="wrap split">
-      <p class="index" aria-hidden="true">05<span>/07</span></p>
+      <p class="index" aria-hidden="true" data-reveal>05<span>/07</span></p>
       <div class="split-main">
-        <h2 class="h2" id="stack-title">Stack</h2>
-        <div class="stack-grid">
-          <div class="stack-group">
+        <h2 class="h2" id="stack-title" data-reveal>Stack</h2>
+        <div class="stack-grid" data-stagger>
+          <div class="stack-group" data-reveal>
             <h3>Languages</h3>
             <ul><li>TypeScript</li><li>JavaScript</li><li>Python</li><li>Java</li><li>Dart</li></ul>
           </div>
-          <div class="stack-group">
+          <div class="stack-group" data-reveal>
             <h3>Backend and data</h3>
             <ul><li>Node.js</li><li>REST</li><li>Pub-sub</li><li>PostgreSQL</li><li>TimescaleDB</li><li>Reconciliation pipelines</li></ul>
           </div>
-          <div class="stack-group">
+          <div class="stack-group" data-reveal>
             <h3>Frontend and mobile</h3>
             <ul><li>React</li><li>React Native</li><li>Angular</li><li>Design systems</li><li>Accessible UI</li></ul>
           </div>
-          <div class="stack-group">
+          <div class="stack-group" data-reveal>
             <h3>IoT and telemetry</h3>
             <ul><li>MQTT</li><li>OTA firmware</li><li>JSON-RPC / UCI</li><li>Codec 8 / 8E / 12</li><li>Real-time ingestion</li></ul>
           </div>
-          <div class="stack-group">
+          <div class="stack-group" data-reveal>
             <h3>Fintech</h3>
             <ul><li>Double-entry ledgers</li><li>Multi-party splits</li><li>Bank rails</li><li>GL reconciliation</li><li>Audit controls</li></ul>
           </div>
-          <div class="stack-group">
+          <div class="stack-group" data-reveal>
             <h3>Cloud and DevOps</h3>
             <ul><li>AWS</li><li>GCP</li><li>Azure</li><li>Docker</li><li>Linux</li><li>Vercel</li><li>Supabase</li></ul>
           </div>
@@ -415,40 +469,65 @@
 
   <section class="section" id="experience" aria-labelledby="experience-title">
     <div class="wrap split">
-      <p class="index" aria-hidden="true">06<span>/07</span></p>
+      <p class="index" aria-hidden="true" data-reveal>06<span>/07</span></p>
       <div class="split-main">
-        <h2 class="h2" id="experience-title">Before this</h2>
-        <p class="exp-intro">Ten years of UX and front-end work as a senior product designer. It's why I design the product before I build it.</p>
-        <ul class="clients">
-          <li>Toyota South Africa <span>KINTO</span></li>
-          <li>FCB Health <span>New York</span></li>
-          <li>MultiChoice <span>Africa Accelerator</span></li>
-          <li>Old Mutual <span>Financial services</span></li>
-          <li>Afreximbank <span>Trade finance</span></li>
-          <li>Hellocomputer <span>Digital agency</span></li>
+        <h2 class="h2" id="experience-title" data-reveal>Before this</h2>
+        <p class="exp-intro" data-reveal>Ten years of UX and front-end work as a senior product designer. It's why I design the product before I build it.</p>
+        <ul class="logo-grid" data-stagger>
+          <li class="logo-tile" data-reveal>
+            <span class="tile-logo logo-mark" aria-hidden="true" style="--logo: url(assets/logos/toyota.svg); --ratio: 1.54"></span>
+            <span class="tile-name">Toyota South Africa</span>
+            <span class="tile-meta">KINTO</span>
+          </li>
+          <li class="logo-tile" data-reveal>
+            <span class="tile-logo logo-mark" aria-hidden="true" style="--logo: url(assets/logos/fcb.png); --ratio: 2.3"></span>
+            <span class="tile-name">FCB Health</span>
+            <span class="tile-meta">New York</span>
+          </li>
+          <li class="logo-tile" data-reveal>
+            <span class="tile-logo logo-mark" aria-hidden="true" style="--logo: url(assets/logos/multichoice.svg); --ratio: 1.65"></span>
+            <span class="tile-name">MultiChoice</span>
+            <span class="tile-meta">Africa Accelerator</span>
+          </li>
+          <li class="logo-tile" data-reveal>
+            <span class="tile-logo logo-mark" aria-hidden="true" style="--logo: url(assets/logos/old-mutual.svg); --ratio: 0.92"></span>
+            <span class="tile-name">Old Mutual</span>
+            <span class="tile-meta">Financial services</span>
+          </li>
+          <li class="logo-tile" data-reveal>
+            <span class="tile-logo logo-mark" aria-hidden="true" style="--logo: url(assets/logos/afreximbank.svg); --ratio: 0.95"></span>
+            <span class="tile-name">Afreximbank</span>
+            <span class="tile-meta">Trade finance</span>
+          </li>
+          <li class="logo-tile" data-reveal>
+            <span class="tile-logo wordmark" aria-hidden="true">hellocomputer</span>
+            <span class="tile-name">Hellocomputer</span>
+            <span class="tile-meta">Digital agency</span>
+          </li>
         </ul>
       </div>
     </div>
   </section>
 
   <section class="section contact" id="contact" aria-labelledby="contact-title">
+    <div class="contact-glow" aria-hidden="true"></div>
     <div class="wrap">
       <div class="split section-head">
-        <p class="index" aria-hidden="true">07<span>/07</span></p>
-        <h2 class="h2" id="contact-title">Tell me what you're building.</h2>
+        <p class="index" aria-hidden="true" data-reveal>07<span>/07</span></p>
+        <h2 class="h2" id="contact-title" data-reveal>Tell me what you're building.</h2>
       </div>
       <div class="split">
-        <svg class="pixel-signal" viewBox="0 0 15 12" aria-hidden="true" shape-rendering="crispEdges">
+        <svg class="pixel-signal" viewBox="0 0 15 12" aria-hidden="true" shape-rendering="crispEdges" data-reveal>
           <defs>
             <pattern id="px-base" width="1" height="1" patternUnits="userSpaceOnUse"><rect class="px-base" width="0.82" height="0.82"/></pattern>
             <pattern id="px-accent" width="1" height="1" patternUnits="userSpaceOnUse"><rect class="px-accent" width="0.82" height="0.82"/></pattern>
           </defs>
-          <rect x="0" y="9" width="3" height="3" fill="url(#px-base)"/>
-          <rect x="4" y="6" width="3" height="6" fill="url(#px-base)"/>
-          <rect x="8" y="3" width="3" height="9" fill="url(#px-base)"/>
-          <rect x="12" y="0" width="3" height="12" fill="url(#px-accent)"/>
+          <rect class="sig sig-1" x="0" y="9" width="3" height="3" fill="url(#px-base)"/>
+          <rect class="sig sig-2" x="4" y="6" width="3" height="6" fill="url(#px-base)"/>
+          <rect class="sig sig-3" x="8" y="3" width="3" height="9" fill="url(#px-base)"/>
+          <rect class="sig sig-4" x="12" y="0" width="3" height="12" fill="url(#px-accent)"/>
         </svg>
-        <div class="split-main">
+        <div class="split-main" data-reveal>
           <p class="contact-lead">Open to product engineering roles, technical co-founder partnerships and part-time CTO work. Based in Johannesburg, open to remote and relocation.</p>
           <dl class="contact-list">
             <div>
@@ -463,7 +542,7 @@
             <div><dt>LinkedIn</dt><dd><a href="https://linkedin.com/in/nyashasa" target="_blank" rel="noopener">linkedin.com/in/nyashasa</a></dd></div>
             <div><dt>GitHub</dt><dd><a href="https://github.com/nyashasa" target="_blank" rel="noopener">github.com/nyashasa</a></dd></div>
           </dl>
-          <a class="btn btn-accent" href="mailto:nyashasa@gmail.com?subject=Project%20enquiry">
+          <a class="btn btn-accent btn-lg" href="mailto:nyashasa@gmail.com?subject=Project%20enquiry" data-magnetic>
             <span>Email me</span>
             <span class="btn-icon" aria-hidden="true">
               <svg viewBox="0 0 7 7" width="14" height="14" shape-rendering="crispEdges" fill="currentColor"><path d="M3 0h1v1H3zM4 1h1v1H4zM5 2h1v1H5zM0 3h7v1H0zM5 4h1v1H5zM4 5h1v1H4zM3 6h1v1H3z"/></svg>
@@ -483,5 +562,10 @@
     <a class="to-top" href="#top">Back to top ↑</a>
   </div>
 </footer>
+
+<a class="fab-top" href="#top" aria-label="Back to top" tabindex="-1" aria-hidden="true">
+  <svg class="fab-ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="fab-track" cx="24" cy="24" r="21"/><circle class="fab-fill" cx="24" cy="24" r="21" pathLength="100"/></svg>
+  <svg class="fab-arrow" viewBox="0 0 7 7" width="14" height="14" aria-hidden="true" shape-rendering="crispEdges" fill="currentColor"><path d="M3 0h1v7H3zM2 1h1v1H2zM4 1h1v1H4zM1 2h1v1H1zM5 2h1v1H5zM0 3h1v1H0zM6 3h1v1H6z"/></svg>
+</a>
 </body>
 </html>
